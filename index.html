@@ -748,15 +748,19 @@ function showApp() {
 
 async function loadApiKeyStatus() {
   try {
-    const { data } = await sb.from('app_config').select('config_value').eq('config_key', 'gemini_api_key').single();
+    const { data, error } = await sb.from('app_config').select('config_value').eq('config_key', 'gemini_api_key').single();
+    if (error) { console.error('loadApiKeyStatus error:', error); return; }
     if (data && data.config_value && data.config_value !== 'your_api_key_here') {
+      console.log('API key loaded, starts with:', data.config_value.slice(0, 8) + '...');
       document.getElementById('api-key-input').value = '••••••••••••';
-      document.getElementById('api-status').textContent = 'Key saved in database ✦';
+      document.getElementById('api-status').textContent = 'Key loaded from database ✦ (' + data.config_value.slice(0, 6) + '...)';
       document.getElementById('api-status').className = 'api-status-text ok';
       document.getElementById('change-key-btn').style.display = 'inline-block';
       document.getElementById('remove-key-btn').style.display = 'inline-block';
+    } else {
+      console.log('No API key in app_config (value:', data?.config_value?.slice(0,10), ')');
     }
-  } catch (e) {}
+  } catch (e) { console.error('loadApiKeyStatus exception:', e); }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1225,9 +1229,14 @@ function openDetail(id) {
 // ═══════════════════════════════════════════════════════════════════
 async function getApiKey() {
   try {
-    const { data } = await sb.from('app_config').select('config_value').eq('config_key', 'gemini_api_key').single();
-    if (data && data.config_value && data.config_value !== 'your_api_key_here') return data.config_value;
-  } catch (e) {}
+    const { data, error } = await sb.from('app_config').select('config_value').eq('config_key', 'gemini_api_key').single();
+    if (error) { console.error('getApiKey DB error:', error); return null; }
+    if (data && data.config_value && data.config_value !== 'your_api_key_here') {
+      console.log('Using API key starting with:', data.config_value.slice(0, 8) + '...');
+      return data.config_value;
+    }
+  } catch (e) { console.error('getApiKey exception:', e); }
+  console.warn('No valid API key found in app_config');
   return null;
 }
 
@@ -1623,25 +1632,46 @@ async function saveApiKey() {
   if (!k || k.startsWith('••')) { document.getElementById('api-status').textContent = '⚠ Please paste your API key first'; document.getElementById('api-status').style.color = 'var(--rust)'; return; }
   const btn = document.getElementById('save-key-btn');
   btn.textContent = 'Saving...'; btn.disabled = true;
-  try {
-    // Upsert: update if exists, insert if not
-    const { data: existing } = await sb.from('app_config').select('id').eq('config_key', 'gemini_api_key').single();
-    if (existing) {
-      await sb.from('app_config').update({ config_value: k }).eq('config_key', 'gemini_api_key');
-    } else {
-      await sb.from('app_config').insert([{ config_key: 'gemini_api_key', config_value: k }]);
+
+  // Try update first, then insert
+  const { error: updateErr, count } = await sb
+    .from('app_config')
+    .update({ config_value: k })
+    .eq('config_key', 'gemini_api_key');
+
+  if (updateErr) {
+    console.error('API key update failed:', updateErr);
+    // Try insert instead
+    const { error: insertErr } = await sb
+      .from('app_config')
+      .insert([{ config_key: 'gemini_api_key', config_value: k }]);
+    if (insertErr) {
+      console.error('API key insert also failed:', insertErr);
+      document.getElementById('api-status').textContent = '⚠ DB write failed: ' + (insertErr.message || 'Check RLS policies');
+      document.getElementById('api-status').style.color = 'var(--rust)';
+      btn.disabled = false; btn.textContent = 'Save key';
+      return;
     }
-    inp.value = '••••••••••••••••••••';
-    btn.textContent = '✓ Saved!'; btn.style.background = 'var(--forest2)';
-    document.getElementById('api-status').textContent = 'Key saved in database ✦';
-    document.getElementById('api-status').className = 'api-status-text ok';
-    document.getElementById('change-key-btn').style.display = 'inline-block';
-    document.getElementById('remove-key-btn').style.display = 'inline-block';
-    showToast('API key saved to database ✓');
-  } catch (e) {
-    document.getElementById('api-status').textContent = '⚠ Save failed: ' + e.message;
-    document.getElementById('api-status').style.color = 'var(--rust)';
   }
+
+  // Verify the key was actually saved by reading it back
+  const { data: verify } = await sb.from('app_config').select('config_value').eq('config_key', 'gemini_api_key').single();
+  if (!verify || verify.config_value !== k) {
+    console.error('Key verification failed. Saved:', k.slice(0,8) + '...', 'Read back:', verify?.config_value?.slice(0,8) + '...');
+    document.getElementById('api-status').textContent = '⚠ Key saved but verification failed. Check Supabase RLS policies.';
+    document.getElementById('api-status').style.color = 'var(--rust)';
+    btn.disabled = false; btn.textContent = 'Save key';
+    return;
+  }
+
+  console.log('API key saved and verified. Starts with:', k.slice(0,8) + '...');
+  inp.value = '••••••••••••••••••••';
+  btn.textContent = '✓ Saved!'; btn.style.background = 'var(--forest2)';
+  document.getElementById('api-status').textContent = 'Key saved and verified ✦';
+  document.getElementById('api-status').className = 'api-status-text ok';
+  document.getElementById('change-key-btn').style.display = 'inline-block';
+  document.getElementById('remove-key-btn').style.display = 'inline-block';
+  showToast('API key saved ✓');
   btn.disabled = false;
   setTimeout(() => { btn.textContent = 'Save key'; btn.style.background = ''; }, 2000);
 }
