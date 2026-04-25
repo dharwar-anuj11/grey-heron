@@ -1,873 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>🐦 Grey Heron — Bird Pokédex</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Josefin+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    :root {
-      --p:#0f1a0f;
-      --p2:#121f12;
-      --p3:#1a2e1a;
-      --ink:#e8f5e8;
-      --ink2:#b8d4b8;
-      --ink3:#7a9d7a;
-      --forest3:#2d7a35;
-      --amber:#ffc947;
-      --amber2:#ffb81c;
-      --rust:#cc4444;
-      --bd:#2a3a2a;
-      --bd2:#1f2f1f;
-    }
-    html, body { font-family:'Josefin Sans', sans-serif; background:var(--p); color:var(--ink); width:100%; height:100%; overflow:hidden; }
-    #login-container { display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:radial-gradient(circle at center, var(--p3) 0%, var(--p) 100%); }
-    .login-box { width:100%; max-width:320px; padding:40px 30px; text-align:center; background:rgba(18,31,18,0.8); border-radius:12px; border:1px solid var(--forest3); backdrop-filter:blur(10px); }
-    .login-box h1 { font-family:'Cormorant Garamond'; font-size:36px; color:var(--amber2); margin-bottom:8px; font-weight:700; }
-    .login-box p { font-size:12px; color:var(--ink3); margin-bottom:24px; }
-    .login-box input { width:100%; padding:12px 14px; margin-bottom:10px; border:1px solid var(--bd); border-radius:6px; background:var(--p2); color:var(--ink); font-family:'Josefin Sans'; font-size:14px; }
-    .login-box input::placeholder { color:var(--ink3); }
-    .login-box input:focus { outline:none; border-color:var(--forest3); box-shadow:0 0 8px rgba(45,122,53,0.3); }
-    .login-box button { width:100%; padding:11px; margin:6px 0; border:none; border-radius:6px; font-family:'Josefin Sans'; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
-    .login-btn-signin { background:var(--forest3); color:#fff; }
-    .login-btn-signin:hover { background:#1f5a25; box-shadow:0 4px 12px rgba(45,122,53,0.4); }
-    .login-btn-signup { background:transparent; color:var(--forest3); border:1.5px solid var(--forest3); }
-    .login-btn-signup:hover { background:rgba(45,122,53,0.1); }
-    .login-box .error { color:var(--rust); font-size:11px; margin-top:10px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grey Heron v2</title>
 
-    #app { display:none; flex-direction:column; width:100%; height:100%; background:var(--p); }
-    .app-header { background:linear-gradient(135deg, var(--p3) 0%, var(--p2) 100%); padding:16px; border-bottom:1px solid var(--bd); display:flex; align-items:center; justify-content:space-between; }
-    .app-header h1 { font-family:'Cormorant Garamond'; font-size:22px; color:var(--amber2); font-weight:700; }
-    .sync-status { font-size:10px; color:var(--ink3); display:flex; align-items:center; gap:4px; }
-    .sync-status.online { color:var(--forest3); }
-    .sync-status.offline { color:var(--amber); }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .app-tabs { flex:1; display:flex; overflow:hidden; }
-    .tab-content { flex:1; overflow-y:auto; overflow-x:hidden; display:none; padding:16px; }
-    .tab-content.active { display:block; }
-    .tab-content::-webkit-scrollbar { width:6px; }
-    .tab-content::-webkit-scrollbar-track { background:var(--p2); }
-    .tab-content::-webkit-scrollbar-thumb { background:var(--bd); border-radius:3px; }
+<style>
+:root {
+  --bg: #0f172a;
+  --card: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.1);
+  --accent: #4ade80;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+}
 
-    .bottom-nav { display:flex; background:var(--p2); border-top:1px solid var(--bd); }
-    .nav-btn { flex:1; padding:12px; text-align:center; cursor:pointer; border:none; background:none; color:var(--ink3); font-size:12px; font-family:'Josefin Sans'; font-weight:600; transition:all 0.2s; border-radius:0; }
-    .nav-btn.active { color:var(--amber2); background:rgba(255,200,71,0.1); }
-    .nav-btn span { display:block; font-size:18px; margin-bottom:4px; }
+* { box-sizing: border-box; }
 
-    .pokedex-section { margin-bottom:24px; }
-    .section-title { display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond'; font-size:18px; font-weight:700; color:var(--amber2); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--bd); }
-    .bird-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; }
-    .bird-card { background:var(--p2); border:1px solid var(--bd); border-radius:8px; padding:12px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden; }
-    .bird-card:hover { border-color:var(--forest3); background:var(--p3); }
-    .bird-card.captured { background:rgba(45,122,53,0.15); border-color:var(--forest3); }
-    .bird-image { width:100%; height:80px; background:var(--p3); border-radius:6px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; font-size:32px; overflow:hidden; position:relative; }
-    .bird-image img { width:100%; height:100%; object-fit:cover; }
-    .bird-image svg { width:60px; height:60px; opacity:0.6; }
-    .bird-overlay { position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:24px; border-radius:6px; }
-    .bird-name { font-size:11px; font-weight:600; color:var(--ink); margin-bottom:4px; }
-    .bird-species { font-size:9px; color:var(--ink3); margin-bottom:6px; }
-    .bird-tags { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
-    .bird-tag { font-size:8px; padding:3px 6px; border-radius:3px; background:var(--p3); color:var(--ink3); border:0.5px solid var(--bd); }
+body {
+  margin:0;
+  font-family: Inter, sans-serif;
+  background: radial-gradient(circle at top, #1e293b, #020617);
+  color: var(--text);
+}
 
-    .detail-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto; }
-    .detail-modal.show { display:flex; align-items:flex-end; }
-    .detail-card { background:var(--p); width:100%; border-radius:16px 16px 0 0; padding:20px; animation:slideUp 0.3s ease; }
-    @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-    .detail-hero { width:100%; height:200px; background:var(--p3); border-radius:8px; margin-bottom:16px; display:flex; align-items:center; justify-content:center; font-size:80px; overflow:hidden; cursor:pointer; position:relative; }
-    .detail-hero img { width:100%; height:100%; object-fit:cover; }
-    .detail-close { position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.6); border:none; color:#fff; font-size:24px; width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .detail-title { font-family:'Cormorant Garamond'; font-size:28px; font-weight:700; color:var(--amber2); margin-bottom:4px; }
-    .detail-subtitle { color:var(--ink3); font-size:13px; margin-bottom:16px; }
-    .detail-meta { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-    .detail-meta-item { background:var(--p2); padding:10px; border-radius:6px; border-left:3px solid var(--forest3); }
-    .detail-meta-label { font-size:10px; color:var(--ink3); text-transform:uppercase; letter-spacing:0.5px; }
-    .detail-meta-val { font-size:13px; color:var(--ink); font-weight:600; margin-top:4px; }
-    .profile-card { background:var(--p2); border:1px solid var(--bd); border-radius:8px; padding:12px; margin-bottom:10px; }
-    .profile-card-icon { font-size:16px; margin-right:8px; }
-    .profile-card-label { font-size:10px; color:var(--ink3); text-transform:uppercase; letter-spacing:0.5px; }
-    .profile-card-val { font-size:12px; color:var(--ink); margin-top:4px; line-height:1.5; }
-    .facts-list { margin-top:12px; padding-top:12px; border-top:1px solid var(--bd); }
-    .facts-list li { font-size:12px; color:var(--ink2); margin-bottom:8px; margin-left:20px; }
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 24px;
+}
 
-    .form-group { margin-bottom:12px; }
-    .form-label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink3); display:block; margin-bottom:4px; font-weight:600; }
-    .form-input, .form-select, .form-textarea { width:100%; padding:10px; border:1px solid var(--bd); border-radius:6px; background:var(--p2); color:var(--ink); font-family:'Josefin Sans'; font-size:13px; }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { outline:none; border-color:var(--forest3); box-shadow:0 0 8px rgba(45,122,53,0.2); }
-    .form-textarea { resize:vertical; min-height:80px; }
-    .btn { padding:11px 20px; border:none; border-radius:6px; font-family:'Josefin Sans'; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
-    .btn-primary { background:var(--forest3); color:#fff; }
-    .btn-primary:hover { background:#1f5a25; }
-    .btn-secondary { background:transparent; color:var(--forest3); border:1.5px solid var(--forest3); }
-    .btn-secondary:hover { background:rgba(45,122,53,0.1); }
-    .btn-danger { background:var(--rust); color:#fff; }
-    .btn-danger:hover { background:#bb3333; }
-    .btn-group { display:flex; gap:8px; }
+/* CARD */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+}
 
-    .toast { position:fixed; bottom:20px; left:20px; right:20px; max-width:300px; padding:12px 16px; border-radius:6px; font-size:12px; z-index:2000; animation:slideIn 0.3s ease; }
-    @keyframes slideIn { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
-    .toast.success { background:rgba(45,122,53,0.9); color:#fff; }
-    .toast.error { background:rgba(204,68,68,0.9); color:#fff; }
-    .toast.info { background:rgba(45,122,53,0.7); color:var(--ink); }
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: white;
+}
 
-    .loading { display:inline-block; width:12px; height:12px; border:2px solid var(--forest3); border-top-color:transparent; border-radius:50%; animation:spin 0.6s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
+/* BUTTON */
+button {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  color: black;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer;
+}
 
-    .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:1001; }
-    .lightbox.show { display:flex; align-items:center; justify-content:center; }
-    .lightbox img { max-width:90%; max-height:90%; border-radius:8px; }
-    .lightbox-close { position:absolute; top:16px; right:16px; background:none; border:none; color:#fff; font-size:32px; cursor:pointer; }
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+  gap: 16px;
+}
 
-    .journal-list { list-style:none; }
-    .journal-item { background:var(--p2); border:1px solid var(--bd); border-radius:8px; padding:12px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; }
-    .journal-item:hover { border-color:var(--forest3); }
-    .journal-item-date { font-size:10px; color:var(--ink3); }
-    .journal-item-name { font-size:14px; font-weight:600; color:var(--amber2); margin:4px 0; }
-    .journal-item-location { font-size:11px; color:var(--ink2); }
+/* BIRD CARD */
+.bird {
+  transition: 0.2s;
+}
+.bird:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
 
-    .settings-section { margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--bd); }
-    .settings-label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink3); font-weight:700; margin-bottom:8px; }
-    .settings-value { font-size:12px; color:var(--ink); }
+.small {
+  font-size: 12px;
+  color: var(--muted);
+}
 
-    .map-container { width:100%; height:500px; background:var(--p2); border-radius:8px; border:1px solid var(--bd); margin-bottom:16px; }
-    #map { width:100%; height:100%; }
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
 
-    .hidden { display:none !important; }
-  </style>
+.hidden { display:none; }
+
+.search {
+  margin-bottom: 20px;
+}
+
+/* IMAGE PREVIEW */
+.preview {
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:10px;
+  margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login-container">
-  <div class="login-box">
-    <div style="font-size:64px; margin-bottom:16px; line-height:1;">
-      🐦
-    </div>
-    <h1 style="margin-bottom:8px;">Grey Heron</h1>
-    <p>Track Indian birds you've spotted</p>
-    <input type="email" id="login-email" placeholder="Email address">
-    <input type="password" id="login-password" placeholder="Password">
-    <button class="login-btn-signin" onclick="handleSignIn()">Sign In</button>
-    <button class="login-btn-signup" onclick="handleSignUp()">Create Account</button>
-    <div id="login-error" class="error"></div>
+<div class="container">
+
+<!-- LOGIN -->
+<div id="login">
+  <h1>🐦 Grey Heron</h1>
+  <div class="card">
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="signIn()">Sign In</button>
+    <button onclick="signUp()">Sign Up</button>
+    <div id="error" class="small"></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
-  <div class="app-header">
-    <h1>Grey Heron</h1>
-    <div class="sync-status offline" id="sync-status">
-      <span>●</span> <span id="sync-text">Offline</span>
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <div class="header">
+    <h2>My Birds</h2>
+    <div>
+      <span id="user"></span>
+      <button onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <div class="app-tabs">
-    <!-- POKÉDEX TAB -->
-    <div id="tab-pokedex" class="tab-content active">
-      <div id="pokedex-container"></div>
-    </div>
-
-    <!-- JOURNAL TAB -->
-    <div id="tab-journal" class="tab-content">
-      <div style="margin-bottom:16px;">
-        <input type="text" id="search-birds" placeholder="Search by name or date..." class="form-input" style="width:100%;">
-      </div>
-      <ul id="journal-list" class="journal-list"></ul>
-    </div>
-
-    <!-- MAP TAB -->
-    <div id="tab-map" class="tab-content">
-      <div class="map-container">
-        <div id="map" style="background:var(--p3); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--ink3);">
-          Maps coming soon — sightings will show on map
-        </div>
-      </div>
-    </div>
-
-    <!-- SETTINGS TAB -->
-    <div id="tab-settings" class="tab-content">
-      <div class="settings-section">
-        <div class="settings-label">Account</div>
-        <div class="settings-value" id="user-email"></div>
-        <button class="btn btn-secondary" onclick="handleSignOut()" style="margin-top:10px;">Sign Out</button>
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-label">Sightings</div>
-        <div id="storage-usage" class="settings-value" style="margin-bottom:10px;"></div>
-        <button class="btn btn-secondary" onclick="exportData()">Export Sightings</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="margin-top:8px;">Import Sightings</button>
-        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
-      </div>
-
-      <div class="settings-section">
-        <div class="settings-label">About</div>
-        <div class="settings-value">Grey Heron — Your birding Pokédex</div>
-      </div>
-    </div>
+  <!-- ADD -->
+  <div class="card">
+    <h3>Add Bird</h3>
+    <input id="name" placeholder="Bird name">
+    <input id="species" placeholder="Species">
+    <input id="location" placeholder="Location">
+    <input id="lat" placeholder="Latitude">
+    <input id="lng" placeholder="Longitude">
+    <input type="file" id="image" onchange="previewImage()">
+    <img id="img-preview" class="preview hidden"/>
+    <button onclick="save()">Save Bird</button>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
-  <div class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('pokedex')"><span>📖</span> Pokédex</button>
-    <button class="nav-btn" onclick="switchTab('journal')"><span>📝</span> Journal</button>
-    <button class="nav-btn" onclick="switchTab('map')"><span>🗺️</span> Map</button>
-    <button class="nav-btn" onclick="switchTab('settings')"><span>⚙️</span> Settings</button>
-    <button class="nav-btn" onclick="showNewBirdForm()" style="background:rgba(255,200,71,0.2); color:var(--amber2);"><span>➕</span> Add</button>
-  </div>
+  <!-- SEARCH -->
+  <input class="search" id="search" placeholder="Search birds..." oninput="render()">
+
+  <!-- LIST -->
+  <div id="list" class="grid"></div>
+
 </div>
 
-<!-- DETAIL MODAL -->
-<div id="detail-modal" class="detail-modal">
-  <div class="detail-card">
-    <div id="detail-content"></div>
-  </div>
-</div>
-
-<!-- IMAGE LIGHTBOX -->
-<div id="lightbox" class="lightbox">
-  <button class="lightbox-close" onclick="closeLightbox()">×</button>
-  <img id="lightbox-img" src="" alt="Bird photo">
-</div>
-
-<!-- FLOATING FORM (NEW BIRD) -->
-<div id="form-overlay" class="detail-modal">
-  <div class="detail-card" style="max-height:90vh; overflow-y:auto;">
-    <button class="detail-close" onclick="closeForm()">×</button>
-    
-    <h2 style="font-family:'Cormorant Garamond'; font-size:24px; color:var(--amber2); margin-bottom:16px;">🐦 Log a Bird Sighting</h2>
-
-    <div id="photo-preview-img" style="width:100%; height:120px; background:var(--p3); border-radius:8px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px dashed var(--bd);" onclick="document.getElementById('photo-file').click();">
-      <div id="photo-placeholder" style="text-align:center; color:var(--ink3);">
-        <div style="font-size:32px; margin-bottom:4px;">📷</div>
-        <div style="font-size:11px;">Tap to upload photo</div>
-      </div>
-    </div>
-    <input type="file" id="photo-file" accept="image/*" onchange="handlePhoto(event)" style="display:none;">
-
-    <div id="gps-bar" style="background:var(--p2); padding:8px 12px; border-radius:6px; margin-bottom:12px; font-size:10px; color:var(--ink3); display:none;">
-      GPS: <span id="gps-coords"></span>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Bird Name *</label>
-      <input type="text" id="f-name" class="form-input" placeholder="Search master list or type custom..." list="master-list">
-      <datalist id="master-list"></datalist>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Scientific Name</label>
-      <input type="text" id="f-species" class="form-input" placeholder="Auto-filled">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Bird Type</label>
-      <select id="f-type" class="form-select">
-        <option value="Unknown">Unknown</option>
-        <option value="Raptor">Raptor</option>
-        <option value="Waterbird">Waterbird</option>
-        <option value="Songbird">Songbird</option>
-        <option value="Wader">Wader</option>
-        <option value="Seabird">Seabird</option>
-        <option value="Pigeon">Pigeon/Dove</option>
-        <option value="Woodpecker">Woodpecker/Barbet</option>
-        <option value="Owl">Owl</option>
-        <option value="Parrot">Parrot/Parakeet</option>
-        <option value="Game">Game bird</option>
-        <option value="Bee-eater">Bee-eater</option>
-        <option value="Kingfisher">Kingfisher</option>
-        <option value="Roller">Roller/Hoopoe</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Size</label>
-      <select id="f-size" class="form-select">
-        <option value="Small">Small (sparrow-sized)</option>
-        <option value="Medium" selected>Medium (dove-sized)</option>
-        <option value="Large">Large (eagle-sized)</option>
-        <option value="Very Large">Very Large (heron-sized)</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Date Spotted</label>
-      <input type="date" id="f-date" class="form-input">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Location Name</label>
-      <input type="text" id="f-location" class="form-input" placeholder="e.g., Sakleshpur forest">
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-      <div class="form-group">
-        <label class="form-label">Latitude</label>
-        <input type="number" id="f-lat" class="form-input" placeholder="0.0000" step="0.0001">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Longitude</label>
-        <input type="number" id="f-lng" class="form-input" placeholder="0.0000" step="0.0001">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <button class="btn btn-secondary" style="width:100%;" onclick="getGPSLocation()">📍 Use Current Location</button>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Field Notes</label>
-      <textarea id="f-notes" class="form-textarea" placeholder="Plumage, call, behaviour..."></textarea>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn btn-primary" style="flex:1;" id="save-btn" onclick="saveBird()">Save Sighting</button>
-      <button class="btn btn-secondary" style="flex:1;" onclick="closeForm()">Cancel</button>
-    </div>
-  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-// SUPABASE INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
+const sb = supabase.createClient(
+  "https://wkcdrxbokzxrvdihfoio.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrY2RyeGJva3p4cnZkaWhmb2lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDI5MDQsImV4cCI6MjA5MjY3ODkwNH0.JiJrTjdwRvpffXRFQRjU68haCecKd4qjoaMLiH1fMY0"
+);
 
-// IMPORTANT: Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://wkcdrxbokzxrvdihfoio.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrY2RyeGJva3p4cnZkaWhmb2lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDI5MDQsImV4cCI6MjA5MjY3ODkwNH0.JiJrTjdwRvpffXRFQRjU68haCecKd4qjoaMLiH1fMY0';
-
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let currentUser = null;
+let user = null;
 let birds = [];
-let masterBirds = [];
-let currentPhotoBase64 = null;
-let isOnline = navigator.onLine;
+let imageData = null;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AUTHENTICATION
-// ═══════════════════════════════════════════════════════════════════════════
-
-async function initAuth() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (user) {
-    currentUser = user;
+/* AUTH */
+async function init() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    user = data.session.user;
     showApp();
-    loadAllData();
-  } else {
-    showLogin();
+    load();
   }
 }
 
-async function handleSignUp() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  
-  if (!email || !password) {
-    showLoginError('Please enter email and password');
-    return;
-  }
-
-  const { data, error } = await sb.auth.signUp({ email, password });
-  
-  if (error) {
-    showLoginError('Signup failed: ' + error.message);
-  } else {
-    showLoginError('Check your email to confirm signup!', false);
-  }
+async function signUp() {
+  const { error } = await sb.auth.signUp({
+    email: v('email'),
+    password: v('password')
+  });
+  showError(error ? error.message : "Check email");
 }
 
-async function handleSignIn() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-  
-  if (!email || !password) {
-    showLoginError('Please enter email and password');
-    return;
-  }
-
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  
-  if (error) {
-    showLoginError('Login failed: ' + error.message);
-  } else {
-    currentUser = data.user;
-    showApp();
-    loadAllData();
-  }
+async function signIn() {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: v('email'),
+    password: v('password')
+  });
+  if (error) return showError(error.message);
+  user = data.user;
+  showApp();
+  load();
 }
 
-async function handleSignOut() {
+async function logout() {
   await sb.auth.signOut();
-  currentUser = null;
-  birds = [];
-  masterBirds = [];
-  showLogin();
+  location.reload();
 }
 
-function showLoginError(msg, isError = true) {
-  const el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.style.color = isError ? 'var(--rust)' : 'var(--forest3)';
-}
-
-function showLogin() {
-  document.getElementById('login-container').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-}
-
+/* UI */
 function showApp() {
-  document.getElementById('login-container').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('user-email').textContent = currentUser.email;
+  q('login').classList.add('hidden');
+  q('app').classList.remove('hidden');
+  q('user').innerText = user.email;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DATA SYNC
-// ═══════════════════════════════════════════════════════════════════════════
-
-async function loadAllData() {
-  updateSyncStatus(isOnline ? 'online' : 'offline');
-
-  // Load master birds
-  const { data: masters } = await sb.from('master_birds').select('*');
-  if (masters) {
-    masterBirds = masters;
-    populateMasterList();
-  }
-
-  // Load user's bird sightings
-  if (isOnline && currentUser) {
-    const { data: sightings, error } = await sb
-      .from('bird_sightings')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('created_at', { ascending: false });
-    
-    if (!error && sightings) {
-      birds = sightings;
-      saveToCache('birds', birds);
-    } else {
-      birds = await getFromCache('birds') || [];
-    }
-  } else {
-    birds = await getFromCache('birds') || [];
-  }
-
-  renderPokedex();
-  updateStorageUsage();
-  showToast('Data loaded ✓', 'success');
+function showError(e) {
+  q('error').innerText = e;
 }
 
-async function saveBird() {
-  if (!currentUser) {
-    showToast('Not logged in', 'error');
-    return;
-  }
+/* DATA */
+async function load() {
+  const { data } = await sb.from('bird_sightings')
+    .select('*')
+    .eq('user_id', user.id);
 
-  const name = document.getElementById('f-name').value.trim();
-  const species = document.getElementById('f-species').value.trim();
-  const type = document.getElementById('f-type').value;
-  const size = document.getElementById('f-size').value;
-  const location = document.getElementById('f-location').value.trim();
-  const lat = parseFloat(document.getElementById('f-lat').value) || null;
-  const lng = parseFloat(document.getElementById('f-lng').value) || null;
-  const date = document.getElementById('f-date').value;
-  const notes = document.getElementById('f-notes').value.trim();
+  birds = data || [];
+  render();
+}
 
-  if (!name) {
-    showToast('Bird name is required', 'error');
-    return;
-  }
+async function save() {
+  const lat = parseFloat(v('lat'));
+  const lng = parseFloat(v('lng'));
 
   const bird = {
-    user_id: currentUser.id,
-    bird_name: name,
-    species: species,
-    bird_type: type,
-    size: size,
-    location: location,
-    location_lat: lat,
-    location_lng: lng,
-    date_spotted: date,
-    notes: notes,
-    photo_base64: currentPhotoBase64,
-    facts: null,
-    profile: null,
+    user_id: user.id,
+    bird_name: v('name'),
+    species: v('species'),
+    location: v('location'),
+    image: imageData,
+    location_lat: (!isNaN(lat) && !isNaN(lng)) ? lat : null,
+    location_lng: (!isNaN(lat) && !isNaN(lng)) ? lng : null
   };
 
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading"></span> Saving...';
-
-  const { data, error } = await sb.from('bird_sightings').insert([bird]);
-
-  if (error) {
-    showToast('Save failed: ' + error.message, 'error');
-    btn.disabled = false;
-    btn.innerHTML = 'Save Sighting';
-  } else {
-    birds.unshift(data[0]);
-    saveToCache('birds', birds);
-    showToast('✓ Sighting saved!', 'success');
-    closeForm();
-    renderPokedex();
-    btn.disabled = false;
-    btn.innerHTML = 'Save Sighting';
-  }
+  const { data } = await sb.from('bird_sightings').insert([bird]);
+  birds.unshift(data[0]);
+  render();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// UI RENDERING
-// ═══════════════════════════════════════════════════════════════════════════
+/* RENDER */
+function render() {
+  const s = v('search').toLowerCase();
 
-function renderPokedex() {
-  const container = document.getElementById('pokedex-container');
-  container.innerHTML = '';
+  const filtered = birds.filter(b =>
+    (b.bird_name || '').toLowerCase().includes(s) ||
+    (b.species || '').toLowerCase().includes(s)
+  );
 
-  const types = ['Raptor', 'Waterbird', 'Songbird', 'Wader', 'Seabird', 'Pigeon', 'Woodpecker', 'Owl', 'Parrot', 'Game', 'Bee-eater', 'Kingfisher', 'Roller'];
-  const typeEmoji = {Raptor:'🐦',Waterbird:'🐦',Songbird:'🐦',Wader:'🐦',Seabird:'🌊',Pigeon:'🕊️',Woodpecker:'🪵',Owl:'🦉',Parrot:'🦜',Game:'🐓','Bee-eater':'🐦',Kingfisher:'🐦',Roller:'🐦'};
-
-  types.forEach(type => {
-    const typeBirds = masterBirds.filter(b => b.type === type);
-    if (typeBirds.length === 0) return;
-
-    const section = document.createElement('div');
-    section.className = 'pokedex-section';
-    section.innerHTML = `<div class="section-title">${typeEmoji[type]||'🐦'} ${type}</div>`;
-
-    const grid = document.createElement('div');
-    grid.className = 'bird-grid';
-
-    typeBirds.forEach(master => {
-      const captured = birds.some(b => b.bird_name.toLowerCase() === master.name.toLowerCase());
-      const card = document.createElement('div');
-      card.className = 'bird-card' + (captured ? ' captured' : '');
-      
-      let imageHtml = '';
-      if (captured) {
-        const userBird = birds.find(b => b.bird_name.toLowerCase() === master.name.toLowerCase());
-        if (userBird && userBird.photo_base64) {
-          imageHtml = `<img src="${userBird.photo_base64}" alt="${master.name}">`;
-        }
-      }
-
-      card.innerHTML = `
-        <div class="bird-image" onclick="showBirdDetail('${master.name}', ${captured})">
-          ${imageHtml || (masterBirds.find(b=>b.name===master.name)?.silhouette || '🐦')}
-          ${!captured ? '<div class="bird-overlay">?</div>' : ''}
-        </div>
-        <div class="bird-name">${master.name}</div>
-        <div class="bird-species">${master.species||''}</div>
-        <div class="bird-tags">
-          <span class="bird-tag">${master.size||'?'}</span>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    container.appendChild(section);
-  });
-}
-
-function showBirdDetail(birdName, isCaptured) {
-  const modal = document.getElementById('detail-modal');
-  const content = document.getElementById('detail-content');
-  
-  const master = masterBirds.find(b => b.name === birdName);
-  const userBird = birds.find(b => b.bird_name === birdName);
-
-  let html = '<button class="detail-close" onclick="closeDetail()">×</button>';
-
-  if (userBird && userBird.photo_base64) {
-    html += `<div class="detail-hero" onclick="openLightbox('${userBird.photo_base64}')"><img src="${userBird.photo_base64}" alt="${birdName}"></div>`;
-  } else if (!isCaptured) {
-    html += `<div class="detail-hero">?</div>`;
-  }
-
-  html += `
-    <div class="detail-title">${birdName}</div>
-    <div class="detail-subtitle">${master?.species||''}</div>
-    <div class="detail-meta">
-      <div class="detail-meta-item"><div class="detail-meta-label">Date</div><div class="detail-meta-val">${userBird?.date_spotted||'—'}</div></div>
-      <div class="detail-meta-item"><div class="detail-meta-label">Location</div><div class="detail-meta-val">${userBird?.location||'—'}</div></div>
-      <div class="detail-meta-item"><div class="detail-meta-label">Size</div><div class="detail-meta-val">${userBird?.size||master?.size||'—'}</div></div>
-      <div class="detail-meta-item"><div class="detail-meta-label">Type</div><div class="detail-meta-val">${userBird?.bird_type||master?.type||'—'}</div></div>
+  q('list').innerHTML = filtered.map(b => `
+    <div class="card bird">
+      ${b.image ? `<img src="${b.image}" class="preview">` : ''}
+      <h3>${b.bird_name || 'Unknown'}</h3>
+      <div class="small">${b.species || ''}</div>
+      <div class="small">📍 ${b.location || 'Unknown'}</div>
     </div>
-  `;
-
-  if (userBird?.notes) {
-    html += `<div class="profile-card"><div class="profile-card-label">Notes</div><div class="profile-card-val">${userBird.notes}</div></div>`;
-  }
-
-  if (isCaptured) {
-    html += `
-      <div class="btn-group" style="margin-top:16px;">
-        <button class="btn btn-secondary" style="flex:1;" onclick="editBird('${birdName}')">Edit</button>
-        <button class="btn btn-danger" style="flex:1;" onclick="deleteBird('${birdName}')">Delete</button>
-      </div>
-    `;
-  } else {
-    html += `
-      <div style="margin-top:16px; padding:16px; background:rgba(45,122,53,0.1); border-radius:8px; text-align:center;">
-        <p style="color:var(--ink3); font-size:12px; margin-bottom:10px;">Haven't spotted this bird yet?</p>
-        <button class="btn btn-primary" onclick="logSighting('${birdName}', '${master?.species||''}', '${master?.type||'Unknown'}', '${master?.size||'Medium'}')" style="width:100%;">I Spotted This! 🎉</button>
-      </div>
-    `;
-  }
-
-  content.innerHTML = html;
-  modal.classList.add('show');
+  `).join('');
 }
 
-function logSighting(name, species, type, size) {
-  closeDetail();
-  showNewBirdForm();
-  document.getElementById('f-name').value = name;
-  document.getElementById('f-species').value = species;
-  document.getElementById('f-type').value = type;
-  document.getElementById('f-size').value = size;
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-}
-
-function closeDetail() {
-  document.getElementById('detail-modal').classList.remove('show');
-}
-
-function openLightbox(src) {
-  document.getElementById('lightbox').classList.add('show');
-  document.getElementById('lightbox-img').src = src;
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('show');
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-}
-
-function showNewBirdForm() {
-  currentPhotoBase64 = null;
-  document.getElementById('form-overlay').classList.add('show');
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-species').value = '';
-  document.getElementById('f-type').value = 'Unknown';
-  document.getElementById('f-size').value = 'Medium';
-  document.getElementById('f-location').value = '';
-  document.getElementById('f-lat').value = '';
-  document.getElementById('f-lng').value = '';
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('f-notes').value = '';
-  document.getElementById('photo-preview-img').style.display = 'none';
-  document.getElementById('photo-placeholder').style.display = 'flex';
-}
-
-function closeForm() {
-  document.getElementById('form-overlay').classList.remove('show');
-}
-
-function populateMasterList() {
-  const list = document.getElementById('master-list');
-  list.innerHTML = '';
-  masterBirds.forEach(bird => {
-    const option = document.createElement('option');
-    option.value = bird.name;
-    option.text = `${bird.name} (${bird.species||''})`;
-    list.appendChild(option);
-  });
-}
-
-function updateStorageUsage() {
-  const used = JSON.stringify(birds).length;
-  const usedKB = Math.round(used / 1024);
-  document.getElementById('storage-usage').innerHTML = `💾 ${usedKB}KB stored in Supabase`;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// PHOTO & LOCATION
-// ═══════════════════════════════════════════════════════════════════════════
-
-function handlePhoto(e) {
-  const file = e.target.files[0];
+/* IMAGE PREVIEW */
+function previewImage() {
+  const file = q('image').files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => {
-      const MAX = 900;
-      let w = img.width, h = img.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
-      
-      const preview = document.getElementById('photo-preview-img');
-      preview.innerHTML = `<img src="${currentPhotoBase64}" style="width:100%; height:100%; object-fit:cover;">`;
-      preview.style.display = 'flex';
-      document.getElementById('photo-placeholder').style.display = 'none';
-    };
-    img.src = ev.target.result;
+  reader.onload = e => {
+    imageData = e.target.result;
+    const img = q('img-preview');
+    img.src = imageData;
+    img.classList.remove('hidden');
   };
   reader.readAsDataURL(file);
 }
 
-function getGPSLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        document.getElementById('f-lat').value = pos.coords.latitude.toFixed(6);
-        document.getElementById('f-lng').value = pos.coords.longitude.toFixed(6);
-        showToast(`📍 ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`, 'info');
-      },
-      err => showToast('Location access denied', 'error')
-    );
-  }
-}
+/* HELPERS */
+function v(id){ return q(id).value.trim(); }
+function q(id){ return document.getElementById(id); }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════════════════════════
-
-function updateSyncStatus(status) {
-  const el = document.getElementById('sync-status');
-  const text = document.getElementById('sync-text');
-  if (status === 'online') {
-    el.className = 'sync-status online';
-    text.textContent = 'Syncing...';
-  } else {
-    el.className = 'sync-status offline';
-    text.textContent = 'Offline';
-  }
-}
-
-function showToast(msg, type = 'info') {
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + type;
-  toast.textContent = msg;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
-
-async function saveToCache(key, data) {
-  try {
-    const db = await new Promise((res, rej) => {
-      const req = indexedDB.open('featherlog', 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore('cache');
-      req.onsuccess = () => res(req.result);
-      req.onerror = () => rej(req.error);
-    });
-    const tx = db.transaction('cache', 'readwrite');
-    tx.objectStore('cache').put({ key, data });
-  } catch (e) { console.error('Cache save failed', e); }
-}
-
-async function getFromCache(key) {
-  try {
-    const db = await new Promise((res, rej) => {
-      const req = indexedDB.open('featherlog', 1);
-      req.onupgradeneeded = e => e.target.result.createObjectStore('cache');
-      req.onsuccess = () => res(req.result);
-      req.onerror = () => rej(req.error);
-    });
-    return new Promise((res) => {
-      const tx = db.transaction('cache');
-      const req = tx.objectStore('cache').get(key);
-      req.onsuccess = () => res(req.result?.data);
-      req.onerror = () => res(null);
-    });
-  } catch (e) { return null; }
-}
-
-function exportData() {
-  const json = JSON.stringify(birds, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `featherlog_${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  showToast('Exported ✓', 'success');
-}
-
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      const imported = JSON.parse(ev.target.result);
-      if (Array.isArray(imported)) {
-        birds = imported;
-        saveToCache('birds', birds);
-        renderPokedex();
-        showToast(`Imported ${imported.length} sightings`, 'success');
-      }
-    } catch (err) {
-      showToast('Invalid file format', 'error');
-    }
-  };
-  reader.readAsText(file);
-}
-
-function deleteBird(birdName) {
-  if (!confirm(`Delete "${birdName}" from your sightings?`)) return;
-  birds = birds.filter(b => b.bird_name !== birdName);
-  saveToCache('birds', birds);
-  renderPokedex();
-  closeDetail();
-  showToast('Deleted', 'success');
-}
-
-function editBird(birdName) {
-  closeDetail();
-  const bird = birds.find(b => b.bird_name === birdName);
-  if (!bird) return;
-  
-  showNewBirdForm();
-  document.getElementById('f-name').value = bird.bird_name;
-  document.getElementById('f-species').value = bird.species || '';
-  document.getElementById('f-type').value = bird.bird_type || 'Unknown';
-  document.getElementById('f-size').value = bird.size || 'Medium';
-  document.getElementById('f-location').value = bird.location || '';
-  document.getElementById('f-lat').value = bird.location_lat || '';
-  document.getElementById('f-lng').value = bird.location_lng || '';
-  document.getElementById('f-date').value = bird.date_spotted || '';
-  document.getElementById('f-notes').value = bird.notes || '';
-  if (bird.photo_base64) {
-    currentPhotoBase64 = bird.photo_base64;
-    const preview = document.getElementById('photo-preview-img');
-    preview.innerHTML = `<img src="${currentPhotoBase64}" style="width:100%; height:100%; object-fit:cover;">`;
-    preview.style.display = 'flex';
-  }
-}
-
-window.addEventListener('online', () => {
-  isOnline = true;
-  updateSyncStatus('online');
-  loadAllData();
-});
-
-window.addEventListener('offline', () => {
-  isOnline = false;
-  updateSyncStatus('offline');
-});
-
-// Initialize on load
-initAuth();
+/* INIT */
+init();
 </script>
 
 </body>
