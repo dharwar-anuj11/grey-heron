@@ -338,8 +338,7 @@
 const SUPABASE_URL = 'https://wkcdrxbokzxrvdihfoio.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrY2RyeGJva3p4cnZkaWhmb2lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDI5MDQsImV4cCI6MjA5MjY3ODkwNH0.JiJrTjdwRvpffXRFQRjU68haCecKd4qjoaMLiH1fMY0';
 
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let birds = [];
@@ -352,7 +351,7 @@ let isOnline = navigator.onLine;
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function initAuth() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (user) {
     currentUser = user;
     showApp();
@@ -371,7 +370,7 @@ async function handleSignUp() {
     return;
   }
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await sb.auth.signUp({ email, password });
   
   if (error) {
     showLoginError('Signup failed: ' + error.message);
@@ -389,7 +388,7 @@ async function handleSignIn() {
     return;
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
   
   if (error) {
     showLoginError('Login failed: ' + error.message);
@@ -401,7 +400,7 @@ async function handleSignIn() {
 }
 
 async function handleSignOut() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   currentUser = null;
   birds = [];
   masterBirds = [];
@@ -433,7 +432,7 @@ async function loadAllData() {
   updateSyncStatus(isOnline ? 'online' : 'offline');
 
   // Load master birds
-  const { data: masters } = await supabase.from('master_birds').select('*');
+  const { data: masters } = await sb.from('master_birds').select('*');
   if (masters) {
     masterBirds = masters;
     populateMasterList();
@@ -441,7 +440,7 @@ async function loadAllData() {
 
   // Load user's bird sightings
   if (isOnline && currentUser) {
-    const { data: sightings, error } = await supabase
+    const { data: sightings, error } = await sb
       .from('bird_sightings')
       .select('*')
       .eq('user_id', currentUser.id)
@@ -503,7 +502,7 @@ async function saveBird() {
   btn.disabled = true;
   btn.innerHTML = '<span class="loading"></span> Saving...';
 
-  const { data, error } = await supabase.from('bird_sightings').insert([bird]);
+  const { data, error } = await sb.from('bird_sightings').insert([bird]);
 
   if (error) {
     showToast('Save failed: ' + error.message, 'error');
