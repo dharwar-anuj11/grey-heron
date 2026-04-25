@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Featherlog</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Josefin+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:#0f1a0f;--p2:#121f12;--p3:#1a2e1a;
+  --ink:#e8f5e8;--ink2:#b8d4b8;--ink3:#6b9a6b;
+  --forest:#1a3a1a;--forest2:#22522a;--forest3:#2d7a35;
+  --amber:#f0a830;--amber2:#ffc947;--rust:#e05050;
+  --sky:#4a9fc8;--bd:rgba(80,200,80,0.12);--bd2:rgba(80,200,80,0.22);
+  --sh:rgba(0,0,0,0.4);
+  --nav-h:60px;
+  --glow:rgba(45,122,53,0.15);
+  --card:#131f13;--card2:#1a2a1a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--p2);color:var(--ink);font-family:'Josefin Sans',sans-serif;font-weight:300;
+  background-image:radial-gradient(circle at 20% 50%, rgba(34,82,42,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45,122,53,0.06) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='1' fill='%2340a040' fill-opacity='0.06'/%3E%3C/svg%3E");
+}
+
+/* ── LAYOUT ─────────────────────────────── */
+.app{display:flex;flex-direction:column;height:100vh;}
+
+/* TOPBAR */
+.topbar{
+  background:#0a120a;
+  padding:0 16px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  border-bottom:1px solid var(--bd);
+  box-shadow:0 1px 20px rgba(45,122,53,0.15);
+}
+.topbar-logo{display:flex;align-items:center;gap:8px;}
+.topbar-logo-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;}
+.topbar-logo-text{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:-0.3px;}
+.topbar-logo-text span{color:var(--amber2);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-stat{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.45);}
+.topbar-stat b{color:var(--amber2);font-size:14px;font-family:'Cormorant Garamond',serif;font-weight:600;}
+.topbar-add{background:var(--amber);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#0a120a;font-size:22px;line-height:1;flex-shrink:0;box-shadow:0 0 16px rgba(240,168,48,0.4);}
+.topbar-add:hover{background:var(--amber2);box-shadow:0 0 24px rgba(255,201,71,0.5);}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;min-height:0;}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  height:var(--nav-h);
+  background:#0a120a;
+  display:flex;align-items:stretch;
+  flex-shrink:0;
+  border-top:1px solid var(--bd);
+  padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -1px 20px rgba(0,0,0,0.5);
+}
+.nav-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:none;cursor:pointer;
+  font-size:8px;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);transition:color 0.15s;
+  padding:8px 4px;
+}
+.nav-tab svg{width:18px;height:18px;flex-shrink:0;}
+.nav-tab.active{color:var(--amber2);}
+
+/* VIEWS */
+.view{display:none;}.view.active{display:block;}#view-map.active{display:flex;flex-direction:column;height:100%;}
+.view.active{display:block;}
+
+/* ── POKEDEX VIEW ─────────────────────── */
+.pokedex-section{padding:16px;position:relative;}
+.pokedex-section+.pokedex-section{padding-top:0;}
+.section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding:0 4px;
+}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--amber2);text-shadow:0 0 20px rgba(255,201,71,0.3);}
+.section-count{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);}
+
+.pokedex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+
+.pdex-card{
+  background:var(--card);border:1px solid var(--bd);border-radius:10px;
+  overflow:hidden;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 2px 12px var(--sh);
+  position:relative;
+}
+.pdex-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(45,122,53,0.25);border-color:var(--forest3);}
+.pdex-card.undiscovered{opacity:0.6;cursor:default;}
+.pdex-card.undiscovered:hover{transform:none;box-shadow:1px 2px 6px var(--sh);}
+
+.pdex-img{width:100%;height:90px;background:var(--card2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.pdex-img img{width:100%;height:90px;object-fit:cover;}
+.pdex-img-silhouette{font-size:36px;filter:grayscale(1) brightness(0.3) opacity(0.25);}
+.pdex-num{position:absolute;top:5px;left:5px;background:rgba(28,26,20,0.6);border-radius:3px;padding:1px 5px;font-size:9px;letter-spacing:0.5px;color:rgba(255,255,255,0.8);}
+.pdex-type-badge{position:absolute;bottom:5px;right:5px;}
+
+.pdex-body{padding:8px 10px 10px;}
+.pdex-name{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--ink);line-height:1.1;margin-bottom:2px;}
+.pdex-species{font-size:9px;letter-spacing:0.3px;color:var(--ink3);font-style:italic;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pdex-tags{display:flex;gap:3px;flex-wrap:wrap;}
+.tag{font-size:8px;letter-spacing:0.5px;text-transform:uppercase;padding:2px 6px;border-radius:99px;border:1px solid;}
+.tag-raptor   {background:#fdf0e6;color:#8a4a12;border-color:rgba(138,74,18,0.2);}
+.tag-waterbird{background:#e6f0f8;color:#2a5f8a;border-color:rgba(42,95,138,0.2);}
+.tag-songbird {background:#e8f5e8;color:#2d6b2d;border-color:rgba(45,107,45,0.2);}
+.tag-wader    {background:#e6f5f5;color:#1a6b6b;border-color:rgba(26,107,107,0.2);}
+.tag-seabird  {background:#e6edf8;color:#2a3d8a;border-color:rgba(42,61,138,0.2);}
+.tag-pigeon   {background:#f0edf8;color:#5a3d8a;border-color:rgba(90,61,138,0.2);}
+.tag-woodpecker{background:#f5ebe6;color:#7a3d1a;border-color:rgba(122,61,26,0.2);}
+.tag-owl      {background:#f0ece6;color:#5a4a2d;border-color:rgba(90,74,45,0.2);}
+.tag-parrot   {background:#e8f5ec;color:#1a6b3d;border-color:rgba(26,107,61,0.2);}
+.tag-game     {background:#f5f0e6;color:#7a6a2d;border-color:rgba(122,106,45,0.2);}
+.tag-unknown  {background:var(--p2);color:var(--ink3);border-color:var(--bd);}
+.tag-bee-eater{background:rgba(34,180,120,0.12);color:#22b478;border:1px solid rgba(34,180,120,0.25);}
+.tag-kingfisher{background:rgba(30,120,220,0.12);color:#4a9fd4;border:1px solid rgba(30,120,220,0.25);}
+.tag-roller   {background:rgba(120,80,220,0.12);color:#9b6ee8;border:1px solid rgba(120,80,220,0.25);}
+.tag-small    {background:#f5f5f5;color:#555;border-color:#ddd;}
+.tag-medium   {background:#eee;color:#444;border-color:#ccc;}
+.tag-large    {background:#e5e5e5;color:#333;border-color:#bbb;}
+.tag-verylarge{background:#ddd;color:#222;border-color:#aaa;}
+.tag-geo{background:rgba(45,74,45,0.08);color:var(--forest2);border-color:rgba(45,74,45,0.2);}
+
+.undiscovered-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;
+}
+.undiscovered-overlay span{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);opacity:0.6;}
+
+/* ── CATALOGUE VIEW ───────────────────── */
+.catalogue-header{padding:16px;display:flex;gap:10px;align-items:center;}
+.search-wrap{position:relative;flex:1;}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--ink3);}
+.search-input{width:100%;background:var(--card);border:1px solid var(--bd2);border-radius:6px;padding:8px 10px 8px 32px;font-size:13px;font-family:'Josefin Sans',sans-serif;color:var(--ink);outline:none;}
+.search-input:focus{border-color:var(--forest3);}
+.search-input::placeholder{color:var(--ink3);font-style:italic;}
+
+.filter-scroll{padding:0 16px 12px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.filter-scroll::-webkit-scrollbar{display:none;}
+.chip{padding:5px 12px;border-radius:99px;font-size:9px;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer;border:1px solid var(--bd2);color:var(--ink3);background:transparent;white-space:nowrap;flex-shrink:0;transition:all 0.15s;}
+.chip.active{background:var(--forest3);border-color:var(--forest3);color:#fff;box-shadow:0 0 10px rgba(45,122,53,0.3);}
+
+.cat-list{padding:0 16px 80px;}
+.cat-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:0 2px 8px var(--sh);transition:all 0.18s;}
+.cat-row:hover{border-color:var(--forest3);box-shadow:0 2px 16px rgba(45,122,53,0.2);}
+.cat-row-thumb{width:50px;height:50px;border-radius:7px;background:var(--card2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.cat-row-thumb img{width:50px;height:50px;object-fit:cover;}
+.cat-row-info{flex:1;min-width:0;}
+.cat-row-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.1;}
+.cat-row-sub{font-size:10px;color:var(--ink3);font-style:italic;margin:1px 0 5px;}
+.cat-row-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.cat-row-date{font-size:9px;color:var(--ink3);letter-spacing:0.3px;flex-shrink:0;text-align:right;}
+
+/* ── MAP VIEW ─────────────────────────── */
+.map-view{flex:1;display:flex;flex-direction:column;min-height:0;}
+#map-el{flex:1;min-height:0;width:100%;}
+.map-info-bar{padding:10px 16px;background:#0a120a;border-top:1px solid var(--bd);font-size:10px;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);}
+
+/* ── SETTINGS VIEW ────────────────────── */
+.settings-view{padding:16px 16px 80px;}
+.settings-section{margin-bottom:24px;}
+.settings-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;padding:0 2px;}
+.settings-card{background:var(--card);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.settings-row{padding:13px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.settings-row-icon.green{background:rgba(45,74,45,0.1);}
+.settings-row-icon.amber{background:rgba(193,127,36,0.1);}
+.settings-row-icon svg{width:16px;height:16px;}
+.settings-row-icon.green svg{color:var(--forest);}
+.settings-row-icon.amber svg{color:var(--amber);}
+.settings-row-text{flex:1;}
+.settings-row-title{font-size:13px;color:var(--ink);letter-spacing:0.2px;}
+.settings-row-sub{font-size:10px;color:var(--ink3);margin-top:1px;}
+.settings-input{width:100%;background:var(--p2);border:1px solid var(--bd2);border-radius:6px;padding:8px 10px;font-size:13px;font-family:'Josefin Sans',sans-serif;color:var(--ink);outline:none;margin-top:8px;}
+.settings-input:focus{border-color:var(--forest);}
+.settings-btn{background:var(--forest3);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:8px;}
+.api-status-text{font-size:10px;margin-top:5px;letter-spacing:0.5px;}
+.api-status-text.ok{color:var(--forest2);}
+.api-status-text.none{color:var(--ink3);}
+
+/* ── MODAL ────────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(28,26,20,0.6);z-index:400;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--bd);border-top:1px solid var(--bd2);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:env(safe-area-inset-bottom);overscroll-behavior:contain;box-shadow:0 -4px 40px rgba(0,0,0,0.6);}
+.modal-handle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:12px auto 4px;}
+.modal-header{padding:8px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--ink);}
+.modal-close{background:none;border:none;font-size:22px;color:var(--ink3);cursor:pointer;padding:4px;line-height:1;}
+.modal-body{padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
+.form-group label{display:block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--p2);border:1px solid var(--bd2);border-radius:7px;padding:10px 12px;font-size:14px;font-family:'Josefin Sans',sans-serif;color:var(--ink);outline:none;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--forest3);box-shadow:0 0 0 3px rgba(45,122,53,0.15);}
+.form-group textarea{resize:vertical;min-height:70px;}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.photo-area{border:2px dashed var(--bd2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:var(--p2);position:relative;transition:border-color 0.15s;}
+.photo-area:hover{border-color:var(--forest);}
+.photo-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;}
+.photo-preview-img{width:100%;height:160px;object-fit:cover;border-radius:8px;display:none;}
+.photo-placeholder-text{font-size:13px;color:var(--ink3);font-style:italic;pointer-events:none;}
+.photo-placeholder-sub{font-size:9px;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);opacity:0.5;margin-top:4px;pointer-events:none;}
+.ai-btn{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:7px;padding:11px;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;width:100%;border:1px solid;font-family:'Josefin Sans',sans-serif;transition:all 0.15s;}
+.ai-btn-id{background:rgba(45,74,45,0.06);color:var(--forest);border-color:rgba(45,74,45,0.25);}
+.ai-btn-id:hover{background:rgba(45,74,45,0.12);}
+.ai-btn-id:disabled{opacity:0.4;cursor:not-allowed;}
+.ai-btn-loc{background:rgba(193,127,36,0.07);color:var(--amber);border-color:rgba(193,127,36,0.3);}
+.ai-btn-loc:hover{background:rgba(193,127,36,0.14);}
+.ai-result{background:var(--p2);border:1px solid var(--bd);border-radius:7px;padding:11px 13px;font-size:13px;color:var(--ink2);line-height:1.7;display:none;}
+.exif-bar{font-size:10px;letter-spacing:0.4px;padding:7px 11px;border-radius:6px;margin-top:-4px;display:none;}
+.exif-bar.found{background:rgba(45,74,45,0.08);color:var(--forest);border:1px solid rgba(45,74,45,0.2);}
+.exif-bar.notfound{background:var(--p2);color:var(--ink3);border:1px solid var(--bd);}
+.modal-footer{padding:4px 20px 16px;display:flex;gap:8px;justify-content:flex-end;}
+.btn-cancel{background:transparent;border:1px solid var(--bd2);border-radius:7px;padding:10px 18px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);cursor:pointer;font-family:'Josefin Sans',sans-serif;transition:border-color 0.15s;}
+.btn-save{background:var(--forest3);color:#fff;border:none;border-radius:7px;padding:10px 22px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Josefin Sans',sans-serif;box-shadow:0 0 12px rgba(45,122,53,0.3);}
+.btn-danger{background:transparent;border:1px solid rgba(139,58,26,0.3);border-radius:7px;padding:10px 18px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--rust);cursor:pointer;font-family:'Josefin Sans',sans-serif;}
+.spinner{width:12px;height:12px;border:2px solid rgba(0,0,0,0.15);border-top-color:currentColor;border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* DETAIL MODAL */
+.detail-hero{width:100%;max-height:280px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:80px;overflow:hidden;flex-shrink:0;}
+.detail-hero img{width:100%;max-height:280px;object-fit:contain;display:block;}
+.detail-body{padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
+.detail-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--ink);}
+.detail-species{font-size:12px;color:var(--ink3);font-style:italic;margin-top:1px;}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.meta-item{background:#0a120a;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;}
+.meta-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:3px;}
+.meta-val{font-size:13px;color:var(--ink);}
+.section-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.notes-box{background:#0a120a;border-left:3px solid var(--forest3);padding:11px 13px;border-radius:0 7px 7px 0;font-size:14px;color:var(--ink2);line-height:1.7;font-style:italic;}
+.facts-box{background:#0a120a;border:1px solid var(--bd);border-radius:8px;padding:14px 16px;font-size:13px;color:var(--ink2);line-height:1.9;white-space:pre-wrap;}
+.facts-btn{display:flex;align-items:center;gap:7px;background:rgba(193,127,36,0.07);color:var(--amber);border:1px solid rgba(193,127,36,0.3);border-radius:7px;padding:10px 13px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Josefin Sans',sans-serif;}
+
+/* UNDISCOVERED modal */
+.undiscovered-modal-body{padding:30px 20px;text-align:center;background:var(--card);}
+.undiscovered-big{font-size:72px;filter:grayscale(1) brightness(0.25) opacity(0.18);display:block;margin-bottom:12px;}
+.undiscovered-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--ink);margin-bottom:6px;}
+.undiscovered-sub{font-size:11px;letter-spacing:0.5px;color:var(--ink3);}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fadeIn{animation:fadeIn 0.3s ease both;}
+
+
+/* BIRD SEARCH DROPDOWN */
+.bird-search-wrap{position:relative;}
+.bird-search-input{width:100%;background:#0a120a;border:1px solid var(--bd2);border-radius:7px;padding:10px 12px;font-size:14px;font-family:'Josefin Sans',sans-serif;color:var(--ink);outline:none;}
+.bird-search-input:focus{border-color:var(--forest);}
+.bird-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--bd2);border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+.bird-dropdown.open{display:block;}
+.bird-dropdown-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--ink);}
+.bird-dropdown-item:last-child{border-bottom:none;}
+.bird-dropdown-item:hover,.bird-dropdown-item.highlighted{background:var(--card2);}
+.bird-dropdown-item small{color:var(--ink3);font-style:italic;font-size:11px;display:block;}
+.bird-dropdown-item.custom-item{color:var(--forest2);font-style:italic;}
+
+/* TOAST */
+.toast{
+  position:fixed; bottom:calc(var(--nav-h) + 12px); left:50%; transform:translateX(-50%) translateY(20px);
+  background:#1a2a1a; color:var(--amber2); border:1px solid var(--bd2); border-radius:99px;
+  padding:10px 20px; font-size:12px; letter-spacing:0.5px;
+  opacity:0; transition:all 0.25s; z-index:999; white-space:nowrap;
+  pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,0.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.success{background:#1a2a1a;color:var(--amber2);box-shadow:0 4px 20px rgba(45,122,53,0.3);}
+.toast.error{background:#2a1010;color:#ff6b6b;border-color:rgba(224,80,80,0.3);}
+
+
+/* DECORATIVE BIRDS */
+@keyframes glide{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-4px) rotate(1deg);}}
+.feather-bg{position:fixed;pointer-events:none;z-index:0;opacity:0.04;font-size:120px;right:-20px;bottom:80px;animation:glide 6s ease-in-out infinite;user-select:none;}
+.section-bird{display:inline-block;font-size:14px;margin-right:6px;animation:glide 3s ease-in-out infinite;}
+
+
+/* BIRD PROFILE CARDS */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
+.profile-card{background:#0a120a;border:1px solid var(--bd);border-radius:8px;padding:10px 12px;}
+.profile-card-icon{font-size:16px;margin-bottom:4px;display:block;}
+.profile-card-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:3px;}
+.profile-card-val{font-size:12px;color:var(--ink);line-height:1.4;}
+.profile-card.full{grid-column:span 2;}
+.conservation-lc{color:#4fc88a;}.conservation-nt{color:#ffc947;}.conservation-vu{color:#f0a830;}.conservation-en{color:#e05050;}.conservation-cr{color:#ff3333;}
+.section-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.section-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;}
+.lightbox.open{display:flex;}
+.lightbox-img{max-width:100vw;max-height:85vh;object-fit:contain;touch-action:pinch-zoom;border-radius:4px;}
+.lightbox-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.lightbox-close:hover{background:rgba(255,255,255,0.2);}
+.lightbox-caption{color:rgba(255,255,255,0.6);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:12px;}
+.lightbox-hint{color:rgba(255,255,255,0.25);font-size:10px;letter-spacing:0.5px;margin-top:6px;}
+.detail-hero{cursor:zoom-in;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="feather-bg">🪶</div>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <!-- Animated flying birds -->
+    <svg style="position:absolute;top:8px;left:50%;transform:translateX(-50%);pointer-events:none;opacity:0.18;z-index:0;" width="300" height="40" viewBox="0 0 300 40">
+      <path d="M30 20 C25 14 18 13 14 17 C18 19 24 18 30 20 C36 14 43 13 47 17 C43 19 36 18 30 20Z" fill="#ffc947">
+        <animateTransform attributeName="transform" type="translate" values="0 0;240 -5;0 0" dur="12s" repeatCount="indefinite"/>
+      </path>
+      <path d="M80 28 C76 23 71 22 68 25 C71 27 76 26 80 28 C84 23 89 22 92 25 C89 27 84 26 80 28Z" fill="#4fc88a">
+        <animateTransform attributeName="transform" type="translate" values="0 0;180 -8;0 0" dur="17s" repeatCount="indefinite"/>
+      </path>
+      <path d="M10 32 C7 28 3 27 1 30 C3 31 7 30 10 32 C13 28 17 27 19 30 C17 31 13 30 10 32Z" fill="#ffc947">
+        <animateTransform attributeName="transform" type="translate" values="0 0;260 -3;0 0" dur="21s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+    <div class="topbar-logo" style="position:relative;z-index:1;">
+      <div class="topbar-logo-icon">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <path d="M16 8 C10 2, 2 4, 0 10 C4 12, 10 11, 16 8Z" fill="rgba(255,255,255,0.8)"/>
+          <path d="M16 8 C22 2, 30 4, 32 10 C28 12, 22 11, 16 8Z" fill="rgba(255,255,255,0.6)"/>
+          <ellipse cx="16" cy="10" rx="3.5" ry="2.5" fill="rgba(255,255,255,0.95)"/>
+          <circle cx="14.5" cy="9" r="0.8" fill="rgba(28,26,20,0.7)"/>
+          <path d="M16 12 L16 22 C14 20,12 22,12 24 C14 24,15 23,16 22 C17 23,18 24,20 24 C20 22,18 20,16 22Z" fill="rgba(255,255,255,0.7)"/>
+        </svg>
+      </div>
+      <div class="topbar-logo-text">Feather<span>log</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-stat"><b id="stat-total">0</b><br>birds</div>
+      <button class="topbar-add" onclick="openAdd()">+</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- POKÉDEX VIEW -->
+    <div class="view active" id="view-pokedex"></div>
+
+    <!-- CATALOGUE VIEW -->
+    <div class="view" id="view-catalogue">
+      <div class="catalogue-header">
+        <div class="search-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="search-input" placeholder="Search field notes…" oninput="renderCatalogue()"/>
+        </div>
+      </div>
+      <div class="filter-scroll" id="type-filters"></div>
+      <div class="cat-list" id="cat-list"></div>
+    </div>
+
+    <!-- MAP VIEW -->
+    <div class="view" id="view-map" style="display:none;flex-direction:column;">
+      <div class="map-view">
+        <div id="map-el"></div>
+        <div class="map-info-bar" id="map-info-bar">Loading map…</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div class="view" id="view-settings">
+      <div class="settings-view">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--ink);padding:4px 2px 16px;">Settings</div>
+
+        <div class="settings-section">
+          <div class="settings-label">Gemini AI</div>
+          <div class="settings-card">
+            <div class="settings-row" style="flex-direction:column;align-items:flex-start;">
+              <div style="display:flex;align-items:center;gap:10px;width:100%;">
+                <div class="settings-row-icon green"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <div class="settings-row-text">
+                  <div class="settings-row-title">API Key</div>
+                  <div class="settings-row-sub">Powers bird identification &amp; facts</div>
+                </div>
+              </div>
+              <input type="password" class="settings-input" id="api-key-input" placeholder="AIzaSy…"/>
+              <div style="font-size:11px;color:var(--ink3);margin-top:6px;line-height:1.6;">
+                1. Go to <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--forest2);">aistudio.google.com/apikey</a><br>
+                2. Sign in with a <b>different Google account</b><br>
+                3. Click <b>Create API Key</b>, copy and paste it above
+              </div>
+              <button class="settings-btn" onclick="saveApiKey()">Save key</button>
+              <div class="api-status-text none" id="api-status">No key saved</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-label">Data</div>
+          <div id="storage-usage" style="font-size:10px;color:var(--ink3);letter-spacing:0.5px;margin-bottom:8px;padding:0 2px;"></div>
+          <div class="settings-card">
+            <div class="settings-row" onclick="exportData()" style="cursor:pointer;">
+              <div class="settings-row-icon green"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+              <div class="settings-row-text"><div class="settings-row-title">Export backup</div><div class="settings-row-sub">Download all your sightings as JSON</div></div>
+            </div>
+            <label class="settings-row" style="cursor:pointer;">
+              <div class="settings-row-icon amber"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+              <div class="settings-row-text"><div class="settings-row-title">Import backup</div><div class="settings-row-sub">Restore from a JSON file</div></div>
+              <input type="file" accept=".json" style="display:none" onchange="importData(event)"/>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" id="tab-pokedex" onclick="switchTab('pokedex')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/></svg>
+      Pokédex
+    </button>
+    <button class="nav-tab" id="tab-catalogue" onclick="switchTab('catalogue')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Journal
+    </button>
+    <button class="nav-tab" id="tab-map" onclick="switchTab('map')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+      Map
+    </button>
+    <button class="nav-tab" id="tab-settings" onclick="switchTab('settings')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </button>
+  </nav>
+<div id="toast" class="toast"></div>
+</div>
+
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img class="lightbox-img" id="lightbox-img" alt="" onclick="event.stopPropagation()"/>
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+  <div class="lightbox-hint">Pinch to zoom · tap outside to close</div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">New sighting</div>
+      <button class="modal-close" onclick="closeModal('add-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="photo-area" id="photo-area" onclick="document.getElementById('photo-file').click()">
+          <input type="file" id="photo-file" accept="image/*" onchange="handlePhoto(event)" style="display:none;"/>
+          <img id="photo-preview-img" class="photo-preview-img" alt=""/>
+          <div id="photo-placeholder">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 6px;opacity:0.3;color:var(--forest);"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+            <div class="photo-placeholder-text">Tap to photograph or upload</div>
+            <div class="photo-placeholder-sub">GPS extracted from photo automatically</div>
+          </div>
+        </div>
+        <div id="exif-bar" class="exif-bar"></div>
+      </div>
+
+      <div class="form-2col" id="geo-row" style="display:none;">
+        <div class="form-group"><label>Latitude</label><input type="text" id="f-lat" placeholder="12.9716"/></div>
+        <div class="form-group"><label>Longitude</label><input type="text" id="f-lng" placeholder="77.5946"/></div>
+      </div>
+
+      <button class="ai-btn ai-btn-id" id="identify-btn" onclick="aiIdentify()" disabled>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Identify with AI
+      </button>
+      <button class="ai-btn ai-btn-loc" onclick="useCurrentLocation()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+        Use my current GPS
+      </button>
+      <div id="ai-result" class="ai-result"></div>
+
+      <div class="form-group">
+        <label>Bird name * <span style="color:var(--ink3);font-size:9px;">(search the master list or type custom)</span></label>
+        <div class="bird-search-wrap">
+          <input type="text" class="bird-search-input" id="f-name-search" placeholder="Type to search… e.g. Heron, Eagle" autocomplete="off" oninput="filterBirdDropdown()" onfocus="openBirdDropdown()" onkeydown="handleDropdownKey(event)"/>
+          <input type="hidden" id="f-name"/>
+          <div class="bird-dropdown" id="bird-dropdown"></div>
+        </div>
+      </div>
+      <div class="form-2col">
+        <div class="form-group"><label>Scientific name</label><input type="text" id="f-species" placeholder="Auto-filled from list"/></div>
+        <div class="form-group"><label>Bird type</label>
+          <select id="f-type">
+            <option value="Songbird">Songbird</option>
+            <option value="Raptor">Raptor</option>
+            <option value="Waterbird">Waterbird</option>
+            <option value="Wader">Wader</option>
+            <option value="Seabird">Seabird</option>
+            <option value="Pigeon">Pigeon/Dove</option>
+            <option value="Woodpecker">Woodpecker/Barbet</option>
+            <option value="Owl">Owl</option>
+            <option value="Parrot">Parrot/Parakeet</option>
+            <option value="Game">Game bird</option>
+            <option value="Bee-eater">Bee-eater</option>
+            <option value="Kingfisher">Kingfisher</option>
+            <option value="Roller">Roller/Hoopoe</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-2col">
+        <div class="form-group"><label>Size</label>
+          <select id="f-size">
+            <option value="Small">Small (sparrow-sized)</option>
+            <option value="Medium">Medium (pigeon-sized)</option>
+            <option value="Large">Large (crow-sized)</option>
+            <option value="Very Large">Very Large (eagle-sized)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Date spotted</label><input type="date" id="f-date"/></div>
+      </div>
+
+      <div class="form-group"><label>Location name</label><input type="text" id="f-location" placeholder="Ulsoor Lake"/></div>
+      <div class="form-group"><label>Field notes</label><textarea id="f-notes" placeholder="Plumage, call, behaviour…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('add-modal')">Cancel</button>
+      <button class="btn-save" onclick="saveBird()">Save to journal</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="detail-modal">
+  <div class="modal" style="border-radius:16px 16px 0 0;">
+    <div class="modal-handle"></div>
+    <div id="detail-content"></div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="detail-delete-btn">Remove</button>
+      <button class="btn-cancel" id="detail-edit-btn" style="color:var(--forest);border-color:rgba(45,74,45,0.3);">Edit</button>
+      <button class="btn-cancel" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNDISCOVERED MODAL -->
+<div class="modal-bg" id="undiscovered-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="undiscovered-title">???</div>
+      <button class="modal-close" onclick="closeModal('undiscovered-modal')">×</button>
+    </div>
+    <div class="undiscovered-modal-body">
+      <span class="undiscovered-big" id="undiscovered-emoji">🐦</span>
+      <div class="undiscovered-title">Not yet discovered</div>
+      <div class="undiscovered-sub" id="undiscovered-hint"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn-save" onclick="closeModal('undiscovered-modal');openAddForBird(currentUndiscoveredName,currentUndiscoveredSpecies,currentUndiscoveredType)">I spotted this! 🎉</button>
+      <button class="btn-cancel" onclick="closeModal('undiscovered-modal');openAdd()">Different bird</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK = 'featherlog_birds';
+const AK = 'featherlog_gemini_key';
+
+// ── IndexedDB storage (replaces localStorage for bird data) ──
+// Falls back to localStorage if IndexedDB unavailable
+const DB = {
+  _db: null,
+  async open(){
+    if(this._db) return this._db;
+    return new Promise((res,rej)=>{
+      const req=indexedDB.open('featherlog',1);
+      req.onupgradeneeded=e=>{
+        const db=e.target.result;
+        if(!db.objectStoreNames.contains('birds')) db.createObjectStore('birds',{keyPath:'id'});
+        if(!db.objectStoreNames.contains('meta')) db.createObjectStore('meta');
+      };
+      req.onsuccess=e=>{ this._db=e.target.result; res(this._db); };
+      req.onerror=()=>rej(req.error);
+    });
+  },
+  async getAll(){
+    try{
+      const db=await this.open();
+      return new Promise((res,rej)=>{
+        const tx=db.transaction('birds','readonly');
+        const req=tx.objectStore('birds').getAll();
+        req.onsuccess=()=>res(req.result||[]);
+        req.onerror=()=>rej(req.error);
+      });
+    }catch(e){ return JSON.parse(localStorage.getItem(SK)||'[]'); }
+  },
+  async saveAll(birds){
+    try{
+      const db=await this.open();
+      return new Promise((res,rej)=>{
+        const tx=db.transaction('birds','readwrite');
+        const store=tx.objectStore('birds');
+        store.clear();
+        birds.forEach(b=>store.put(b));
+        tx.oncomplete=()=>res();
+        tx.onerror=()=>rej(tx.error);
+      });
+    }catch(e){
+      // Fallback to localStorage with compression
+      try{ localStorage.setItem(SK,JSON.stringify(birds)); }catch(qe){ console.warn('Storage full',qe); }
+    }
+  },
+  async getMeta(key){ try{ const db=await this.open(); return new Promise((res)=>{ const tx=db.transaction('meta','readonly'); const req=tx.objectStore('meta').get(key); req.onsuccess=()=>res(req.result); req.onerror=()=>res(null); }); }catch(e){ return localStorage.getItem(key); } },
+  async setMeta(key,val){ try{ const db=await this.open(); return new Promise((res)=>{ const tx=db.transaction('meta','readwrite'); tx.objectStore('meta').put(val,key); tx.oncomplete=()=>res(); }); }catch(e){ try{localStorage.setItem(key,val);}catch(qe){} } },
+};
+
+// ── SVG silhouettes per bird type ──
+const SILHOUETTES = {
+  Raptor:`<svg viewBox="0 0 60 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M30 8C26 10 18 7 10 14C6 18 8 24 14 22C18 20 22 22 24 26L26 34L24 44L28 43L30 36L32 43L36 44L34 34L36 26C38 22 42 20 46 22C52 24 54 18 50 14C42 7 34 10 30 8Z"/><ellipse cx="30" cy="12" rx="5" ry="4"/></svg>`,
+  Waterbird:`<svg viewBox="0 0 60 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M34 6C32 9 28 10 24 8C20 14 22 20 26 22L24 30L22 44C20 48 22 54 26 52L28 44L30 36L32 44L34 52C38 54 40 48 38 44L36 30L34 22C38 20 40 14 36 8C35 10 34 8 34 6Z"/><circle cx="36" cy="10" r="5"/><path d="M36 10L48 6L46 12Z"/></svg>`,
+  Songbird:`<svg viewBox="0 0 60 55" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="30" rx="13" ry="9"/><circle cx="38" cy="20" r="7"/><path d="M38 20L50 16L48 23Z"/><path d="M17 32C10 30 7 37 12 40C17 42 20 37 17 32Z"/><path d="M24 39L22 53L27 51L30 44L33 51L38 53L36 39Z"/></svg>`,
+  Wader:`<svg viewBox="0 0 60 65" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="26" cy="22" rx="11" ry="7"/><circle cx="36" cy="13" r="6"/><path d="M36 13L52 8L50 15Z"/><line x1="26" y1="29" x2="24" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="30" y1="29" x2="32" y2="50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24 50L19 55 M24 50L28 55 M32 50L28 55 M32 50L37 55" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`,
+  Seabird:`<svg viewBox="0 0 70 45" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M35 15C22 12 8 18 5 26C3 33 10 36 20 33L26 30L28 38L35 40L42 38L44 30L50 33C60 36 67 33 65 26C62 18 48 12 35 15Z"/><circle cx="44" cy="12" r="6"/><path d="M44 12L56 7L54 14Z"/></svg>`,
+  Pigeon:`<svg viewBox="0 0 60 55" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="27" cy="30" rx="15" ry="10"/><circle cx="38" cy="20" r="7"/><path d="M38 20L47 18L46 24Z"/><path d="M14 32C8 30 6 38 11 40C16 42 18 36 14 32Z"/><path d="M25 40L23 53L28 51L30 44L32 51L37 53L35 40Z"/></svg>`,
+  Woodpecker:`<svg viewBox="0 0 60 58" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="26" cy="28" rx="11" ry="8"/><circle cx="36" cy="17" r="6"/><path d="M36 17L52 14L50 19L52 23L36 22Z"/><path d="M17 30C10 28 7 34 13 37C18 39 21 33 17 30Z"/><path d="M24 36L22 52L27 50L30 42L33 50L38 52L36 36Z"/></svg>`,
+  Owl:`<svg viewBox="0 0 60 65" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="32" rx="16" ry="18"/><circle cx="22" cy="24" r="7" fill="#0f1a0f"/><circle cx="38" cy="24" r="7" fill="#0f1a0f"/><circle cx="22" cy="24" r="3.5" fill="currentColor" opacity="0.35"/><circle cx="38" cy="24" r="3.5" fill="currentColor" opacity="0.35"/><path d="M27 33L30 37L33 33Z" fill="#0f1a0f"/><path d="M20 14L24 20 M40 14L36 20" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M16 40C11 43 9 50 14 52L16 47Z"/><path d="M44 40C49 43 51 50 46 52L44 47Z"/></svg>`,
+  Parrot:`<svg viewBox="0 0 60 58" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="27" cy="30" rx="12" ry="10"/><circle cx="36" cy="19" r="8"/><path d="M42 16C47 11 53 14 50 20C48 24 42 23 42 16Z" opacity="0.7"/><path d="M15 33C8 30 6 38 12 41C17 43 20 36 15 33Z"/><path d="M24 40L22 54L28 51L30 44L32 51L38 54L36 40Z"/><path d="M34 21C37 24 37 29 34 29" stroke="#0f1a0f" stroke-width="4" stroke-linecap="round" fill="none"/></svg>`,
+  Game:`<svg viewBox="0 0 65 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="34" rx="18" ry="13"/><circle cx="42" cy="20" r="8"/><path d="M42 20L52 17L51 24Z"/><path d="M14 32C7 34 5 42 10 44C15 46 17 38 14 32Z"/><path d="M28 47L26 58L31 56L33 49L35 56L40 58L38 47Z"/><path d="M36 14L38 7L42 12L47 9L42 18Z" opacity="0.8"/></svg>`,
+  Unknown:`<svg viewBox="0 0 60 55" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="32" rx="14" ry="10"/><circle cx="38" cy="21" r="7"/><path d="M18 34C11 32 9 40 14 42C19 44 22 37 18 34Z"/><path d="M25 42L23 54L30 52L37 54L35 42Z"/></svg>`,
+  'Bee-eater':`<svg viewBox="0 0 70 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="25" rx="14" ry="8"/><circle cx="42" cy="16" r="7"/><path d="M42 16L62 12L58 18Z"/><path d="M16 27C9 25 7 32 12 35C18 37 20 30 16 27Z"/><path d="M26 32L24 42L30 42L30 32Z"/><path d="M30 32L30 44L36 42L34 32Z"/><path d="M30 42L28 52L32 52Z"/></svg>`,
+  Kingfisher:`<svg viewBox="0 0 65 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="26" rx="13" ry="8"/><circle cx="40" cy="16" r="8"/><path d="M40 16L58 10L55 18Z"/><path d="M16 28C9 26 7 33 13 36C19 38 21 31 16 28Z"/><path d="M24 33L22 46L28 44L30 37L32 44L38 46L36 33Z"/></svg>`,
+  Roller:`<svg viewBox="0 0 65 52" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="28" rx="14" ry="9"/><circle cx="40" cy="18" r="7"/><path d="M40 18L54 14L52 21Z"/><path d="M15 30C8 28 6 36 12 38C18 40 20 33 15 30Z"/><path d="M24 36L22 50L28 47L30 40L32 47L38 50L36 36Z"/></svg>`,
+};
+
+// ── Pokédex master list — 120 common Indian birds ──
+const MASTER = [
+  {name:'Brahminy Kite',species:'Haliastur indus',type:'Raptor',size:'Large'},
+  {name:'Black Kite',species:'Milvus migrans',type:'Raptor',size:'Large'},
+  {name:'Shikra',species:'Accipiter badius',type:'Raptor',size:'Medium'},
+  {name:'Crested Serpent Eagle',species:'Spilornis cheela',type:'Raptor',size:'Large'},
+  {name:'White-eyed Buzzard',species:'Butastur teesa',type:'Raptor',size:'Medium'},
+  {name:'Changeable Hawk-Eagle',species:'Nisaetus cirrhatus',type:'Raptor',size:'Large'},
+  {name:"Bonelli's Eagle",species:'Aquila fasciata',type:'Raptor',size:'Very Large'},
+  {name:'Oriental Honey Buzzard',species:'Pernis ptilorhynchus',type:'Raptor',size:'Large'},
+  {name:'Eurasian Marsh Harrier',species:'Circus aeruginosus',type:'Raptor',size:'Large'},
+  {name:'Laggar Falcon',species:'Falco jugger',type:'Raptor',size:'Medium'},
+  {name:'Common Kestrel',species:'Falco tinnunculus',type:'Raptor',size:'Small'},
+  {name:'Peregrine Falcon',species:'Falco peregrinus',type:'Raptor',size:'Medium'},
+  {name:'Indian Pond Heron',species:'Ardeola grayii',type:'Waterbird',size:'Medium'},
+  {name:'Little Egret',species:'Egretta garzetta',type:'Waterbird',size:'Medium'},
+  {name:'Great Egret',species:'Ardea alba',type:'Waterbird',size:'Large'},
+  {name:'Purple Heron',species:'Ardea purpurea',type:'Waterbird',size:'Large'},
+  {name:'Grey Heron',species:'Ardea cinerea',type:'Waterbird',size:'Very Large'},
+  {name:'Black-crowned Night Heron',species:'Nycticorax nycticorax',type:'Waterbird',size:'Medium'},
+  {name:'Cattle Egret',species:'Bubulcus ibis',type:'Waterbird',size:'Medium'},
+  {name:'Intermediate Egret',species:'Ardea intermedia',type:'Waterbird',size:'Medium'},
+  {name:'Little Cormorant',species:'Microcarbo niger',type:'Waterbird',size:'Medium'},
+  {name:'Indian Cormorant',species:'Phalacrocorax fuscicollis',type:'Waterbird',size:'Large'},
+  {name:'Great Cormorant',species:'Phalacrocorax carbo',type:'Waterbird',size:'Large'},
+  {name:'Darter',species:'Anhinga melanogaster',type:'Waterbird',size:'Large'},
+  {name:'Lesser Whistling Duck',species:'Dendrocygna javanica',type:'Waterbird',size:'Medium'},
+  {name:'Spot-billed Duck',species:'Anas poecilorhyncha',type:'Waterbird',size:'Large'},
+  {name:'Cotton Pygmy Goose',species:'Nettapus coromandelianus',type:'Waterbird',size:'Small'},
+  {name:'Black-headed Ibis',species:'Threskiornis melanocephalus',type:'Waterbird',size:'Large'},
+  {name:'Asian Openbill',species:'Anastomus oscitans',type:'Waterbird',size:'Large'},
+  {name:'Painted Stork',species:'Mycteria leucocephala',type:'Waterbird',size:'Very Large'},
+  {name:'Woolly-necked Stork',species:'Ciconia episcopus',type:'Waterbird',size:'Very Large'},
+  {name:'White-breasted Waterhen',species:'Amaurornis phoenicurus',type:'Waterbird',size:'Medium'},
+  {name:'Common Moorhen',species:'Gallinula chloropus',type:'Waterbird',size:'Medium'},
+  {name:'Eurasian Coot',species:'Fulica atra',type:'Waterbird',size:'Medium'},
+  {name:'Pheasant-tailed Jacana',species:'Hydrophasianus chirurgus',type:'Waterbird',size:'Medium'},
+  {name:'Bronze-winged Jacana',species:'Metopidius indicus',type:'Waterbird',size:'Medium'},
+  {name:'Common Kingfisher',species:'Alcedo atthis',type:'Waterbird',size:'Small'},
+  {name:'White-throated Kingfisher',species:'Halcyon smyrnensis',type:'Waterbird',size:'Medium'},
+  {name:'Pied Kingfisher',species:'Ceryle rudis',type:'Waterbird',size:'Medium'},
+  {name:'Little Grebe',species:'Tachybaptus ruficollis',type:'Waterbird',size:'Small'},
+  {name:'Black-winged Stilt',species:'Himantopus himantopus',type:'Wader',size:'Medium'},
+  {name:'Red-wattled Lapwing',species:'Vanellus indicus',type:'Wader',size:'Medium'},
+  {name:'Yellow-wattled Lapwing',species:'Vanellus malabaricus',type:'Wader',size:'Medium'},
+  {name:'River Lapwing',species:'Vanellus duvaucelii',type:'Wader',size:'Medium'},
+  {name:'Common Sandpiper',species:'Actitis hypoleucos',type:'Wader',size:'Small'},
+  {name:'Wood Sandpiper',species:'Tringa glareola',type:'Wader',size:'Small'},
+  {name:'Little Ringed Plover',species:'Charadrius dubius',type:'Wader',size:'Small'},
+  {name:'Eurasian Curlew',species:'Numenius arquata',type:'Wader',size:'Large'},
+  {name:'Indian Myna',species:'Acridotheres tristis',type:'Songbird',size:'Medium'},
+  {name:'House Sparrow',species:'Passer domesticus',type:'Songbird',size:'Small'},
+  {name:'Purple Sunbird',species:'Cinnyris asiaticus',type:'Songbird',size:'Small'},
+  {name:'Purple-rumped Sunbird',species:'Leptocoma zeylonica',type:'Songbird',size:'Small'},
+  {name:"Loten's Sunbird",species:'Cinnyris lotenius',type:'Songbird',size:'Small'},
+  {name:'Oriental Magpie Robin',species:'Copsychus saularis',type:'Songbird',size:'Small'},
+  {name:'Indian Robin',species:'Saxicoloides fulicatus',type:'Songbird',size:'Small'},
+  {name:'White-rumped Shama',species:'Copsychus malabaricus',type:'Songbird',size:'Small'},
+  {name:'Asian Koel',species:'Eudynamys scolopaceus',type:'Songbird',size:'Medium'},
+  {name:'Greater Coucal',species:'Centropus sinensis',type:'Songbird',size:'Large'},
+  {name:'Indian Grey Hornbill',species:'Ocyceros birostris',type:'Songbird',size:'Large'},
+  {name:'Malabar Pied Hornbill',species:'Anthracoceros coronatus',type:'Songbird',size:'Very Large'},
+  {name:'Indian Roller',species:'Coracias benghalensis',type:'Songbird',size:'Medium'},
+  {name:'Eurasian Tree Sparrow',species:'Passer montanus',type:'Songbird',size:'Small'},
+  {name:'Baya Weaver',species:'Ploceus philippinus',type:'Songbird',size:'Small'},
+  {name:'White-rumped Munia',species:'Lonchura striata',type:'Songbird',size:'Small'},
+  {name:'Indian Silverbill',species:'Euodice malabarica',type:'Songbird',size:'Small'},
+  {name:'Scaly-breasted Munia',species:'Lonchura punctulata',type:'Songbird',size:'Small'},
+  {name:'Ashy Prinia',species:'Prinia socialis',type:'Songbird',size:'Small'},
+  {name:'Plain Prinia',species:'Prinia inornata',type:'Songbird',size:'Small'},
+  {name:'Common Tailorbird',species:'Orthotomus sutorius',type:'Songbird',size:'Small'},
+  {name:'Common Iora',species:'Aegithina tiphia',type:'Songbird',size:'Small'},
+  {name:'Indian Paradise Flycatcher',species:'Terpsiphone paradisi',type:'Songbird',size:'Small'},
+  {name:'Black-naped Monarch',species:'Hypothymis azurea',type:'Songbird',size:'Small'},
+  {name:'Jungle Babbler',species:'Argya striata',type:'Songbird',size:'Small'},
+  {name:'Yellow-billed Babbler',species:'Argya affinis',type:'Songbird',size:'Small'},
+  {name:'Common Babbler',species:'Argya caudata',type:'Songbird',size:'Small'},
+  {name:'Red-vented Bulbul',species:'Pycnonotus cafer',type:'Songbird',size:'Small'},
+  {name:'Red-whiskered Bulbul',species:'Pycnonotus jocosus',type:'Songbird',size:'Small'},
+  {name:'White-browed Bulbul',species:'Pycnonotus luteolus',type:'Songbird',size:'Small'},
+  {name:"Tickell's Blue Flycatcher",species:'Cyornis tickelliae',type:'Songbird',size:'Small'},
+  {name:'Barn Swallow',species:'Hirundo rustica',type:'Songbird',size:'Small'},
+  {name:'Wire-tailed Swallow',species:'Hirundo smithii',type:'Songbird',size:'Small'},
+  {name:'Asian Pied Starling',species:'Gracupica contra',type:'Songbird',size:'Medium'},
+  {name:'Brahminy Starling',species:'Sturnia pagodarum',type:'Songbird',size:'Small'},
+  {name:'Large-billed Crow',species:'Corvus macrorhynchos',type:'Songbird',size:'Large'},
+  {name:'House Crow',species:'Corvus splendens',type:'Songbird',size:'Medium'},
+  {name:'Rufous Treepie',species:'Dendrocitta vagabunda',type:'Songbird',size:'Medium'},
+  {name:'Spotted Owlet',species:'Athene brama',type:'Owl',size:'Small'},
+  {name:'Barn Owl',species:'Tyto alba',type:'Owl',size:'Medium'},
+  {name:'Indian Eagle-Owl',species:'Bubo bengalensis',type:'Owl',size:'Very Large'},
+  {name:'Jungle Owlet',species:'Glaucidium radiatum',type:'Owl',size:'Small'},
+  {name:'Mottled Wood Owl',species:'Strix ocellata',type:'Owl',size:'Large'},
+  {name:'Brown Fish Owl',species:'Ketupa zeylonensis',type:'Owl',size:'Large'},
+  {name:'Rose-ringed Parakeet',species:'Psittacula krameri',type:'Parrot',size:'Medium'},
+  {name:'Alexandrine Parakeet',species:'Psittacula eupatria',type:'Parrot',size:'Large'},
+  {name:'Plum-headed Parakeet',species:'Psittacula cyanocephala',type:'Parrot',size:'Medium'},
+  {name:'Malabar Parakeet',species:'Psittacula columboides',type:'Parrot',size:'Medium'},
+  {name:'Vernal Hanging Parrot',species:'Loriculus vernalis',type:'Parrot',size:'Small'},
+  {name:'Coppersmith Barbet',species:'Psilopogon haemacephalus',type:'Woodpecker',size:'Small'},
+  {name:'White-cheeked Barbet',species:'Psilopogon viridis',type:'Woodpecker',size:'Small'},
+  {name:'Brown-headed Barbet',species:'Psilopogon zeylanicus',type:'Woodpecker',size:'Medium'},
+  {name:'Black-rumped Flameback',species:'Dinopium benghalense',type:'Woodpecker',size:'Medium'},
+  {name:'Heart-spotted Woodpecker',species:'Hemicircus canente',type:'Woodpecker',size:'Small'},
+  {name:'Brown-capped Pygmy Woodpecker',species:'Yungipicus nanus',type:'Woodpecker',size:'Small'},
+  {name:'Rock Pigeon',species:'Columba livia',type:'Pigeon',size:'Medium'},
+  {name:'Spotted Dove',species:'Spilopelia chinensis',type:'Pigeon',size:'Medium'},
+  {name:'Eurasian Collared Dove',species:'Streptopelia decaocto',type:'Pigeon',size:'Medium'},
+  {name:'Laughing Dove',species:'Spilopelia senegalensis',type:'Pigeon',size:'Small'},
+  {name:'Yellow-footed Green Pigeon',species:'Treron phoenicoptera',type:'Pigeon',size:'Medium'},
+  {name:'Indian Peafowl',species:'Pavo cristatus',type:'Game',size:'Very Large'},
+  {name:'Red Junglefowl',species:'Gallus gallus',type:'Game',size:'Medium'},
+  {name:'Grey Francolin',species:'Ortygornis pondicerianus',type:'Game',size:'Medium'},
+  {name:'Jungle Bush Quail',species:'Perdicula asiatica',type:'Game',size:'Small'},
+  // BEE-EATERS
+  {name:'Asian Green Bee-eater',species:'Merops orientalis',type:'Bee-eater',size:'Small'},
+  {name:'Blue-tailed Bee-eater',species:'Merops philippinus',type:'Bee-eater',size:'Small'},
+  {name:'Chestnut-headed Bee-eater',species:'Merops leschenaulti',type:'Bee-eater',size:'Small'},
+  {name:'Blue-bearded Bee-eater',species:'Nyctyornis athertoni',type:'Bee-eater',size:'Medium'},
+  // KINGFISHERS (moved out of Waterbird for clarity)
+  {name:'Stork-billed Kingfisher',species:'Pelargopsis capensis',type:'Kingfisher',size:'Large'},
+  {name:'Black-backed Dwarf Kingfisher',species:'Ceyx erithaca',type:'Kingfisher',size:'Small'},
+  // ROLLERS & RELATIVES
+  {name:'Hoopoe',species:'Upupa epops',type:'Roller',size:'Small'},
+  {name:'Indian Pitta',species:'Pitta brachyura',type:'Roller',size:'Small'},
+  {name:'Malabar Trogon',species:'Harpactes fasciatus',type:'Roller',size:'Medium'},
+];
+
+
+
+const PRELOADED = {};
+PRELOADED["Purple Heron"] = {facts:"• Despite its name, not truly purple - its plumage is slate-grey, rufous-brown and black with a subtle purplish sheen only visible in certain light.\\n• It hunts by standing perfectly motionless for minutes, then strikes with explosive speed - neck vertebrae act like a compressed spring.\\n• Prefers dense reedbeds, holding its neck in a tight S-shape to blend into the stems - nearly invisible when still.\\n• Breeds from Western Europe to Japan - Bengaluru lakes are a favourite wintering ground.\\n• Can swallow fish almost as long as its own head - its jaw flexes slightly to manage large prey.",profile:{range:"Resident and winter visitor across India; common around Bengaluru lakes and coastal wetlands.",habitat:"Dense reedbeds, marshes, shallow lakes and paddy fields with emergent vegetation.",breeding:"February to May; nests colonially in tall reeds or trees near water.",diet:"Fish, frogs, insects, small mammals and lizards.",call:"A harsh guttural kraak - deeper and more hoarse than the Grey Heron.",fieldId:"1. Rust-and-black streaked neck (diagnostic). 2. Much slimmer than Grey Heron. 3. Neck kinked in S when flying.",conservation:"LC",wingspan:"120-150 cm"}};
+PRELOADED["Indian Roller"] = {facts:"• Performs dramatic aerial rolls during courtship - this display is the origin of its name.\\n• State bird of three Indian states: Odisha, Karnataka and Telangana.\\n• Despite brilliant turquoise wings in flight, almost invisible when perched due to cryptic brown-green tones.\\n• Intensely territorial - will chase crows and kites twice its size from its patch.\\n• Can spot a beetle from 50 metres, drops from a perch and beats it against a branch before swallowing.",profile:{range:"Widespread resident across India; common in Karnataka including Bengaluru outskirts.",habitat:"Open woodland, agricultural fields, scrub and areas with scattered trees.",breeding:"April to July; nests in tree holes or building crevices.",diet:"Insects, spiders, small lizards, frogs and occasionally small snakes.",call:"A harsh raucous chak-chak - noisy during breeding season.",fieldId:"1. Brilliant blue wings visible only in flight. 2. Brown-green body when perched. 3. Stout hooked beak.",conservation:"LC",wingspan:"65-75 cm"}};
+PRELOADED["Spotted Owlet"] = {facts:"• Pairs for life and performs an intense head-bobbing display to gauge depth when threatened.\\n• One of the few owls fully comfortable in urban environments - Bengaluru neighbourhoods with large trees are ideal.\\n• Despite being only 21 cm tall, will mob Shikras and other raptors much larger than itself.\\n• Hunts both day and night, using asymmetric ear placement to pinpoint prey with extreme accuracy.\\n• In Indian mythology it is the vehicle of Goddess Lakshmi - considered both auspicious and unlucky depending on tradition.",profile:{range:"Resident across the entire Indian subcontinent; very common in Bengaluru gardens and parks.",habitat:"Open woodland, orchards, gardens, ruins and rocky hillsides - thrives near humans.",breeding:"November to April; nests in tree hollows or crevices in walls and buildings.",diet:"Insects, earthworms, small rodents, lizards and occasionally small birds.",call:"A loud harsh chattering chirurr-chirurr - heard at dusk and dawn.",fieldId:"1. Brown with white spots (diagnostic). 2. Bright yellow eyes. 3. No ear tufts. Small round head.",conservation:"LC",wingspan:"45-50 cm"}};
+PRELOADED["Rose-ringed Parakeet"] = {facts:"• Established feral populations in 35 countries including the UK and Netherlands - escaped pets now number in the millions.\\n• Can mimic human speech with vocabularies of 200-300 words when kept as pets.\\n• Considered agricultural pests - a flock can strip a mango tree in minutes - but they also disperse seeds.\\n• Males only develop the pink-and-black neck ring after 2-3 years; younger males look identical to females.\\n• Each bird apparently recognises individual voices within a flock through complex contact calls.",profile:{range:"Native across South Asia; abundant resident across all of India.",habitat:"Open woodland, gardens, agricultural land and urban parks.",breeding:"November to April; nests in tree hollows, often evicting other species.",diet:"Seeds, fruits, flowers, nectar and grain.",call:"Loud shrill screaming kee-ak - flocks are extraordinarily noisy.",fieldId:"1. Bright green with long tail. 2. Males: pink and black neck ring. 3. Red hooked beak.",conservation:"LC",wingspan:"42-48 cm"}};
+PRELOADED["Indian Myna"] = {facts:"• Listed as one of the world 100 worst invasive species - populations in Australia and New Zealand cause ecological damage.\\n• Recognises individual human faces and holds grudges - birds alarm-call at researchers who handled them weeks earlier.\\n• Pairs for life and is fiercely monogamous - a widowed bird will call persistently for its mate for days.\\n• Exceptional mimics, incorporating sounds of other birds, machinery and human speech into their repertoire.\\n• Urban Mynas follow lawnmowers and vehicles to snap up insects disturbed from the ground.",profile:{range:"Native to South Asia; now one of the most widespread birds on Earth due to human introductions.",habitat:"Open habitats, gardens, agricultural fields, roadsides and urban areas.",breeding:"March to August; nests in any cavity - buildings, trees, electrical boxes.",diet:"Omnivorous - insects, fruits, scraps, earthworms, small lizards.",call:"A rich vocabulary of gurgling whistling and shrieking notes; remarkable mimic.",fieldId:"1. Yellow beak and bare yellow eye patch. 2. White wing patch in flight. 3. Brown body, black head.",conservation:"LC",wingspan:"35-40 cm"}};
+PRELOADED["Common Kingfisher"] = {facts:"• Dives at up to 40 km/h and can catch a fish in under a second - its beak aerodynamics inspired Japan bullet train nose design.\\n• Compensates for water refraction by aiming slightly below where the fish appears to the naked eye.\\n• Both parents dig a tunnel nest up to 60 cm long into a riverbank and take turns incubating eggs.\\n• Intensely territorial - a single bird defends up to 1 km of stream bank.\\n• Its brilliant blue plumage is not from pigment but from nanostructures that scatter light - feathers are actually brown underneath.",profile:{range:"Resident across India; found wherever there is clean shallow water.",habitat:"Streams, rivers, lakes, ponds and coastal mangroves with clear water and perching branches.",breeding:"March to July; nests in a self-dug tunnel in earthen banks.",diet:"Small fish, aquatic insects, tadpoles and small crustaceans.",call:"A sharp high-pitched chee or ti-ti-ti in flight.",fieldId:"1. Electric blue back and wings. 2. Rufous-orange underparts. 3. Dagger beak. 4. Very short tail.",conservation:"LC",wingspan:"22-25 cm"}};
+PRELOADED["Red-vented Bulbul"] = {facts:"• So prized for its combative nature it was historically used in bulbul fighting - now illegal in India.\\n• One of the first birds to sing before dawn and last to stop at dusk - its calls bookend the day in Indian gardens.\\n• Disperses seeds of hundreds of plant species and plays a critical ecological role in forest regeneration.\\n• Builds remarkably neat cup nests reinforced with spider webs - the same nest may be reused across seasons.\\n• Has been observed hovering briefly like a hummingbird to drink nectar from tubular flowers.",profile:{range:"Common resident across the Indian subcontinent; one of the most abundant birds in Bengaluru.",habitat:"Gardens, scrub, open woodland edges, parks and agricultural areas.",breeding:"February to May; builds a neat cup nest in a bush or low tree.",diet:"Fruits, berries, flower nectar, insects and occasionally small lizards.",call:"A cheerful musical be-care-ful or quick-doctor-quick - easy to learn.",fieldId:"1. Red patch under the tail (diagnostic). 2. Black crested head. 3. White rump in flight.",conservation:"LC",wingspan:"28-32 cm"}};
+PRELOADED["Brahminy Kite"] = {facts:"• Considered the mount of Lord Vishnu (Garuda) in Hindu mythology - official bird of Jakarta, Indonesia.\\n• An opportunistic pirate, regularly stealing food from other birds mid-air with acrobatic precision.\\n• Unlike most raptors, largely scavenges - floating fish scraps, dead crabs and refuse are staple foods.\\n• Immatures are brown and look nothing like adults - complete transformation to white-and-chestnut takes 3 years.\\n• One of the most distinctive silhouettes in Indian skies - chestnut body and white head visible from hundreds of metres.",profile:{range:"Resident across coastal and inland India; common around Bengaluru lakes.",habitat:"Coastal areas, large lakes, rivers, paddy fields and wherever there is open water or refuse.",breeding:"December to April; builds a large stick nest in a tall tree near water.",diet:"Dead fish, crabs, frogs, insects, small mammals and refuse.",call:"A mewing pee-ah or keeyah - weak for such a large bird.",fieldId:"1. White head and breast. 2. Rich chestnut body. 3. Rounded tail (not forked like Black Kite).",conservation:"LC",wingspan:"110-125 cm"}};
+function getPreloadedData(name){return PRELOADED[name]||null;}
+
+
+
+let birds = [];
+let nextId = 1;
+
+// ── Boot: load from IndexedDB (migrating from localStorage if needed) ──
+async function initStorage(){
+  // Migrate from localStorage if data exists there
+  const legacy = localStorage.getItem(SK);
+  if(legacy){
+    try{
+      const parsed = JSON.parse(legacy);
+      if(parsed.length){
+        await DB.saveAll(parsed);
+        localStorage.removeItem(SK); // clear after migration
+        console.log(`Migrated ${parsed.length} birds from localStorage to IndexedDB`);
+      }
+    }catch(e){}
+  }
+  birds = await DB.getAll();
+  nextId = birds.length ? Math.max(...birds.map(b=>b.id))+1 : 1;
+  updateStats(); renderPokedex(); renderCatalogue();
+  // Restore API key from IndexedDB meta
+  const savedKey = await DB.getMeta(AK) || localStorage.getItem(AK);
+  if(savedKey){
+    document.getElementById('api-key-input').value='••••••••••••';
+    document.getElementById('api-status').textContent='Key saved ✦';
+    document.getElementById('api-status').className='api-status-text ok';
+    // Store in both for compatibility
+    if(!await DB.getMeta(AK)) await DB.setMeta(AK, savedKey);
+  }
+}
+let currentPhotoBase64 = null;
+let activeType = '';
+
+function habitatEmoji(h){ const m={Forest:'🌲',Wetland:'🌿',Grassland:'🌾',Urban:'🏙️',Coast:'🌊',Highland:'⛰️',Other:'🐦',Songbird:'🐦',Raptor:'🦅',Waterbird:'🦆',Wader:'🐦',Owl:'🦉',Parrot:'🦜',Pigeon:'🕊️',Woodpecker:'🐦',Seabird:'🌊',Game:'🐓','Bee-eater':'🐦',Kingfisher:'🐦',Roller:'🐦',Unknown:'🐦'}; return m[h]||'🐦'; }
+
+function typeClass(t){ const m={Raptor:'raptor',Waterbird:'waterbird',Songbird:'songbird',Wader:'wader',Seabird:'seabird',Pigeon:'pigeon',Woodpecker:'woodpecker',Owl:'owl',Parrot:'parrot',Game:'game','Bee-eater':'bee-eater',Kingfisher:'kingfisher',Roller:'roller'}; return m[t]||'unknown'; }
+function sizeClass(s){ const m={'Small':'small','Medium':'medium','Large':'large','Very Large':'verylarge'}; return m[s]||'small'; }
+
+function save(){
+  DB.saveAll(birds).catch(e=>console.warn('Save error',e));
+  updateStats(); renderPokedex(); renderCatalogue();
+}
+window.addEventListener('resize', ()=>{ if(MAP.canvas) MAP.resize(); });
+function updateStats(){
+  document.getElementById('stat-total').textContent = birds.length;
+  const storageEl=document.getElementById('storage-usage');
+  if(storageEl){
+    try{
+      // Estimate storage from bird data size
+      const approxBytes=new Blob([JSON.stringify(birds)]).size;
+      const usedMB=(approxBytes/1048576).toFixed(1);
+      const usedKB=Math.round(approxBytes/1024);
+      const display=approxBytes>1048576?`${usedMB}MB`:usedKB<1?'<1KB':`${usedKB}KB`;
+      storageEl.innerHTML=`<span style="color:var(--ink3)">💾 Using ${display} · IndexedDB (no practical limit) · ${birds.length} bird${birds.length!==1?'s':''}</span>`;
+    }catch(e){}
+  }
+}
+
+// ── SWITCH TAB ──
+function switchTab(tab){
+  document.querySelectorAll('.view').forEach(v=>{v.classList.remove('active');v.style.display='none';});
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const activeView=document.getElementById('view-'+tab);
+  activeView.classList.add('active');
+  activeView.style.display=(tab==='map'?'flex':'block');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='map') setTimeout(initMap,60);
+}
+
+// ── POKÉDEX ──
+function renderPokedex(){
+  const captured = new Set(birds.map(b=>(b.name||'').toLowerCase().trim()));
+  const types = [...new Set(MASTER.map(m=>m.type))].sort();
+  let html='';
+  types.forEach(type=>{
+    const group = MASTER.filter(m=>m.type===type);
+    const capturedGroup = group.filter(m=>captured.has(m.name.toLowerCase()));
+    const userBirdsOfType = birds.filter(b=>b.type===type);
+    // merge master + user-captured not in master
+    const masterNames = new Set(group.map(m=>m.name.toLowerCase()));
+    const extra = userBirdsOfType.filter(b=>!masterNames.has((b.name||'').toLowerCase()));
+    const allInType = [...group, ...extra.map(b=>({name:b.name,species:b.species,type:b.type,size:b.size,emoji:habitatEmoji(b.type),_captured:true,_id:b.id}))];
+    html+=`<div class="pokedex-section">
+      <div class="section-header">
+        <div class="section-title"><span class="section-bird">${{'Raptor':'🦅','Waterbird':'🦆','Songbird':'🐦','Wader':'🐦','Seabird':'🌊','Pigeon':'🕊️','Woodpecker':'🪵','Owl':'🦉','Parrot':'🦜','Game':'🐓','Bee-eater':'🦜','Kingfisher':'🐦','Roller':'🐦','Unknown':'❓'}[type]||'🐦'}</span>${type}s</div>
+        <div class="section-count">${capturedGroup.length+extra.length} / ${allInType.length}</div>
+      </div>
+      <div class="pokedex-grid">`;
+    // Sort: user-captured with photos first, then captured without photo, then undiscovered
+    allInType.sort((a,b)=>{
+      const aU=birds.find(x=>x.id===a._id||(x.name||'').toLowerCase()===a.name.toLowerCase());
+      const bU=birds.find(x=>x.id===b._id||(x.name||'').toLowerCase()===b.name.toLowerCase());
+      const aScore=(aU?.photo?2:aU?1:0);
+      const bScore=(bU?.photo?2:bU?1:0);
+      return bScore-aScore;
+    });
+    allInType.forEach((item,i)=>{
+      const isCaptured = item._captured || captured.has(item.name.toLowerCase());
+      const userBird = item._id ? birds.find(b=>b.id===item._id) : birds.find(b=>(b.name||'').toLowerCase()===item.name.toLowerCase());
+      if(isCaptured && userBird){
+        html+=`<div class="pdex-card fadeIn" style="animation-delay:${i*0.03}s" onclick="openDetail(${userBird.id})">
+          <div class="pdex-img" style="${userBird.photo?'':'background:var(--card2);'}">
+            <div class="pdex-num">#${String(i+1).padStart(3,'0')}</div>
+            ${userBird.photo
+              ? `<img src="${userBird.photo}" alt="${userBird.name}" onclick="event.stopPropagation();openLightbox('${userBird.photo}','${userBird.name}')" style="cursor:zoom-in;"/>`
+              : `<div style="width:60px;height:60px;color:rgba(107,154,107,0.5);">${SILHOUETTES[userBird.type||item.type]||SILHOUETTES.Unknown}</div>`
+            }
+          </div>
+          <div class="pdex-body">
+            <div class="pdex-name" style="font-size:12px;line-height:1.2;">${userBird.name}</div>
+            <div class="pdex-species" style="font-size:9px;">${userBird.species||''}</div>
+            <div class="pdex-tags">
+              <span class="tag tag-${typeClass(userBird.type)}">${userBird.type||'—'}</span>
+              <span class="tag tag-${sizeClass(userBird.size)}">${userBird.size||''}</span>
+              ${userBird.lat&&userBird.lng?`<span class="tag tag-geo">GPS</span>`:''}
+            </div>
+          </div>
+        </div>`;
+      } else {
+        html+=`<div class="pdex-card undiscovered" onclick="showUndiscovered('${item.name.replace(/'/g,"\\'")}','${(item.species||'').replace(/'/g,"\\'")}','${item.type||type}')">
+          <div class="pdex-img" style="background:var(--card2);">
+            <div class="pdex-num">#${String(i+1).padStart(3,'0')}</div>
+            <div style="width:60px;height:60px;color:rgba(107,154,107,0.25);display:flex;align-items:center;justify-content:center;">${SILHOUETTES[item.type||type]||SILHOUETTES.Unknown}</div>
+            <div class="undiscovered-overlay"><span>???</span></div>
+          </div>
+          <div class="pdex-body">
+            <div class="pdex-name" style="color:var(--ink3);font-size:12px;">${item.name}</div>
+            <div class="pdex-species" style="font-size:9px;color:var(--ink3);opacity:0.5;font-style:italic;">${item.species||''}</div>
+            <div class="pdex-tags"><span class="tag tag-${typeClass(type)}">${type}</span></div>
+          </div>
+        </div>`;
+      }
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('view-pokedex').innerHTML = html;
+}
+
+let currentUndiscoveredName='', currentUndiscoveredSpecies='', currentUndiscoveredType='';
+function showUndiscovered(name,species,type){
+  currentUndiscoveredName=name; currentUndiscoveredSpecies=species; currentUndiscoveredType=type;
+  document.getElementById('undiscovered-title').textContent = name;
+  const emojiEl = document.getElementById('undiscovered-emoji');
+  emojiEl.innerHTML = `<div style="width:80px;height:80px;color:rgba(107,154,107,0.3);margin:0 auto;">${SILHOUETTES[type]||SILHOUETTES.Unknown}</div>`;
+  emojiEl.style.fontSize = 'inherit';
+  document.getElementById('undiscovered-hint').textContent = species ? `${species} — tap to log your sighting` : 'tap to log your sighting';
+  document.getElementById('undiscovered-modal').classList.add('open');
+}
+function openAddForBird(name,species,type){
+  openAdd();
+  setTimeout(()=>{
+    const ns=document.getElementById('f-name-search'); if(ns) ns.value=name;
+    const nf=document.getElementById('f-name'); if(nf) nf.value=name;
+    const sp=document.getElementById('f-species'); if(sp) sp.value=species||'';
+    const ts=document.getElementById('f-type'); if(ts) for(let o of ts.options) if(o.value===type){ts.value=type;break;}
+    const master=MASTER.find(m=>m.name===name);
+    if(master){const ss=document.getElementById('f-size');if(ss)ss.value=master.size||'Medium';}
+  },50);
+}
+
+// ── CATALOGUE ──
+function renderCatalogue(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  let filtered=birds.filter(b=>(!activeType||b.type===activeType)&&(!q||(b.name||'').toLowerCase().includes(q)||(b.species||'').toLowerCase().includes(q)||(b.location||'').toLowerCase().includes(q)));
+  const types=[...new Set(birds.map(b=>b.type).filter(Boolean))].sort();
+  let filterHtml='<button class="chip'+(activeType?'':' active')+'" onclick="setTypeFilter(\'\',this)">All</button>';
+  types.forEach(t=>{ filterHtml+=`<button class="chip${activeType===t?' active':''}" onclick="setTypeFilter('${t}',this)">${t}</button>`; });
+  document.getElementById('type-filters').innerHTML=filterHtml;
+  if(!filtered.length){ document.getElementById('cat-list').innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3);font-style:italic;">No entries yet</div>`; return; }
+  document.getElementById('cat-list').innerHTML=filtered.map(b=>`
+    <div class="cat-row" onclick="openDetail(${b.id})">
+      <div class="cat-row-thumb">${b.photo?`<img src="${b.photo}" alt="${b.name}"/>`:`<span style="font-size:24px;">${habitatEmoji(b.type)}</span>`}</div>
+      <div class="cat-row-info">
+        <div class="cat-row-name">${b.name||'Unknown'}</div>
+        <div class="cat-row-sub">${b.species||'Species unrecorded'}</div>
+        <div class="cat-row-tags">
+          <span class="tag tag-${typeClass(b.type)}">${b.type||'Unknown'}</span>
+          <span class="tag tag-${sizeClass(b.size)}">${b.size||''}</span>
+          ${b.lat&&b.lng?`<span class="tag tag-geo">GPS</span>`:''}
+        </div>
+      </div>
+      <div class="cat-row-date">${b.date?new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):''}</div>
+    </div>`).join('');
+}
+
+function setTypeFilter(t,el){
+  activeType=t;
+  document.querySelectorAll('#type-filters .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderCatalogue();
+}
+
+// ── MAP (OpenStreetMap via inline SVG tiles — no external lib) ──
+// ── SELF-CONTAINED SLIPPY MAP (no external library) ──
+const MAP = {
+  el:null, canvas:null, ctx:null,
+  lat:12.97, lng:77.59, zoom:12,
+  dragging:false, dragStart:null, tileCache:{},
+  W:0, H:0,
+
+  latLngToTile(lat,lng,z){
+    const n=Math.pow(2,z);
+    return { x:Math.floor((lng+180)/360*n), y:Math.floor((1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*n) };
+  },
+  tileToLatLng(tx,ty,z){
+    const n=Math.pow(2,z);
+    const lng=tx/n*360-180;
+    const latRad=Math.atan(Math.sinh(Math.PI*(1-2*ty/n)));
+    return {lat:latRad*180/Math.PI, lng};
+  },
+  project(lat,lng){
+    const t=this.latLngToTile(this.lat,this.lng,this.zoom);
+    const ref=this.tileToLatLng(t.x,t.y,this.zoom);
+    const scale=256*Math.pow(2,this.zoom);
+    const n=Math.pow(2,this.zoom);
+    const wx=(lng+180)/360*scale;
+    const wy=(1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*scale;
+    const cx=(this.lng+180)/360*scale;
+    const cy=(1-Math.log(Math.tan(this.lat*Math.PI/180)+1/Math.cos(this.lat*Math.PI/180))/Math.PI)/2*scale;
+    return {x:this.W/2+(wx-cx), y:this.H/2+(wy-cy)};
+  },
+  getTile(tx,ty,z,dx,dy){
+    const key=`${z}/${tx}/${ty}`;
+    if(this.tileCache[key]){
+      if(this.tileCache[key].complete) this.ctx.drawImage(this.tileCache[key],dx,dy,256,256);
+      return;
+    }
+    const img=new Image(); img.crossOrigin='anonymous';
+    img.src=`https://tile.openstreetmap.org/${z}/${tx}/${ty}.png`;
+    img.onload=()=>{ this.tileCache[key]=img; this.draw(); };
+    this.tileCache[key]=img;
+  },
+  draw(){
+    if(!this.ctx)return;
+    this.ctx.clearRect(0,0,this.W,this.H);
+    const t=this.latLngToTile(this.lat,this.lng,this.zoom);
+    const scale=256;
+    const n=Math.pow(2,this.zoom);
+    const wx=(this.lng+180)/360*n*scale;
+    const wy=(1-Math.log(Math.tan(this.lat*Math.PI/180)+1/Math.cos(this.lat*Math.PI/180))/Math.PI)/2*n*scale;
+    const ox=this.W/2-wx%scale;
+    const oy=this.H/2-wy%scale;
+    const startX=Math.floor(wx/scale)-Math.ceil(this.W/2/scale)-1;
+    const startY=Math.floor(wy/scale)-Math.ceil(this.H/2/scale)-1;
+    const endX=startX+Math.ceil(this.W/scale)+3;
+    const endY=startY+Math.ceil(this.H/scale)+3;
+    for(let tx=startX;tx<=endX;tx++){
+      for(let ty=startY;ty<=endY;ty++){
+        if(ty<0||ty>=n)continue;
+        const dx=ox+(tx-Math.floor(wx/scale))*scale;
+        const dy=oy+(ty-Math.floor(wy/scale))*scale;
+        this.getTile(((tx%n)+n)%n,ty,this.zoom,dx,dy);
+      }
+    }
+    // Draw pins
+    const geoBirds=birds.filter(b=>b.lat&&b.lng);
+    geoBirds.forEach(b=>{
+      const p=this.project(b.lat,b.lng);
+      this.ctx.save();
+      // Drop shadow
+      this.ctx.shadowColor='rgba(0,0,0,0.5)'; this.ctx.shadowBlur=6; this.ctx.shadowOffsetY=3;
+      // Pin circle
+      this.ctx.beginPath();
+      this.ctx.arc(p.x,p.y-18,13,0,Math.PI*2);
+      this.ctx.fillStyle='#22522a'; this.ctx.fill();
+      this.ctx.strokeStyle='#ffc947'; this.ctx.lineWidth=2.5; this.ctx.stroke();
+      // Pin tail
+      this.ctx.beginPath(); this.ctx.moveTo(p.x,p.y); this.ctx.lineTo(p.x-7,p.y-10); this.ctx.lineTo(p.x+7,p.y-10); this.ctx.closePath();
+      this.ctx.fillStyle='#22522a'; this.ctx.fill();
+      this.ctx.shadowColor='transparent';
+      // Bird silhouette (simple wing shape)
+      this.ctx.fillStyle='#ffc947';
+      this.ctx.beginPath();
+      // Body
+      this.ctx.ellipse(p.x,p.y-18,5,3.5,0,0,Math.PI*2);
+      this.ctx.fill();
+      // Left wing
+      this.ctx.beginPath();
+      this.ctx.moveTo(p.x-1,p.y-18);
+      this.ctx.bezierCurveTo(p.x-5,p.y-23,p.x-10,p.y-22,p.x-9,p.y-18);
+      this.ctx.bezierCurveTo(p.x-7,p.y-16,p.x-3,p.y-17,p.x-1,p.y-18);
+      this.ctx.fill();
+      // Right wing
+      this.ctx.beginPath();
+      this.ctx.moveTo(p.x+1,p.y-18);
+      this.ctx.bezierCurveTo(p.x+5,p.y-23,p.x+10,p.y-22,p.x+9,p.y-18);
+      this.ctx.bezierCurveTo(p.x+7,p.y-16,p.x+3,p.y-17,p.x+1,p.y-18);
+      this.ctx.fill();
+      // Head
+      this.ctx.beginPath();
+      this.ctx.arc(p.x+5,p.y-21,3,0,Math.PI*2);
+      this.ctx.fill();
+      // Eye
+      this.ctx.fillStyle='#22522a';
+      this.ctx.beginPath();
+      this.ctx.arc(p.x+6,p.y-21.5,1,0,Math.PI*2);
+      this.ctx.fill();
+      // Name label
+      this.ctx.fillStyle='rgba(0,0,0,0.7)'; this.ctx.strokeStyle='#ffc947'; this.ctx.lineWidth=1;
+      const label=b.name||'?'; const lw=this.ctx.measureText(label).width;
+      this.ctx.roundRect(p.x-lw/2-5,p.y+2,lw+10,16,4);
+      this.ctx.fill(); this.ctx.stroke();
+      this.ctx.fillStyle='#ffc947'; this.ctx.font='bold 9px sans-serif';
+      this.ctx.textAlign='center'; this.ctx.textBaseline='middle';
+      this.ctx.fillText(label,p.x,p.y+10);
+      this.ctx.restore();
+    });
+    // Attribution
+    this.ctx.fillStyle='rgba(255,255,255,0.8)'; this.ctx.fillRect(0,this.H-18,200,18);
+    this.ctx.fillStyle='#333'; this.ctx.font='10px sans-serif'; this.ctx.textAlign='left'; this.ctx.textBaseline='middle';
+    this.ctx.fillText('© OpenStreetMap contributors',4,this.H-9);
+  },
+  init(containerId){
+    const container=document.getElementById(containerId);
+    if(!container)return;
+    this.el=container; this.W=container.offsetWidth||window.innerWidth; this.H=container.offsetHeight||Math.max(window.innerHeight-56-60-40,300);
+    this.canvas=document.createElement('canvas');
+    this.canvas.width=this.W; this.canvas.height=this.H;
+    this.canvas.style.cssText='width:100%;height:100%;display:block;cursor:grab;';
+    container.innerHTML=''; container.appendChild(this.canvas);
+    this.ctx=this.canvas.getContext('2d');
+    // Center on birds or India
+    const geoBirds=birds.filter(b=>b.lat&&b.lng);
+    if(geoBirds.length===1){this.lat=geoBirds[0].lat;this.lng=geoBirds[0].lng;this.zoom=14;}
+    else if(geoBirds.length>1){
+      const lats=geoBirds.map(b=>b.lat), lngs=geoBirds.map(b=>b.lng);
+      this.lat=(Math.max(...lats)+Math.min(...lats))/2;
+      this.lng=(Math.max(...lngs)+Math.min(...lngs))/2;
+      this.zoom=10;
+    }
+    this.draw();
+    // Pointer events
+    this.canvas.addEventListener('pointerdown',e=>{
+      this.dragging=true; this.dragStart={x:e.clientX,y:e.clientY,lat:this.lat,lng:this.lng};
+      this.canvas.style.cursor='grabbing'; this.canvas.setPointerCapture(e.pointerId);
+    });
+    this.canvas.addEventListener('pointermove',e=>{
+      if(!this.dragging)return;
+      const dx=e.clientX-this.dragStart.x, dy=e.clientY-this.dragStart.y;
+      const scale=256*Math.pow(2,this.zoom);
+      const dLng=dx/scale*360;
+      const cy=(1-Math.log(Math.tan(this.dragStart.lat*Math.PI/180)+1/Math.cos(this.dragStart.lat*Math.PI/180))/Math.PI)/2;
+      const newCy=cy-dy/scale;
+      this.lat=Math.atan(Math.sinh(Math.PI*(1-2*newCy)))*180/Math.PI;
+      this.lng=this.dragStart.lng-dLng;
+      this.draw();
+    });
+    this.canvas.addEventListener('pointerup',e=>{ this.dragging=false; this.canvas.style.cursor='grab'; });
+    this.canvas.addEventListener('wheel',e=>{
+      e.preventDefault();
+      this.zoom=Math.max(2,Math.min(18,this.zoom+(e.deltaY<0?1:-1)));
+      this.tileCache={}; this.draw();
+    },{passive:false});
+    // Tap to show bird popup
+    this.canvas.addEventListener('click',e=>{
+      if(this.dragStart&&(Math.abs(e.clientX-this.dragStart.x)>4||Math.abs(e.clientY-this.dragStart.y)>4))return;
+      const rect=this.canvas.getBoundingClientRect();
+      const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+      const geoBirds=birds.filter(b=>b.lat&&b.lng);
+      for(const b of geoBirds){
+        const p=this.project(b.lat,b.lng);
+        if(Math.hypot(mx-p.x,my-(p.y-12))<14){ openDetail(b.id); break; }
+      }
+    });
+  },
+  resize(){
+    if(!this.canvas||!this.el)return;
+    this.W=this.el.offsetWidth||window.innerWidth; this.H=this.el.offsetHeight||400;
+    this.canvas.width=this.W; this.canvas.height=this.H; this.draw();
+  }
+};
+
+function initMap(){
+  const infoBar=document.getElementById('map-info-bar');
+  const geoBirds=birds.filter(b=>b.lat&&b.lng);
+  infoBar.textContent=`${geoBirds.length} of ${birds.length} sightings geotagged — drag to pan, scroll/pinch to zoom, tap pin to view`;
+  // Use requestAnimationFrame to ensure DOM has painted and container has height
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      MAP.init('map-el');
+    });
+  });
+}
+
+// ── DETAIL ──
+function openDetail(id){
+  const b=birds.find(x=>x.id===id); if(!b)return;
+  document.getElementById('detail-content').innerHTML=`
+    <div class="detail-hero" onclick="b_photo_click(this)" data-photo-id="${b.id}">${b.photo?`<img src="${b.photo}" alt="${b.name}"/>`:`<span style="font-size:80px;">${habitatEmoji(b.type)}</span>`}</div>
+    <div class="detail-body">
+      <div><div class="detail-name">${b.name||'Unknown'}</div><div class="detail-species">${b.species||'Species unrecorded'}</div></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="tag tag-${typeClass(b.type)}">${b.type||'Unknown'}</span>
+        <span class="tag tag-${sizeClass(b.size)}">${b.size||''}</span>
+        ${b.lat&&b.lng?`<span class="tag tag-geo">GPS</span>`:''}
+      </div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Date</div><div class="meta-val">${b.date?new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—'}</div></div>
+        <div class="meta-item"><div class="meta-label">Location</div><div class="meta-val">${b.location||'—'}</div></div>
+        ${b.lat&&b.lng?`<div class="meta-item" style="grid-column:span 2;"><div class="meta-label">GPS</div><div class="meta-val" style="font-size:11px;font-family:monospace;">${parseFloat(b.lat).toFixed(5)}, ${parseFloat(b.lng).toFixed(5)} <a href="https://www.openstreetmap.org/?mlat=${b.lat}&mlon=${b.lng}&zoom=15" target="_blank" style="color:var(--forest);font-size:10px;font-family:'Josefin Sans',sans-serif;margin-left:6px;">Open map</a></div></div>`:''}
+      </div>
+      ${b.notes?`<div><div class="section-lbl">🔭 Field notes</div><div class="notes-box">${b.notes}</div></div>`:''}
+      ${b.profile?`
+      <div>
+        <div class="section-lbl">📋 Bird profile</div>
+        <div class="profile-grid">
+          ${b.profile.range?`<div class="profile-card full"><span class="profile-card-icon">🗺️</span><div class="profile-card-label">Range & distribution</div><div class="profile-card-val">${b.profile.range}</div></div>`:''}
+          ${b.profile.habitat?`<div class="profile-card full"><span class="profile-card-icon">🌿</span><div class="profile-card-label">Preferred habitat</div><div class="profile-card-val">${b.profile.habitat}</div></div>`:''}
+          ${b.profile.breeding?`<div class="profile-card"><span class="profile-card-icon">🥚</span><div class="profile-card-label">Breeding season</div><div class="profile-card-val">${b.profile.breeding}</div></div>`:''}
+          ${b.profile.diet?`<div class="profile-card"><span class="profile-card-icon">🍽️</span><div class="profile-card-label">Diet</div><div class="profile-card-val">${b.profile.diet}</div></div>`:''}
+          ${b.profile.call?`<div class="profile-card full"><span class="profile-card-icon">🔊</span><div class="profile-card-label">Call / song</div><div class="profile-card-val">${b.profile.call}</div></div>`:''}
+          ${b.profile.fieldId?`<div class="profile-card full"><span class="profile-card-icon">🔍</span><div class="profile-card-label">Field identification tips</div><div class="profile-card-val">${b.profile.fieldId}</div></div>`:''}
+          ${b.profile.conservation?`<div class="profile-card"><span class="profile-card-icon">🛡️</span><div class="profile-card-label">Conservation status</div><div class="profile-card-val conservation-${(b.profile.conservation||'').toLowerCase().replace(/[^a-z]/g,'')}">${({'LC':'Least Concern ✓','NT':'Near Threatened','VU':'Vulnerable ⚠','EN':'Endangered ⚠⚠','CR':'Critically Endangered 🚨'})[b.profile.conservation]||b.profile.conservation}</div></div>`:''}
+          ${b.profile.wingspan?`<div class="profile-card"><span class="profile-card-icon">📏</span><div class="profile-card-label">Wingspan</div><div class="profile-card-val">${b.profile.wingspan}</div></div>`:''}
+        </div>
+      </div>`:''}
+      <div>
+        <div class="section-lbl">✨ Fascinating facts</div>
+        ${b.facts?`<div class="facts-box">${b.facts}</div>`:`<button class="facts-btn" id="facts-btn-${id}" onclick="loadFacts(${id})"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Load bird profile + facts</button>`}
+        <div id="facts-area-${id}" style="margin-top:8px;"></div>
+      </div>
+    </div>`;
+  document.getElementById('detail-delete-btn').onclick=()=>deleteBird(id);
+  document.getElementById('detail-edit-btn').onclick=()=>openEdit(id);
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+async function autoFetchFacts(id){
+  const b=birds.find(x=>x.id===id); if(!b||b.facts) return;
+  // Check preloaded first
+  const pre=getPreloadedData(b.name);
+  if(pre){
+    birds=birds.map(x=>x.id===id?{...x,facts:pre.facts,profile:pre.profile}:x);
+    DB.saveAll(birds).catch(e=>{});
+    showToast('Bird profile ready ✦');
+    return;
+  }
+  const key=localStorage.getItem(AK); if(!key) return;
+  try{
+    const prompt=`You are an expert ornithologist. For "${b.name}" (${b.species||''}), respond ONLY in this JSON format with no markdown:
+{"profile":{"range":"India range in 1-2 sentences","habitat":"preferred habitat","breeding":"breeding season","diet":"diet","call":"call description","fieldId":"top 3 ID features","conservation":"LC/NT/VU/EN/CR","wingspan":"wingspan in cm"},"facts":["fact1","fact2","fact3","fact4","fact5"]}`;
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json'}})
+    });
+    const data=await r.json();
+    if(data.error) return;
+    const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!raw) return;
+    let parsed; try{parsed=JSON.parse(raw);}catch(e){return;}
+    const factsText='• '+parsed.facts.join('\n• ');
+    birds=birds.map(x=>x.id===id?{...x,facts:factsText,profile:parsed.profile}:x);
+    DB.saveAll(birds).catch(e=>{});
+    showToast('Bird profile loaded ✦');
+  }catch(e){}
+}
+
+async function loadFacts(id){
+  const b=birds.find(x=>x.id===id); if(!b)return;
+  // Use preloaded if available
+  const pre=getPreloadedData(b.name);
+  if(pre&&!b.facts){
+    birds=birds.map(x=>x.id===id?{...x,facts:pre.facts,profile:pre.profile}:x);
+    save(); openDetail(id); return;
+  }
+  const key=localStorage.getItem(AK); if(!key){showToast('Add Gemini API key in Settings','error');return;}
+  const btn=document.getElementById(`facts-btn-${id}`); if(btn)btn.style.display='none';
+  const area=document.getElementById(`facts-area-${id}`);
+  area.innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink3);letter-spacing:0.5px;"><div class="spinner" style="border-top-color:var(--amber);"></div>Loading profile &amp; facts for ${b.name}…</div>`;
+  try{
+    const prompt=`You are an expert ornithologist. For the bird "${b.name}" (${b.species||'unknown species'}), provide BOTH a structured profile AND fascinating facts.
+
+Respond ONLY in this exact JSON format with no markdown, no backticks, no extra text:
+{"profile":{"range":"where found in India and globally (2-3 sentences)","habitat":"preferred ecosystems and microhabitats","breeding":"breeding season months and nesting behaviour","diet":"what it eats","call":"describe the call/song vividly","fieldId":"3 key visual features to identify it in the field","conservation":"one of: LC, NT, VU, EN, CR","wingspan":"wingspan range in cm"},"facts":["fact1","fact2","fact3","fact4","fact5"]}`;
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json'}})
+    });
+    const data=await r.json();
+    if(data.error)throw new Error(data.error.message);
+    const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!raw)throw new Error('No response');
+    let parsed; try{parsed=JSON.parse(raw);}catch(e){throw new Error('Could not parse response');}
+    const factsText='• '+parsed.facts.join('\n• ');
+    birds=birds.map(x=>x.id===id?{...x,facts:factsText,profile:parsed.profile}:x);
+    save();
+    // Re-render the detail view to show profile cards
+    openDetail(id);
+  }catch(e){area.innerHTML=`<div style="color:var(--rust);font-size:11px;">Could not load: ${e.message}</div>`;}
+}
+
+function deleteBird(id){
+  if(!confirm('Remove this entry?'))return;
+  birds=birds.filter(b=>b.id!==id); save(); closeModal('detail-modal'); showToast('Entry removed','error');
+}
+
+// ── ADD BIRD ──
+function openAdd(){
+  currentPhotoBase64=null;
+  document.getElementById('photo-preview-img').style.display='none';
+  document.getElementById('photo-placeholder').style.display='block';
+  ['f-name','f-name-search','f-species','f-location','f-notes','f-lat','f-lng'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const szEl=document.getElementById('f-size'); if(szEl) szEl.value='Medium';
+  document.getElementById('bird-dropdown').classList.remove('open');
+  document.getElementById('f-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ai-result').style.display='none';
+  document.getElementById('exif-bar').style.display='none';
+  document.getElementById('geo-row').style.display='none';
+  document.getElementById('identify-btn').disabled=true;
+  // reset save button in case coming from edit
+  const saveBtn=document.querySelector('#add-modal .btn-save');
+  saveBtn.textContent='Save to journal'; saveBtn.onclick=saveBird;
+  document.querySelector('#add-modal .modal-title').textContent='New sighting';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function handlePhoto(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const original=ev.target.result;
+    // Extract GPS from original full-res file FIRST (before compression strips it)
+    extractExifGps(original);
+    // Then compress for storage — resize to max 900px, JPEG quality 0.75
+    // This keeps photos under ~100KB vs 2-5MB originals
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=900;
+      let w=img.width, h=img.height;
+      if(w>MAX||h>MAX){ if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;} }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      currentPhotoBase64=canvas.toDataURL('image/jpeg',0.75);
+      document.getElementById('photo-preview-img').src=currentPhotoBase64;
+      document.getElementById('photo-preview-img').style.display='block';
+      document.getElementById('photo-placeholder').style.display='none';
+      document.getElementById('identify-btn').disabled=false;
+      // Show compressed size hint
+      const kb=Math.round(currentPhotoBase64.length*0.75/1024);
+      const bar=document.getElementById('exif-bar');
+      if(bar.className.includes('found')){
+        bar.textContent=bar.textContent+` · photo compressed to ${kb}KB`;
+      }
+    };
+    img.src=original;
+  };
+  reader.readAsDataURL(file);
+}
+
+function extractExifGps(dataUrl){
+  const bar=document.getElementById('exif-bar');
+  bar.style.display='block'; bar.className='exif-bar notfound'; bar.textContent='Reading EXIF…';
+  try{
+    const binary=atob(dataUrl.split(',')[1]);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    const gps=parseExifGps(new DataView(bytes.buffer));
+    if(gps){
+      document.getElementById('f-lat').value=gps.lat.toFixed(7);
+      document.getElementById('f-lng').value=gps.lng.toFixed(7);
+      document.getElementById('geo-row').style.display='grid';
+      bar.className='exif-bar found';
+      bar.textContent=`📍 GPS extracted: ${gps.lat.toFixed(5)}, ${gps.lng.toFixed(5)}`;
+      if(gps.dateTime){ const d=gps.dateTime.split(' ')[0].replace(/:/g,'-'); document.getElementById('f-date').value=d; }
+    } else {
+      document.getElementById('geo-row').style.display='grid';
+      bar.className='exif-bar notfound'; bar.textContent='No GPS in photo — enter manually or use GPS button below.';
+    }
+  }catch(e){ document.getElementById('geo-row').style.display='grid'; bar.className='exif-bar notfound'; bar.textContent='Could not read EXIF.'; }
+}
+
+function parseExifGps(view){
+  if(view.getUint16(0)!==0xFFD8)return null;
+  let offset=2;
+  while(offset<view.byteLength-4){
+    const marker=view.getUint16(offset);offset+=2;
+    if(marker===0xFFE1){
+      const segLen=view.getUint16(offset);
+      const hdr=String.fromCharCode(...new Uint8Array(view.buffer,offset+2,4));
+      if(hdr!=='Exif'){offset+=segLen;continue;}
+      const t=offset+8; const le=view.getUint16(t)===0x4949;
+      const rd=(o,sz)=>sz===4?view.getUint32(t+o,le):sz===2?view.getUint16(t+o,le):view.getUint8(t+o);
+      const ifd=rd(4,4); const n=rd(ifd,2);
+      let gpsOff=null,dt=null;
+      for(let i=0;i<n;i++){const e=ifd+2+i*12;const tag=rd(e,2);if(tag===0x8825)gpsOff=rd(e+8,4);if(tag===0x0132){dt='';for(let c=0;c<19;c++)dt+=String.fromCharCode(rd(rd(e+8,4)+c,1));}}
+      if(!gpsOff)return null;
+      const gn=rd(gpsOff,2); const gd={};
+      for(let i=0;i<gn;i++){const e=gpsOff+2+i*12;const tag=rd(e,2);const vo=rd(e+8,4);if([1,2,3,4].includes(tag)){if(tag===1||tag===3){gd[tag]=String.fromCharCode(rd(e+8,1));}else{const d=view.getUint32(t+vo,le)/view.getUint32(t+vo+4,le);const m=view.getUint32(t+vo+8,le)/view.getUint32(t+vo+12,le);const s=view.getUint32(t+vo+16,le)/view.getUint32(t+vo+20,le);gd[tag]=d+m/60+s/3600;}}}
+      if(gd[2]&&gd[4])return{lat:gd[1]==='S'?-gd[2]:gd[2],lng:gd[3]==='W'?-gd[4]:gd[4],dateTime:dt};
+      return null;
+    } else if((marker&0xFF00)===0xFF00){offset+=view.getUint16(offset);}else break;
+  }return null;
+}
+
+function useCurrentLocation(){
+  navigator.geolocation.getCurrentPosition(p=>{
+    document.getElementById('f-lat').value=p.coords.latitude.toFixed(7);
+    document.getElementById('f-lng').value=p.coords.longitude.toFixed(7);
+    document.getElementById('geo-row').style.display='grid';
+    document.getElementById('exif-bar').style.display='block';
+    document.getElementById('exif-bar').className='exif-bar found';
+    document.getElementById('exif-bar').textContent=`📍 Current location: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
+  },()=>alert('Location access denied.'));
+}
+
+async function aiIdentify(){
+  const key=localStorage.getItem(AK);
+  const res=document.getElementById('ai-result');
+  res.style.display='block';
+  if(!key){
+    res.style.cssText='background:rgba(139,58,26,0.08);border:1px solid rgba(139,58,26,0.25);color:var(--rust);display:block;';
+    res.textContent='⚠ No API key — go to Settings and paste your Gemini API key.';
+    return;
+  }
+  if(!currentPhotoBase64)return;
+  const btn=document.getElementById('identify-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Identifying…';
+  res.style.cssText='display:block;';
+  res.textContent='Analysing your photo…';
+  try{
+    const b64=currentPhotoBase64.split(',')[1];
+    const mime=(currentPhotoBase64.match(/data:([^;]+);/)||[])[1]||'image/jpeg';
+    const prompt=`You are an expert ornithologist. Identify the bird in this photo. Respond ONLY in this exact format with no extra text:\nCommon name: [name]\nScientific name: [scientific name]\nBird type: [exactly one of: Raptor, Waterbird, Songbird, Wader, Seabird, Pigeon, Woodpecker, Owl, Parrot, Game, Bee-eater, Kingfisher, Roller, Unknown]\nSize: [exactly one of: Small, Medium, Large, Very Large]\nConfidence: [High/Medium/Low]\nNote: [1 sentence about key identifying features]`;
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{inline_data:{mime_type:mime,data:b64}},{text:prompt}]}]})
+    });
+    const data=await r.json();
+    if(data.error){
+      res.style.cssText='background:rgba(139,58,26,0.08);border:1px solid rgba(139,58,26,0.25);color:var(--rust);display:block;';
+      res.textContent='API error: '+data.error.message;
+      btn.disabled=false; btn.innerHTML='<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Try again';
+      return;
+    }
+    const text=data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    res.style.cssText='background:rgba(45,74,45,0.05);border:1px solid rgba(45,74,45,0.15);color:var(--ink2);display:block;';
+    res.textContent=text;
+    const match=(p)=>{const m=text.match(new RegExp(p+':\\s*(.+)','i'));return m?m[1].trim():null;};
+    if(match('Common name')){const n=match('Common name');document.getElementById('f-name').value=n;document.getElementById('f-name-search').value=n;}
+    if(match('Scientific name'))document.getElementById('f-species').value=match('Scientific name');
+    if(match('Bird type')){const t=match('Bird type');const s=document.getElementById('f-type');if(s)for(let o of s.options)if(o.value===t){s.value=t;break;}}
+    if(match('Size')){const sz=match('Size');const s=document.getElementById('f-size');if(s)for(let o of s.options)if(o.value===sz){s.value=sz;break;}}
+  }catch(e){
+    res.style.cssText='background:rgba(139,58,26,0.08);border:1px solid rgba(139,58,26,0.25);color:var(--rust);display:block;';
+    res.textContent='Error: '+e.message;
+  }
+  btn.disabled=false; btn.innerHTML='<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Identify again';
+}
+
+function saveBird(){
+  const name=(document.getElementById('f-name').value||document.getElementById('f-name-search').value||'').trim();
+  if(!name){showToast('Please select or type a bird name','error');return;}
+  const saveBtn=document.querySelector('#add-modal .btn-save');
+  saveBtn.textContent='Saving…'; saveBtn.disabled=true;
+  const lat=parseFloat(document.getElementById('f-lat').value)||null;
+  const lng=parseFloat(document.getElementById('f-lng').value)||null;
+  const _species=(document.getElementById('f-species')||{}).value||'';
+  const _type=(document.getElementById('f-type')||{}).value||'Unknown';
+  const _size=(document.getElementById('f-size')||{}).value||'Medium';
+  const _location=(document.getElementById('f-location')||{}).value||'';
+  const _date=(document.getElementById('f-date')||{}).value||new Date().toISOString().slice(0,10);
+  const _notes=(document.getElementById('f-notes')||{}).value||'';
+  birds.unshift({id:nextId++,name,species:_species.trim(),type:_type,size:_size,location:_location.trim(),date:_date,notes:_notes.trim(),photo:currentPhotoBase64||null,lat:(lat&&lng)?lat:null,lng:(lat&&lng)?lng:null,facts:null});
+  save();
+  saveBtn.textContent='✓ Saved!'; saveBtn.style.background='var(--forest2)';
+  setTimeout(()=>{
+    closeModal('add-modal');
+    showToast('Sighting saved to journal ✓');
+    saveBtn.textContent='Save to journal'; saveBtn.style.background=''; saveBtn.disabled=false;
+    const newBird=birds[0];
+    if(localStorage.getItem(AK)&&newBird&&!newBird.facts) setTimeout(()=>autoFetchFacts(newBird.id),400);
+  },600);
+}
+
+
+// ── BIRD NAME DROPDOWN ──
+let dropdownHighlight = -1;
+function openBirdDropdown(){ filterBirdDropdown(); }
+function filterBirdDropdown(){
+  const q = (document.getElementById('f-name-search').value||'').toLowerCase().trim();
+  const dd = document.getElementById('bird-dropdown');
+  const matches = q.length < 1
+    ? MASTER.slice(0,30)
+    : MASTER.filter(m=>m.name.toLowerCase().includes(q)||m.species.toLowerCase().includes(q));
+  dropdownHighlight = -1;
+  if(!matches.length && q.length > 1){
+    dd.innerHTML = `<div class="bird-dropdown-item custom-item" onclick="selectCustomBird('${q.replace(/'/g,"\'")}')">Use "${q}" as custom name</div>`;
+  } else {
+    dd.innerHTML = matches.map((m,i)=>`
+      <div class="bird-dropdown-item" onclick="selectBird(${MASTER.indexOf(m)})">
+        ${m.name}<small>${m.species} · ${m.type} · ${m.size}</small>
+      </div>`).join('');
+    if(q.length > 1) dd.innerHTML += `<div class="bird-dropdown-item custom-item" onclick="selectCustomBird('${q.replace(/'/g,"\'")}')">Use "${q}" as custom name</div>`;
+  }
+  dd.classList.add('open');
+}
+function selectBird(idx){
+  const m = MASTER[idx]; if(!m) return;
+  const ns=document.getElementById('f-name-search'); if(ns) ns.value=m.name;
+  const nf=document.getElementById('f-name'); if(nf) nf.value=m.name;
+  const sp=document.getElementById('f-species'); if(sp) sp.value=m.species;
+  const ts=document.getElementById('f-type'); if(ts) for(let o of ts.options) if(o.value===m.type){ts.value=m.type;break;}
+  const ss=document.getElementById('f-size'); if(ss) for(let o of ss.options) if(o.value===m.size){ss.value=m.size;break;}
+  const dd=document.getElementById('bird-dropdown'); if(dd) dd.classList.remove('open');
+}
+function selectCustomBird(name){
+  document.getElementById('f-name-search').value = name;
+  document.getElementById('f-name').value = name;
+  document.getElementById('bird-dropdown').classList.remove('open');
+}
+function handleDropdownKey(e){
+  const dd = document.getElementById('bird-dropdown');
+  const items = dd.querySelectorAll('.bird-dropdown-item');
+  if(e.key==='ArrowDown'){e.preventDefault();dropdownHighlight=Math.min(dropdownHighlight+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('highlighted',i===dropdownHighlight));}
+  else if(e.key==='ArrowUp'){e.preventDefault();dropdownHighlight=Math.max(dropdownHighlight-1,0);items.forEach((el,i)=>el.classList.toggle('highlighted',i===dropdownHighlight));}
+  else if(e.key==='Enter'&&dropdownHighlight>=0){e.preventDefault();items[dropdownHighlight].click();}
+  else if(e.key==='Escape'){dd.classList.remove('open');}
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.bird-search-wrap')) document.getElementById('bird-dropdown')?.classList.remove('open');
+});
+
+// ── EDIT ENTRY ──
+function openEdit(id){
+  const b = birds.find(x=>x.id===id); if(!b) return;
+  closeModal('detail-modal');
+  currentPhotoBase64 = b.photo||null;
+  // populate form
+  document.getElementById('f-name-search').value = b.name||'';
+  document.getElementById('f-name').value = b.name||'';
+  document.getElementById('f-species').value = b.species||'';
+  const ts=document.getElementById('f-type'); if(ts) ts.value=b.type||'Unknown';
+  const szE=document.getElementById('f-size'); if(szE) szE.value=b.size||'Medium';
+  document.getElementById('f-date').value = b.date||'';
+  document.getElementById('f-location').value = b.location||'';
+  document.getElementById('f-notes').value = b.notes||'';
+  document.getElementById('f-lat').value = b.lat||'';
+  document.getElementById('f-lng').value = b.lng||'';
+  if(b.lat&&b.lng) document.getElementById('geo-row').style.display='grid';
+  if(b.photo){
+    document.getElementById('photo-preview-img').src=b.photo;
+    document.getElementById('photo-preview-img').style.display='block';
+    document.getElementById('photo-placeholder').style.display='none';
+    document.getElementById('identify-btn').disabled=false;
+  } else {
+    document.getElementById('photo-preview-img').style.display='none';
+    document.getElementById('photo-placeholder').style.display='block';
+    document.getElementById('identify-btn').disabled=true;
+  }
+  document.getElementById('exif-bar').style.display='none';
+  document.getElementById('ai-result').style.display='none';
+  // Change save button to update
+  const saveBtn = document.querySelector('#add-modal .btn-save');
+  saveBtn.textContent = 'Update entry';
+  saveBtn.onclick = ()=>updateBird(id);
+  document.querySelector('#add-modal .modal-title').textContent = 'Edit sighting';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function updateBird(id){
+  const nameVal=(document.getElementById('f-name').value||document.getElementById('f-name-search').value||'').trim();
+  if(!nameVal){showToast('Please enter a bird name','error');return;}
+  const saveBtn=document.querySelector('#add-modal .btn-save');
+  saveBtn.textContent='Updating…'; saveBtn.disabled=true;
+  const lat=parseFloat(document.getElementById('f-lat').value)||null;
+  const lng=parseFloat(document.getElementById('f-lng').value)||null;
+  const sizeEl=document.getElementById('f-size');
+  const typeEl=document.getElementById('f-type');
+  const specEl=document.getElementById('f-species');
+  const locEl=document.getElementById('f-location');
+  const dateEl=document.getElementById('f-date');
+  const notesEl=document.getElementById('f-notes');
+  birds=birds.map(b=>b.id===id ? {
+    ...b,
+    name:nameVal,
+    species:specEl?(specEl.value||'').trim():b.species,
+    type:typeEl?typeEl.value:b.type,
+    size:sizeEl?sizeEl.value:b.size,
+    location:locEl?(locEl.value||'').trim():b.location,
+    date:dateEl?(dateEl.value||b.date):b.date,
+    notes:notesEl?(notesEl.value||'').trim():b.notes,
+    photo:currentPhotoBase64||b.photo,
+    lat:(lat&&lng)?lat:b.lat,
+    lng:(lat&&lng)?lng:b.lng,
+  } : b);
+  save();
+  saveBtn.textContent='✓ Updated!'; saveBtn.style.background='var(--forest2)';
+  setTimeout(()=>{
+    closeModal('add-modal');
+    showToast('Entry updated ✓');
+    saveBtn.textContent='Save to journal';
+    saveBtn.style.background='';
+    saveBtn.disabled=false;
+    saveBtn.onclick=saveBird;
+    document.querySelector('#add-modal .modal-title').textContent='New sighting';
+  },800);
+}
+
+
+// ── LIGHTBOX ──
+function openLightbox(src, caption){
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-caption').textContent = caption || '';
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function b_photo_click(el){
+  const id=parseInt(el.dataset.photoId);
+  const b=birds.find(x=>x.id===id);
+  if(b&&b.photo) openLightbox(b.photo, b.name+' · '+b.species);
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
+
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type;
+  requestAnimationFrame(()=>{ t.classList.add('show');
+    setTimeout(()=>{t.classList.remove('show');},2200);
+  });
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function saveApiKey(){
+  const inp=document.getElementById('api-key-input');
+  const k=inp.value.trim();
+  if(!k){
+    document.getElementById('api-status').textContent='⚠ Please paste your API key first';
+    document.getElementById('api-status').className='api-status-text';
+    document.getElementById('api-status').style.color='var(--rust)';
+    return;
+  }
+  DB.setMeta(AK,k); localStorage.setItem(AK,k); // store in both
+  inp.value='••••••••••••••••••••';
+  const btn=document.querySelector('.settings-btn');
+  btn.textContent='✓ Saved!';
+  btn.style.background='var(--forest2)';
+  document.getElementById('api-status').textContent='Key saved and active ✦';
+  document.getElementById('api-status').className='api-status-text ok';
+  document.getElementById('api-status').style.color='';
+  showToast('API key saved ✓');
+  setTimeout(()=>{btn.textContent='Save key';btn.style.background='';},2000);
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify({featherlog:true,version:2,birds},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`featherlog-${new Date().toISOString().slice(0,10)}.json`;a.click();
+}
+
+function importData(e){
+  const file=e.target.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      const imported=d.birds||(Array.isArray(d)?d:[]);
+      if(!imported.length){alert('No birds found.');return;}
+      if(!confirm(`Import ${imported.length} entries?`))return;
+      const maxId=birds.length?Math.max(...birds.map(b=>b.id)):0;
+      imported.forEach((b,i)=>b.id=maxId+i+1);
+      birds=[...birds,...imported]; nextId=Math.max(...birds.map(b=>b.id))+1;
+      save(); alert(`Imported ${imported.length} entries!`);
+    }catch{alert('Invalid file.');}
+  };
+  reader.readAsText(file);
+}
+
+document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
+
+window.addEventListener('resize', ()=>{ if(MAP.canvas) MAP.resize(); });
+// Boot — loads from IndexedDB, migrates localStorage if needed
+initStorage();
+</script>
+</body>
+</html>
