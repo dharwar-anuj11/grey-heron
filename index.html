@@ -20,11 +20,11 @@
       --glass:rgba(14,24,14,0.7);
       --r:14px;
     }
-    html,body { font-family:'DM Sans',system-ui,sans-serif; font-weight:300; background:var(--p); color:var(--ink); width:100%; height:100%; overflow:hidden; }
+    html,body { font-family:'DM Sans',system-ui,sans-serif; font-weight:300; background:var(--p); color:var(--ink); width:100%; height:100vh; height:100dvh; overflow:hidden; }
 
     /* ── LOGIN ─────────────────────────── */
     #login-container {
-      display:flex; align-items:center; justify-content:center; width:100%; height:100%;
+      display:flex; align-items:center; justify-content:center; width:100%; height:100vh; height:100dvh;
       background:var(--p);
       background-image:
         radial-gradient(ellipse 130% 80% at 25% 85%, rgba(30,96,40,0.18) 0%, transparent 55%),
@@ -51,7 +51,7 @@
 
     /* ── LAYOUT ─────────────────────────── */
     .app {
-      display:none; flex-direction:column; height:100vh; width:100%;
+      display:none; flex-direction:column; height:100vh; height:100dvh; width:100%;
       background:var(--p);
       background-image:
         radial-gradient(circle at 10% 90%, rgba(40,160,64,0.05) 0%, transparent 35%),
@@ -124,11 +124,43 @@
     #view-map.active { display:flex; flex-direction:column; height:100%; }
 
     /* ── POKÉDEX VIEW ─────────────────── */
-    .pokedex-section { padding:20px 14px 8px; position:relative; }
+    .pdex-tabs-wrap {
+      position:sticky; top:0; z-index:8;
+      background:linear-gradient(180deg, var(--p) 80%, rgba(7,13,7,0));
+      padding:8px 0 6px;
+    }
+    .pdex-tabs {
+      display:flex; gap:0; overflow-x:auto; scrollbar-width:none;
+      padding:0 14px;
+    }
+    .pdex-tabs::-webkit-scrollbar { display:none; }
+    .pdex-tab {
+      padding:8px 14px; border:none; background:none; cursor:pointer;
+      font-size:11px; letter-spacing:0.3px; color:var(--ink3);
+      white-space:nowrap; flex-shrink:0; transition:all 0.2s;
+      font-family:'DM Sans',sans-serif; font-weight:400;
+      position:relative; border-bottom:2px solid transparent;
+    }
+    .pdex-tab:hover { color:var(--ink2); }
+    .pdex-tab.active {
+      color:var(--amber2); font-weight:500;
+      border-bottom-color:var(--amber2);
+    }
+    .pdex-tab .pdex-tab-frac {
+      display:inline-block; margin-left:4px;
+      font-size:8px; color:var(--ink3); opacity:0.5;
+    }
+    .pdex-tab.active .pdex-tab-frac { color:var(--amber2); opacity:0.7; }
+    .pdex-tab.has-birds { color:var(--ink2); }
+    .pdex-tab.has-birds .pdex-tab-frac { opacity:0.7; }
+
+    .pokedex-section { padding:4px 14px 8px; position:relative; }
     .pokedex-section+.pokedex-section { padding-top:4px; }
     .section-header {
       display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:14px; padding:0 2px;
+      margin-bottom:12px; padding:12px 2px 8px;
+      position:sticky; top:40px; z-index:7;
+      background:linear-gradient(180deg, var(--p) 70%, rgba(7,13,7,0));
     }
     .section-title {
       font-family:'Playfair Display',serif; font-size:17px; font-weight:700;
@@ -188,18 +220,50 @@
     .undiscovered-overlay span { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); font-weight:500; }
 
     /* ── CATALOGUE VIEW ───────────────── */
-    .catalogue-header { padding:16px; display:flex; gap:10px; align-items:center; }
+    .catalogue-header { padding:16px 16px 12px; display:flex; gap:10px; align-items:center; }
     .search-wrap { position:relative; flex:1; }
     .search-wrap svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink3); }
     .search-input { width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:11px 14px 11px 36px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:all 0.25s; }
     .search-input:focus { border-color:rgba(40,160,64,0.3); box-shadow:0 0 0 3px rgba(40,160,64,0.08); background:rgba(255,255,255,0.04); }
     .search-input::placeholder { color:rgba(90,138,90,0.5); font-style:italic; }
-    .filter-scroll { padding:0 16px 12px; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
-    .filter-scroll::-webkit-scrollbar { display:none; }
-    .chip { padding:6px 14px; border-radius:99px; font-size:9px; letter-spacing:0.8px; text-transform:uppercase; cursor:pointer; border:1px solid rgba(255,255,255,0.06); color:var(--ink3); background:transparent; white-space:nowrap; flex-shrink:0; transition:all 0.2s; font-weight:500; }
-    .chip.active { background:linear-gradient(135deg, var(--forest2), var(--forest3)); border-color:transparent; color:#fff; box-shadow:0 2px 16px rgba(40,160,64,0.2); }
+
+    .cat-tabs-wrap {
+      position:sticky; top:0; z-index:8;
+      background:linear-gradient(180deg, var(--p) 80%, rgba(7,13,7,0));
+      padding:0 0 8px;
+    }
+    .cat-tabs {
+      display:flex; gap:0; overflow-x:auto; scrollbar-width:none;
+      padding:0 16px;
+    }
+    .cat-tabs::-webkit-scrollbar { display:none; }
+    .cat-tab {
+      padding:10px 16px; border:none; background:none; cursor:pointer;
+      font-size:11px; letter-spacing:0.3px; color:var(--ink3);
+      white-space:nowrap; flex-shrink:0; transition:all 0.2s;
+      font-family:'DM Sans',sans-serif; font-weight:400;
+      position:relative; border-bottom:2px solid transparent;
+    }
+    .cat-tab:hover { color:var(--ink2); }
+    .cat-tab.active {
+      color:var(--amber2); font-weight:500;
+      border-bottom-color:var(--amber2);
+    }
+    .cat-tab .cat-tab-count {
+      display:inline-block; margin-left:5px;
+      font-size:9px; color:var(--ink3); opacity:0.6;
+    }
+    .cat-tab.active .cat-tab-count { color:var(--amber2); opacity:0.8; }
 
     .cat-list { padding:0 16px 80px; }
+    .cat-section-header {
+      font-family:'Playfair Display',serif; font-size:15px; font-weight:700;
+      color:var(--amber2); padding:16px 0 10px; display:flex; align-items:center; gap:8px;
+      position:sticky; top:42px; z-index:7;
+      background:linear-gradient(180deg, var(--p) 70%, rgba(7,13,7,0));
+    }
+    .cat-section-header::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(255,209,102,0.15), transparent); }
+    .cat-section-count { font-size:9px; letter-spacing:1px; color:var(--ink3); font-family:'DM Sans',sans-serif; font-weight:400; }
     .cat-row { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:var(--r); padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.25s; }
     .cat-row:hover { border-color:rgba(40,160,64,0.15); transform:translateX(4px); background:rgba(14,24,14,0.9); }
     .cat-row-thumb { width:52px; height:52px; border-radius:10px; background:rgba(14,24,14,0.8); overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:24px; }
@@ -413,7 +477,12 @@
 
   <!-- CONTENT -->
   <div class="content" id="content">
-    <div class="view active" id="view-pokedex"></div>
+    <div class="view active" id="view-pokedex">
+      <div class="pdex-tabs-wrap">
+        <div class="pdex-tabs" id="pdex-tabs"></div>
+      </div>
+      <div id="pdex-grid-area"></div>
+    </div>
 
     <div class="view" id="view-catalogue">
       <div class="catalogue-header">
@@ -422,7 +491,9 @@
           <input type="text" class="search-input" id="search-input" placeholder="Search field notes..." oninput="renderCatalogue()"/>
         </div>
       </div>
-      <div class="filter-scroll" id="type-filters"></div>
+      <div class="cat-tabs-wrap">
+        <div class="cat-tabs" id="type-filters"></div>
+      </div>
       <div class="cat-list" id="cat-list"></div>
     </div>
 
@@ -921,7 +992,7 @@ function renderPokedex() {
     return { ...cat, group, allInType, capturedCount };
   }).filter(cat => cat.allInType.length > 0);
 
-  // Sort: categories with logged birds first, then by capture count desc, then alphabetical
+  // Sort: categories with logged birds first, then by capture count desc
   categories.sort((a, b) => {
     if (a.capturedCount > 0 && b.capturedCount === 0) return -1;
     if (a.capturedCount === 0 && b.capturedCount > 0) return 1;
@@ -929,18 +1000,29 @@ function renderPokedex() {
     return a.label.localeCompare(b.label);
   });
 
+  // Render tabs
+  const tabsEl = document.getElementById('pdex-tabs');
+  if (tabsEl) {
+    let tabHtml = '';
+    categories.forEach((cat, i) => {
+      const shortLabel = cat.label.replace(/^[^\w]*\s/, '');
+      tabHtml += `<button class="pdex-tab${i === 0 ? ' active' : ''}${cat.capturedCount > 0 ? ' has-birds' : ''}" onclick="scrollToPdexSection('pdex-sec-${i}',this)">${shortLabel} <span class="pdex-tab-frac">${cat.capturedCount}/${cat.allInType.length}</span></button>`;
+    });
+    tabsEl.innerHTML = tabHtml;
+  }
+
+  // Render grid sections
   let html = '';
-  categories.forEach(cat => {
+  categories.forEach((cat, catIdx) => {
     const { label, allInType, capturedCount } = cat;
 
-    html += `<div class="pokedex-section">
+    html += `<div class="pokedex-section" id="pdex-sec-${catIdx}">
       <div class="section-header">
         <div class="section-title">${label}</div>
         <div class="section-count">${capturedCount} / ${allInType.length}</div>
       </div>
       <div class="pokedex-grid">`;
 
-    // Sort within category: captured with photo first, then captured without, then undiscovered
     allInType.sort((a, b) => {
       const aU = birds.find(x => x.id === a._id || (x.name || '').toLowerCase() === a.name.toLowerCase());
       const bU = birds.find(x => x.id === b._id || (x.name || '').toLowerCase() === b.name.toLowerCase());
@@ -986,7 +1068,48 @@ function renderPokedex() {
     });
     html += '</div></div>';
   });
-  document.getElementById('view-pokedex').innerHTML = html;
+
+  document.getElementById('pdex-grid-area').innerHTML = html;
+
+  // Set up scroll spy for pokedex tabs
+  setupPdexScrollSpy();
+}
+
+function scrollToPdexSection(id, tabEl) {
+  document.querySelectorAll('.pdex-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  const section = document.getElementById(id);
+  if (section) {
+    const content = document.querySelector('.content');
+    const offset = section.offsetTop - 50;
+    content.scrollTo({ top: offset, behavior: 'smooth' });
+  }
+}
+
+function setupPdexScrollSpy() {
+  const content = document.querySelector('.content');
+  if (!content) return;
+  const sections = document.querySelectorAll('.pokedex-section[id^="pdex-sec-"]');
+  if (!sections.length) return;
+
+  // Disconnect previous observer if any
+  if (window._pdexObserver) window._pdexObserver.disconnect();
+
+  window._pdexObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = entry.target.id.replace('pdex-sec-', '');
+        const tabs = document.querySelectorAll('.pdex-tab');
+        tabs.forEach((t, i) => t.classList.toggle('active', i === parseInt(idx)));
+        // Auto-scroll the active tab into view
+        const activeTab = tabs[parseInt(idx)];
+        if (activeTab) activeTab.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  }, { root: content, rootMargin: '-60px 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => window._pdexObserver.observe(s));
 }
 
 let currentUndiscoveredName = '', currentUndiscoveredSpecies = '', currentUndiscoveredType = '';
@@ -1017,34 +1140,103 @@ function openAddForBird(name, species, type) {
 // ═══════════════════════════════════════════════════════════════════
 function renderCatalogue() {
   const q = (document.getElementById('search-input').value || '').toLowerCase();
-  let filtered = birds.filter(b => (!activeType || b.type === activeType) && (!q || (b.name || '').toLowerCase().includes(q) || (b.species || '').toLowerCase().includes(q) || (b.location || '').toLowerCase().includes(q)));
-  const types = [...new Set(birds.map(b => b.type).filter(Boolean))].sort();
-  let filterHtml = '<button class="chip' + (activeType ? '' : ' active') + '" onclick="setTypeFilter(\'\',this)">All</button>';
-  types.forEach(t => { filterHtml += `<button class="chip${activeType === t ? ' active' : ''}" onclick="setTypeFilter('${t}',this)">${t}</button>`; });
-  document.getElementById('type-filters').innerHTML = filterHtml;
-  if (!filtered.length) { document.getElementById('cat-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--ink3);font-style:italic;">No entries yet</div>`; return; }
-  document.getElementById('cat-list').innerHTML = filtered.map(b => `
-    <div class="cat-row" onclick="openDetail('${b.id}')">
-      <div class="cat-row-thumb">${b.photo ? `<img src="${b.photo}" alt="${b.name}"/>` : `<span style="font-size:24px;">${habitatEmoji(b.type)}</span>`}</div>
-      <div class="cat-row-info">
-        <div class="cat-row-name">${b.name || 'Unknown'}</div>
-        <div class="cat-row-sub">${b.species || 'Species unrecorded'}</div>
-        <div class="cat-row-tags">
-          <span class="tag tag-${typeClass(b.type)}">${b.type || 'Unknown'}</span>
-          <span class="tag tag-${sizeClass(b.size)}">${b.size || ''}</span>
-          ${b.lat && b.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
+  const filtered = birds.filter(b => !q || (b.name || '').toLowerCase().includes(q) || (b.species || '').toLowerCase().includes(q) || (b.location || '').toLowerCase().includes(q));
+
+  // Group by category using CATEGORY_CONFIG
+  const groups = [];
+  const usedTypes = new Set();
+  CATEGORY_CONFIG.forEach(cat => {
+    const catBirds = filtered.filter(b => cat.types.includes(b.type));
+    if (catBirds.length > 0) {
+      groups.push({ label: cat.label, types: cat.types, birds: catBirds });
+      cat.types.forEach(t => usedTypes.add(t));
+    }
+  });
+  // Catch any birds with types not in CATEGORY_CONFIG
+  const uncategorized = filtered.filter(b => !usedTypes.has(b.type));
+  if (uncategorized.length) groups.push({ label: '❓ Other', types: ['Other'], birds: uncategorized });
+
+  // Render tabs
+  const tabsEl = document.getElementById('type-filters');
+  let tabHtml = `<button class="cat-tab active" onclick="scrollToCatSection('all',this)">All <span class="cat-tab-count">${filtered.length}</span></button>`;
+  groups.forEach((g, i) => {
+    tabHtml += `<button class="cat-tab" onclick="scrollToCatSection('cat-sec-${i}',this)">${g.label.replace(/^[^\w]*\s/, '')} <span class="cat-tab-count">${g.birds.length}</span></button>`;
+  });
+  tabsEl.innerHTML = tabHtml;
+
+  // Render grouped list
+  if (!filtered.length) {
+    document.getElementById('cat-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--ink3);font-style:italic;">No entries yet</div>`;
+    return;
+  }
+
+  let listHtml = '';
+  groups.forEach((g, i) => {
+    listHtml += `<div id="cat-sec-${i}" class="cat-section-header">${g.label} <span class="cat-section-count">${g.birds.length}</span></div>`;
+    g.birds.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    g.birds.forEach(b => {
+      listHtml += `
+      <div class="cat-row" onclick="openDetail('${b.id}')">
+        <div class="cat-row-thumb">${b.photo ? `<img src="${b.photo}" alt="${b.name}"/>` : `<span style="font-size:24px;">${habitatEmoji(b.type)}</span>`}</div>
+        <div class="cat-row-info">
+          <div class="cat-row-name">${b.name || 'Unknown'}</div>
+          <div class="cat-row-sub">${b.species || 'Species unrecorded'}</div>
+          <div class="cat-row-tags">
+            <span class="tag tag-${typeClass(b.type)}">${b.type || 'Unknown'}</span>
+            <span class="tag tag-${sizeClass(b.size)}">${b.size || ''}</span>
+            ${b.lat && b.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
+          </div>
         </div>
-      </div>
-      <div class="cat-row-date">${b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
-    </div>`).join('');
+        <div class="cat-row-date">${b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('cat-list').innerHTML = listHtml;
+
+  // Set up scroll spy to highlight active tab
+  setupCatScrollSpy();
 }
 
-function setTypeFilter(t, el) {
-  activeType = t;
-  document.querySelectorAll('#type-filters .chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderCatalogue();
+function scrollToCatSection(id, tabEl) {
+  // Highlight tab
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  // Scroll tab into view
+  tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+
+  if (id === 'all') {
+    document.getElementById('cat-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  const section = document.getElementById(id);
+  if (section) {
+    const content = document.querySelector('#view-catalogue').closest('.content') || document.querySelector('.content');
+    const offset = section.offsetTop - 100; // account for sticky tabs
+    content.scrollTo({ top: offset, behavior: 'smooth' });
+  }
 }
+
+function setupCatScrollSpy() {
+  const content = document.querySelector('.content');
+  if (!content) return;
+  const sections = document.querySelectorAll('.cat-section-header');
+  if (!sections.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = entry.target.id.replace('cat-sec-', '');
+        const tabs = document.querySelectorAll('.cat-tab');
+        tabs.forEach((t, i) => t.classList.toggle('active', i === parseInt(idx) + 1));
+      }
+    });
+  }, { root: content, rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+  sections.forEach(s => observer.observe(s));
+}
+
+// Keep old function name as no-op for compatibility
+function setTypeFilter() {}
 
 // ═══════════════════════════════════════════════════════════════════
 // CANVAS SLIPPY MAP (Feature 6) — no external library
@@ -1129,7 +1321,7 @@ const MAP = {
     this.el=container; this.W=container.offsetWidth||window.innerWidth; this.H=container.offsetHeight||Math.max(window.innerHeight-56-60-40,300);
     this.canvas=document.createElement('canvas');
     this.canvas.width=this.W; this.canvas.height=this.H;
-    this.canvas.style.cssText='width:100%;height:100%;display:block;cursor:grab;';
+    this.canvas.style.cssText='width:100%;height:100%;display:block;cursor:grab;touch-action:none;';
     container.innerHTML=''; container.appendChild(this.canvas);
     this.ctx=this.canvas.getContext('2d');
     const geoBirds=birds.filter(b=>b.lat&&b.lng);
@@ -1139,12 +1331,67 @@ const MAP = {
       this.lat=(Math.max(...lats)+Math.min(...lats))/2; this.lng=(Math.max(...lngs)+Math.min(...lngs))/2; this.zoom=10;
     }
     this.draw();
+
+    // --- Zoom toward a screen point ---
+    this.zoomAt=(sx,sy,newZoom)=>{
+      // Convert screen point to lat/lng before zoom
+      const rect=this.canvas.getBoundingClientRect();
+      const mx=sx-rect.left, my=sy-rect.top;
+      const oldScale=256*Math.pow(2,this.zoom);
+      const cx=(this.lng+180)/360*oldScale;
+      const cy=(1-Math.log(Math.tan(this.lat*Math.PI/180)+1/Math.cos(this.lat*Math.PI/180))/Math.PI)/2*oldScale;
+      const wx=cx+(mx-this.W/2);
+      const wy=cy+(my-this.H/2);
+      const ptLng=wx/oldScale*360-180;
+      const ptLat=Math.atan(Math.sinh(Math.PI*(1-2*wy/oldScale)))*180/Math.PI;
+      // Apply new zoom
+      this.zoom=Math.max(2,Math.min(18,newZoom));
+      // Adjust center so the point under cursor stays in place
+      const newScale=256*Math.pow(2,this.zoom);
+      const ptWx=(ptLng+180)/360*newScale;
+      const ptWy=(1-Math.log(Math.tan(ptLat*Math.PI/180)+1/Math.cos(ptLat*Math.PI/180))/Math.PI)/2*newScale;
+      const newCx=ptWx-(mx-this.W/2);
+      const newCy=ptWy-(my-this.H/2);
+      this.lng=newCx/newScale*360-180;
+      this.lat=Math.atan(Math.sinh(Math.PI*(1-2*newCy/newScale)))*180/Math.PI;
+      this.draw();
+    };
+
+    // --- Drag (pointer events for both mouse + single touch) ---
+    let pointers=new Map();
+    let lastPinchDist=null;
+
     this.canvas.addEventListener('pointerdown',e=>{
-      this.dragging=true; this.dragStart={x:e.clientX,y:e.clientY,lat:this.lat,lng:this.lng};
-      this.canvas.style.cursor='grabbing'; this.canvas.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(pointers.size===1){
+        this.dragging=true; this.dragStart={x:e.clientX,y:e.clientY,lat:this.lat,lng:this.lng};
+        this.canvas.style.cursor='grabbing';
+      }
+      this.canvas.setPointerCapture(e.pointerId);
     });
+
     this.canvas.addEventListener('pointermove',e=>{
-      if(!this.dragging)return;
+      pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(pointers.size===2){
+        // Pinch zoom
+        const pts=[...pointers.values()];
+        const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+        if(lastPinchDist!==null){
+          const delta=dist-lastPinchDist;
+          if(Math.abs(delta)>8){
+            const midX=(pts[0].x+pts[1].x)/2;
+            const midY=(pts[0].y+pts[1].y)/2;
+            const step=delta>0?0.3:-0.3;
+            this.zoomAt(midX,midY,this.zoom+step);
+            lastPinchDist=dist;
+          }
+        } else {
+          lastPinchDist=dist;
+        }
+        this.dragging=false;
+        return;
+      }
+      if(!this.dragging||pointers.size!==1)return;
       const dx=e.clientX-this.dragStart.x, dy=e.clientY-this.dragStart.y;
       const scale=256*Math.pow(2,this.zoom);
       const dLng=dx/scale*360;
@@ -1153,11 +1400,32 @@ const MAP = {
       this.lat=Math.atan(Math.sinh(Math.PI*(1-2*newCy)))*180/Math.PI;
       this.lng=this.dragStart.lng-dLng; this.draw();
     });
-    this.canvas.addEventListener('pointerup',()=>{ this.dragging=false; this.canvas.style.cursor='grab'; });
+
+    const pointerEnd=(e)=>{
+      pointers.delete(e.pointerId);
+      if(pointers.size<2) lastPinchDist=null;
+      if(pointers.size===0){ this.dragging=false; this.canvas.style.cursor='grab'; }
+    };
+    this.canvas.addEventListener('pointerup',pointerEnd);
+    this.canvas.addEventListener('pointercancel',pointerEnd);
+
+    // --- Scroll wheel zoom toward cursor ---
     this.canvas.addEventListener('wheel',e=>{
-      e.preventDefault(); this.zoom=Math.max(2,Math.min(18,this.zoom+(e.deltaY<0?1:-1)));
-      this.tileCache={}; this.draw();
+      e.preventDefault();
+      const step=e.deltaY<0?1:-1;
+      this.zoomAt(e.clientX,e.clientY,this.zoom+step);
     },{passive:false});
+
+    // --- Zoom buttons ---
+    const btnStyle='position:absolute;z-index:5;width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(7,13,7,0.85);backdrop-filter:blur(8px);color:var(--ink);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:system-ui;';
+    const zoomIn=document.createElement('button'); zoomIn.innerHTML='+'; zoomIn.style.cssText=btnStyle+'right:12px;top:12px;';
+    const zoomOut=document.createElement('button'); zoomOut.innerHTML='−'; zoomOut.style.cssText=btnStyle+'right:12px;top:54px;';
+    zoomIn.addEventListener('click',()=>{ this.zoomAt(this.W/2+container.getBoundingClientRect().left, this.H/2+container.getBoundingClientRect().top, this.zoom+1); });
+    zoomOut.addEventListener('click',()=>{ this.zoomAt(this.W/2+container.getBoundingClientRect().left, this.H/2+container.getBoundingClientRect().top, this.zoom-1); });
+    container.style.position='relative';
+    container.appendChild(zoomIn); container.appendChild(zoomOut);
+
+    // --- Tap on bird pin ---
     this.canvas.addEventListener('click',e=>{
       if(this.dragStart&&(Math.abs(e.clientX-this.dragStart.x)>4||Math.abs(e.clientY-this.dragStart.y)>4))return;
       const rect=this.canvas.getBoundingClientRect();
