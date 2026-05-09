@@ -440,6 +440,35 @@
     .feather-bg { position:fixed; pointer-events:none; z-index:0; opacity:0.025; font-size:160px; right:-30px; bottom:80px; animation:glide 10s ease-in-out infinite; user-select:none; }
 
 
+
+    /* STATS TABS */
+    .stats-tabs { display:flex; gap:8px; padding:12px 14px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .stats-tab { flex:1; padding:8px; background:none; border:none; border-bottom:2px solid transparent; color:var(--ink3); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all 0.2s; }
+    .stats-tab.active { color:var(--amber2); border-bottom-color:var(--amber2); }
+
+    /* MIGRATION CALENDAR */
+    .migrate-view { padding:16px 14px 24px; }
+    .migrate-month-header { font-family:'Cormorant Garamond',serif; font-size:22px; font-style:italic; color:var(--ink); margin-bottom:4px; }
+    .migrate-subtitle { font-size:11px; color:var(--ink3); margin-bottom:16px; }
+    .migrate-month-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .migrate-nav-btn { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:8px; color:var(--ink2); font-size:18px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .migrate-nav-btn:hover { background:rgba(40,160,64,0.08); border-color:rgba(40,160,64,0.2); }
+    .migrate-month-label { flex:1; text-align:center; font-family:'Josefin Sans',sans-serif; font-size:13px; letter-spacing:1px; color:var(--ink); }
+    .migrate-bird-card { background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+    .migrate-bird-card.spotted { border-color:rgba(40,160,64,0.2); background:rgba(14,24,14,0.9); }
+    .migrate-bird-icon { font-size:28px; width:40px; text-align:center; flex-shrink:0; }
+    .migrate-bird-info { flex:1; }
+    .migrate-bird-name { font-size:14px; color:var(--ink); font-weight:500; }
+    .migrate-bird-species { font-size:10px; color:var(--ink3); font-style:italic; margin:2px 0 4px; }
+    .migrate-bird-tip { font-size:11px; color:var(--ink2); line-height:1.5; }
+    .migrate-spotted-badge { font-size:9px; color:var(--forest3); letter-spacing:0.5px; margin-top:4px; }
+    .migrate-likelihood { display:flex; gap:3px; margin-top:6px; }
+    .migrate-pip { width:8px; height:8px; border-radius:2px; background:rgba(40,160,64,0.15); }
+    .migrate-pip.filled { background:var(--forest3); }
+    .migrate-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:16px 0 8px 2px; }
+
+    /* SHARE CARD */
+    #share-canvas { display:none; }
     /* IUCN STATUS BADGES */
     .iucn-badge { display:inline-flex; align-items:center; gap:3px; border-radius:4px; padding:2px 6px; font-size:8px; font-weight:700; letter-spacing:0.5px; border:1px solid; line-height:1.4; }
     .iucn-cr { background:rgba(255,50,50,0.12); color:#ff4444; border-color:rgba(255,50,50,0.25); }
@@ -578,7 +607,12 @@
     </div>
 
     <div class="view" id="view-stats">
+      <div class="stats-tabs">
+        <button class="stats-tab active" id="stab-stats" onclick="switchStatsTab('stats')">Stats</button>
+        <button class="stats-tab" id="stab-migrate" onclick="switchStatsTab('migrate')">Migration</button>
+      </div>
       <div class="stats-view" id="stats-view-inner"></div>
+      <div class="stats-view" id="migrate-view-inner" style="display:none;"></div>
     </div>
 
     <div class="view" id="view-settings">
@@ -668,6 +702,7 @@
     </button>
   </nav>
   <div id="toast" class="toast"></div>
+<canvas id="share-canvas"></canvas>
 </div>
 
 <!-- LIGHTBOX -->
@@ -780,6 +815,7 @@
     <div class="modal-footer detail-modal-footer">
       <button class="btn-danger" id="detail-delete-btn">Remove</button>
       <button class="btn-cancel" id="detail-edit-btn" style="color:var(--forest3);border-color:rgba(40,160,64,0.2);">Edit</button>
+      <button class="btn-cancel" id="detail-share-btn" style="color:var(--amber);border-color:rgba(193,127,36,0.3);">Share</button>
       <button class="btn-cancel" onclick="closeModal('detail-modal')">Close</button>
     </div>
   </div>
@@ -1562,6 +1598,7 @@ function openDetail(id) {
     </div>`;
   document.getElementById('detail-delete-btn').onclick = () => deleteBird(id);
   document.getElementById('detail-edit-btn').onclick = () => openEdit(id);
+  document.getElementById('detail-share-btn').onclick = () => shareSightingCard(id);
   document.getElementById('detail-modal').classList.add('open');
 }
 
@@ -2347,6 +2384,368 @@ function renderStats() {
   });
 
   el.innerHTML = html;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// SHAREABLE SIGHTING CARD
+// ═══════════════════════════════════════════════════════════════════
+function switchStatsTab(tab) {
+  document.getElementById('stats-view-inner').style.display = tab === 'stats' ? 'block' : 'none';
+  document.getElementById('migrate-view-inner').style.display = tab === 'migrate' ? 'block' : 'none';
+  document.getElementById('stab-stats').classList.toggle('active', tab === 'stats');
+  document.getElementById('stab-migrate').classList.toggle('active', tab === 'migrate');
+  if (tab === 'migrate') renderMigration();
+}
+
+async function shareSightingCard(id) {
+  var b = birds.find(function(x){ return x.id == id; });
+  if (!b) return;
+
+  var canvas = document.getElementById('share-canvas');
+  var W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+
+  // Background
+  var bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#070d07');
+  bg.addColorStop(1, '#0b1a0b');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid texture
+  ctx.strokeStyle = 'rgba(40,160,64,0.04)';
+  ctx.lineWidth = 1;
+  for (var gx = 0; gx < W; gx += 60) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+  for (var gy = 0; gy < H; gy += 60) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+  // Green accent bar top
+  var accentGrad = ctx.createLinearGradient(0, 0, W, 0);
+  accentGrad.addColorStop(0, '#1a6028');
+  accentGrad.addColorStop(1, '#28a040');
+  ctx.fillStyle = accentGrad;
+  ctx.fillRect(0, 0, W, 6);
+
+  // Draw photo or silhouette
+  var photoY = 80, photoH = 500;
+  if (b.photo) {
+    await new Promise(function(resolve) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        // Draw photo with rounded rect clip
+        ctx.save();
+        roundRect(ctx, 60, photoY, W-120, photoH, 24);
+        ctx.clip();
+        // Cover fit
+        var scale = Math.max((W-120)/img.width, photoH/img.height);
+        var dw = img.width*scale, dh = img.height*scale;
+        var dx = 60 + ((W-120)-dw)/2, dy = photoY + (photoH-dh)/2;
+        ctx.drawImage(img, dx, dy, dw, dh);
+        // Gradient overlay on photo bottom
+        var photoOverlay = ctx.createLinearGradient(0, photoY+photoH-200, 0, photoY+photoH);
+        photoOverlay.addColorStop(0, 'rgba(7,13,7,0)');
+        photoOverlay.addColorStop(1, 'rgba(7,13,7,0.85)');
+        ctx.fillStyle = photoOverlay;
+        ctx.fillRect(60, photoY, W-120, photoH);
+        ctx.restore();
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = b.photo;
+    });
+  } else {
+    // Dark card with emoji silhouette
+    ctx.save();
+    roundRect(ctx, 60, photoY, W-120, photoH, 24);
+    ctx.fillStyle = 'rgba(14,22,14,0.9)';
+    ctx.fill();
+    ctx.font = '220px serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(40,160,64,0.15)';
+    ctx.fillText(habitatEmoji(b.type), W/2, photoY + photoH/2 + 80);
+    ctx.restore();
+  }
+
+  // IUCN badge on photo
+  if (b.profile && b.profile.conservation && b.profile.conservation !== 'LC') {
+    var iucnColors = { CR:'#ff4444', EN:'#e05050', VU:'#e8a020', NT:'#ffd166' };
+    var iucnNames = { CR:'Critically Endangered', EN:'Endangered', VU:'Vulnerable', NT:'Near Threatened' };
+    var ic = b.profile.conservation;
+    if (iucnColors[ic]) {
+      ctx.font = 'bold 22px DM Sans, sans-serif';
+      var badgeText = ic + ' · ' + iucnNames[ic];
+      var bw = ctx.measureText(badgeText).width + 32;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      roundRect(ctx, 80, photoY+16, bw, 40, 8);
+      ctx.fill();
+      ctx.fillStyle = iucnColors[ic];
+      ctx.textAlign = 'left';
+      ctx.fillText(badgeText, 96, photoY+42);
+    }
+  }
+
+  // Bird name
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#dceadc';
+  ctx.font = 'bold 64px Playfair Display, serif';
+  ctx.fillText(b.name || 'Unknown Bird', 60, photoY + photoH + 72);
+
+  // Species
+  if (b.species) {
+    ctx.fillStyle = '#5a8a5a';
+    ctx.font = 'italic 32px Playfair Display, serif';
+    ctx.fillText(b.species, 60, photoY + photoH + 116);
+  }
+
+  // Meta row
+  var metaY = photoY + photoH + (b.species ? 168 : 140);
+  ctx.font = '28px DM Sans, sans-serif';
+  ctx.fillStyle = '#a8cca8';
+  var metaParts = [];
+  if (b.date) metaParts.push('📅 ' + new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}));
+  if (b.location) metaParts.push('📍 ' + b.location);
+  if (b.type) metaParts.push('🐦 ' + b.type);
+  ctx.fillText(metaParts.join('   ·   '), 60, metaY);
+
+  // Grey Heron branding bottom
+  ctx.fillStyle = 'rgba(40,160,64,0.15)';
+  ctx.fillRect(0, H-80, W, 80);
+  ctx.fillStyle = '#ffd166';
+  ctx.font = 'bold italic 32px Playfair Display, serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Grey', 60, H-32);
+  ctx.fillStyle = '#dceadc';
+  ctx.font = 'italic 32px Playfair Display, serif';
+  ctx.fillText(' Heron', 60 + ctx.measureText('Grey').width, H-32);
+  ctx.fillStyle = '#5a8a5a';
+  ctx.font = '22px DM Sans, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Bird Sighting · Bengaluru', W-60, H-32);
+
+  // Share or download
+  canvas.toBlob(function(blob) {
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'sighting.png', { type: 'image/png' })] })) {
+      navigator.share({
+        title: b.name + ' — Grey Heron',
+        text: 'Spotted a ' + b.name + (b.location ? ' at ' + b.location : '') + ' 🐦',
+        files: [new File([blob], 'greyheron-' + (b.name||'bird').replace(/\s+/g,'-').toLowerCase() + '.png', { type: 'image/png' })]
+      }).catch(function(){});
+    } else {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = 'greyheron-' + (b.name||'bird').replace(/\s+/g,'-').toLowerCase() + '.png';
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    }
+  }, 'image/png');
+
+  showToast('Sighting card ready!');
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+  ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+  ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
+  ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+  ctx.closePath();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BANGALORE MIGRATION CALENDAR
+// ═══════════════════════════════════════════════════════════════════
+var BLR_MIGRATION = {
+  0: { // January
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:5, tip:'Massive flocks at Hesaraghatta and Ulsoor. Often 10,000+ birds roosting together.', status:'LC' },
+      { name:'Common Teal', species:'Anas crecca', icon:'🦆', likelihood:4, tip:'Small dabbling duck on Puttenahalli and Bellandur lakes. Look for the green eye stripe.', status:'LC' },
+      { name:'Northern Pintail', species:'Anas acuta', icon:'🦢', likelihood:4, tip:'Elegant long-tailed duck. Bellandur and Varthur lakes host good numbers.', status:'LC' },
+      { name:'Eurasian Wigeon', species:'Mareca penelope', icon:'🦆', likelihood:3, tip:'Rusty-headed duck. Hesaraghatta reservoir is the best bet.', status:'LC' },
+      { name:'Black Redstart', species:'Phoenicurus ochruros', icon:'🔴', likelihood:4, tip:'Fiery orange tail, bobs constantly. Common on rooftops and walls city-wide.', status:'LC' },
+      { name:'Bluethroat', species:'Luscinia svecica', icon:'💙', likelihood:3, tip:'Skulks in tall grass near water. Patience required — worth it for the blue bib.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Indian Roller','Brahminy Kite','Spotted Owlet','Common Kingfisher'],
+    note:'Peak winter. Best month for waterbirds — most migrants at maximum numbers.'
+  },
+  1: { // February
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:4, tip:'Numbers begin dropping but still spectacular at Hesaraghatta.', status:'LC' },
+      { name:'Common Teal', species:'Anas crecca', icon:'🦆', likelihood:4, tip:'Still present on most Bangalore lakes before northward departure.', status:'LC' },
+      { name:'Garganey', species:'Spatula querquedula', icon:'🦆', likelihood:3, tip:'Watch for the bold white supercilium. Passage migrant passing through.', status:'LC' },
+      { name:'Western Yellow Wagtail', species:'Motacilla flava', icon:'💛', likelihood:4, tip:'Bright yellow, walks on ground near water. Hundreds at a time at open lakes.', status:'LC' },
+      { name:'Citrine Wagtail', species:'Motacilla citreola', icon:'💛', likelihood:3, tip:'Yellow with grey back. Check wagtail flocks carefully for this one.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Indian Roller','Rose-ringed Parakeet','Red-vented Bulbul'],
+    note:'Late winter. Wagtails peak. Raptors begin moving north.'
+  },
+  2: { // March
+    visitors: [
+      { name:'Eurasian Golden Oriole', species:'Oriolus oriolus', icon:'🌟', likelihood:4, tip:'Brilliant yellow and black. Listen for the liquid fluting call in large trees.', status:'LC' },
+      { name:'Blue-tailed Bee-eater', species:'Merops philippinus', icon:'🌈', likelihood:4, tip:'Arrives from wintering grounds. Watch telephone wires near open country.', status:'LC' },
+      { name:'Common Swift', species:'Apus apus', icon:'⚡', likelihood:3, tip:'Screaming flocks overhead. Barely ever lands — eats, sleeps, mates in the air.', status:'LC' },
+      { name:'Garganey', species:'Spatula querquedula', icon:'🦆', likelihood:4, tip:'Peak passage month. Bellandur and Puttenahalli are reliable spots.', status:'LC' },
+      { name:'Black-naped Oriole', species:'Oriolus chinensis', icon:'🌟', likelihood:2, tip:'Rarer than Golden Oriole. Worth checking fruiting fig trees carefully.', status:'LC' },
+    ],
+    residents: ['Indian Roller','Brahminy Kite','Common Kingfisher','Spotted Owlet'],
+    note:'Spring passage begins. Summer visitors arrive. Orioles and bee-eaters return.'
+  },
+  3: { // April
+    visitors: [
+      { name:'Indian Pitta', species:'Pitta brachyura', icon:'🎨', likelihood:4, tip:'Nine colours on one bird. Arrives before monsoon. Listen for the two-note whistle.', status:'LC' },
+      { name:'Blue-tailed Bee-eater', species:'Merops philippinus', icon:'🌈', likelihood:5, tip:'Peak numbers now. Colonies in sandy banks around Hesaraghatta.', status:'LC' },
+      { name:'Eurasian Golden Oriole', species:'Oriolus oriolus', icon:'🌟', likelihood:5, tip:'Breeding and passage. Rain trees and large tamarind trees in parks.', status:'LC' },
+      { name:'Asian Koel', species:'Eudynamys scolopaceus', icon:'🎵', likelihood:5, tip:'Incessant rising call from dawn. Males jet black, females streaky brown.', status:'LC' },
+      { name:'Common Hawk-Cuckoo', species:'Hierococcyx varius', icon:'🔔', likelihood:4, tip:'Brain-fever bird — call rises in pitch until unbearable. Dense forest patches.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Indian Roller','Rose-ringed Parakeet','Brahminy Kite'],
+    note:'Pre-monsoon heat. Summer breeders arrive and immediately start calling.'
+  },
+  4: { // May
+    visitors: [
+      { name:'Indian Pitta', species:'Pitta brachyura', icon:'🎨', likelihood:5, tip:'Peak presence before monsoon breeding. Whitefield and Bannerghatta forest edges.', status:'LC' },
+      { name:'Asian Koel', species:'Eudynamys scolopaceus', icon:'🎵', likelihood:5, tip:'Calls reach a crescendo before monsoon. Parasitises House Crow nests.', status:'LC' },
+      { name:'Pied Cuckoo', species:'Clamator jacobinus', icon:'⚫', likelihood:4, tip:'Black and white, crested. Arrival famously signals monsoon onset.', status:'LC' },
+      { name:'Blue-tailed Bee-eater', species:'Merops philippinus', icon:'🌈', likelihood:4, tip:'Still present, often seen catching dragonflies over lakes.', status:'LC' },
+      { name:'Blyths Reed Warbler', species:'Acrocephalus dumetorum', icon:'🌿', likelihood:3, tip:'Skulks in dense vegetation. Identified by call more than sight.', status:'LC' },
+    ],
+    residents: ['Common Kingfisher','Red-vented Bulbul','Spotted Owlet','Indian Roller'],
+    note:'Hottest month. Indian Pitta at peak. Watch for Pied Cuckoo as monsoon harbinger.'
+  },
+  5: { // June
+    visitors: [
+      { name:'Pied Cuckoo', species:'Clamator jacobinus', icon:'⚫', likelihood:5, tip:'Monsoon has arrived when this bird appears. Loud calls from treetops.', status:'LC' },
+      { name:'Indian Pitta', species:'Pitta brachyura', icon:'🎨', likelihood:3, tip:'Breeding in forest undergrowth. Very secretive now — listen for the whistle.', status:'LC' },
+      { name:'Chestnut-headed Bee-eater', species:'Merops leschenaulti', icon:'🌈', likelihood:3, tip:'Replaces Blue-tailed during monsoon. Chestnut and green with blue tail.', status:'LC' },
+      { name:'Jungle Nightjar', species:'Caprimulgus indicus', icon:'🌙', likelihood:3, tip:'Monsoon activates nightjars. Listen for churring calls after dark near Bannerghatta.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Brahminy Kite','Common Kingfisher','Indian Roller'],
+    note:'Monsoon arrives. Birding is magical in the rain — amphibian-eating specialists active.'
+  },
+  6: { // July
+    visitors: [
+      { name:'Pied Cuckoo', species:'Clamator jacobinus', icon:'⚫', likelihood:4, tip:'Still calling loudly. Full monsoon season.', status:'LC' },
+      { name:'Green Sandpiper', species:'Tringa ochropus', icon:'🌿', likelihood:3, tip:'Early southbound migrant. Bobs tail constantly. Muddy margins of tanks.', status:'LC' },
+      { name:'Wood Sandpiper', species:'Tringa glareola', icon:'🌿', likelihood:3, tip:'Spotted above, pale below. Check any mudflat with other waders.', status:'LC' },
+      { name:'Lesser Sand Plover', species:'Charadrius mongolus', icon:'🏖️', likelihood:2, tip:'Unusual for Bangalore but appears at Varthur during high monsoon.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Red-vented Bulbul','Spotted Owlet','Brahminy Kite'],
+    note:'Deep monsoon. Lakes full. First southbound wader migrants appear.'
+  },
+  7: { // August
+    visitors: [
+      { name:'Green Sandpiper', species:'Tringa ochropus', icon:'🌿', likelihood:4, tip:'Peak passage. Any flooded field or lake margin worth checking.', status:'LC' },
+      { name:'Common Sandpiper', species:'Actitis hypoleucos', icon:'🌿', likelihood:4, tip:'Bobs tail, flicks wings in flight. Rocky lake shores.', status:'LC' },
+      { name:'Marsh Sandpiper', species:'Tringa stagnatilis', icon:'🌿', likelihood:3, tip:'Elegant long-legged wader. Bellandur and Varthur at high water.', status:'LC' },
+      { name:'Black-winged Stilt', species:'Himantopus himantopus', icon:'🦩', likelihood:4, tip:'Impossibly long pink legs. Flooded agricultural fields and shallow lakes.', status:'LC' },
+      { name:'Pheasant-tailed Jacana', species:'Hydrophasianus chirurgus', icon:'🦅', likelihood:3, tip:'Walks on lily pads. Males grow spectacular tail in breeding plumage.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Common Kingfisher','Indian Roller','Brahminy Kite'],
+    note:'Wader passage peaks. Lakes at maximum size. Great for waterbirds and waders.'
+  },
+  8: { // September
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:2, tip:'First flocks arrive from Central Asia. Hesaraghatta the best site.', status:'LC' },
+      { name:'Common Sandpiper', species:'Actitis hypoleucos', icon:'🌿', likelihood:4, tip:'Passage continues. Almost every lake has one.', status:'LC' },
+      { name:'Eurasian Marsh Harrier', species:'Circus aeruginosus', icon:'🦅', likelihood:3, tip:'Large raptor quartering over reedbeds. Bellandur and Varthur.', status:'LC' },
+      { name:'Blyths Pipit', species:'Anthus godlewskii', icon:'🌾', likelihood:3, tip:'Grasslands around Hesaraghatta. Tricky ID — check tail wagging and call.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Spotted Owlet','Common Kingfisher','Red-vented Bulbul'],
+    note:'Monsoon retreating. Mix of departing monsoon visitors and arriving winter migrants.'
+  },
+  9: { // October
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:4, tip:'Numbers building rapidly at Hesaraghatta. Spectacular pre-roost murmurations.', status:'LC' },
+      { name:'Amur Falcon', species:'Falco amurensis', icon:'⚡', likelihood:4, tip:'Small slate-grey falcon. Thousands pass through Karnataka in October.', status:'LC' },
+      { name:'Eurasian Marsh Harrier', species:'Circus aeruginosus', icon:'🦅', likelihood:4, tip:'Multiple birds quartering over reedbeds. Bellandur is reliable.', status:'LC' },
+      { name:'Blue-tailed Bee-eater', species:'Merops philippinus', icon:'🌈', likelihood:3, tip:'Returning winter visitors. Telephone wires and open country.', status:'LC' },
+      { name:'Common Teal', species:'Anas crecca', icon:'🦆', likelihood:3, tip:'First winter ducks arriving on Bangalore lakes.', status:'LC' },
+    ],
+    residents: ['Indian Roller','Brahminy Kite','Common Kingfisher','Spotted Owlet'],
+    note:'Post-monsoon. Amur Falcon spectacle. Winter visitors begin arriving.'
+  },
+  10: { // November
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:5, tip:'Peak numbers. Hesaraghatta roost is one of Indias great wildlife spectacles.', status:'LC' },
+      { name:'Common Teal', species:'Anas crecca', icon:'🦆', likelihood:5, tip:'Large flocks on all major lakes. Ulsoor, Puttenahalli, Hesaraghatta.', status:'LC' },
+      { name:'Northern Pintail', species:'Anas acuta', icon:'🦢', likelihood:4, tip:'Elegant long-tailed duck. Bellandur and Varthur host hundreds.', status:'LC' },
+      { name:'Black Redstart', species:'Phoenicurus ochruros', icon:'🔴', likelihood:4, tip:'Returns for winter. Flicks orange tail constantly on rooftops.', status:'LC' },
+      { name:'Bluethroat', species:'Luscinia svecica', icon:'💙', likelihood:3, tip:'Shy but stunning. Dense grass near water edges. Dawn is best.', status:'LC' },
+      { name:'Eurasian Marsh Harrier', species:'Circus aeruginosus', icon:'🦅', likelihood:4, tip:'Multiple birds now established at Bellandur for the winter.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Indian Roller','Rose-ringed Parakeet','Brahminy Kite'],
+    note:'Best birding month. Winter residents at peak. Rosy Starling murmuration unmissable.'
+  },
+  11: { // December
+    visitors: [
+      { name:'Rosy Starling', species:'Pastor roseus', icon:'🌸', likelihood:5, tip:'Full winter strength. Pre-roost displays at Hesaraghatta are extraordinary.', status:'LC' },
+      { name:'Common Teal', species:'Anas crecca', icon:'🦆', likelihood:5, tip:'Peak numbers on all Bangalore lakes.', status:'LC' },
+      { name:'Eurasian Wigeon', species:'Mareca penelope', icon:'🦆', likelihood:4, tip:'Rusty head, pink breast. Hesaraghatta and Varthur.', status:'LC' },
+      { name:'Black Redstart', species:'Phoenicurus ochruros', icon:'🔴', likelihood:5, tip:'One of the most common winter visitors city-wide.', status:'LC' },
+      { name:'Bluethroat', species:'Luscinia svecica', icon:'💙', likelihood:3, tip:'Full winter plumage — blue bib visible. Wetland margins and tall grass.', status:'LC' },
+      { name:'Greater Flamingo', species:'Phoenicopterus roseus', icon:'🦩', likelihood:2, tip:'Rare but recorded at Hesaraghatta and Varthur. Worth scanning large flocks.', status:'LC' },
+    ],
+    residents: ['Purple Heron','Indian Roller','Common Kingfisher','Spotted Owlet'],
+    note:'Peak winter. Coldest mornings bring out the best birds. Go early.'
+  }
+};
+
+var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var currentMigrateMonth = new Date().getMonth();
+
+function renderMigration() {
+  var el = document.getElementById('migrate-view-inner');
+  if (!el) return;
+  var m = currentMigrateMonth;
+  var data = BLR_MIGRATION[m];
+  var spottedNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase(); }));
+
+  var html = '<div class="migrate-view">';
+  html += '<div class="migrate-month-nav">';
+  html += '<button class="migrate-nav-btn" onclick="changeMigrateMonth(-1)">‹</button>';
+  html += '<div class="migrate-month-label">' + MONTH_NAMES[m] + ' · Bengaluru</div>';
+  html += '<button class="migrate-nav-btn" onclick="changeMigrateMonth(1)">›</button>';
+  html += '</div>';
+  html += '<div style="font-size:11px;color:var(--ink3);margin-bottom:16px;font-style:italic;">' + data.note + '</div>';
+
+  html += '<div class="migrate-section-label">Visitors this month</div>';
+  data.visitors.forEach(function(bird) {
+    var spotted = spottedNames.has(bird.name.toLowerCase());
+    html += '<div class="migrate-bird-card' + (spotted?' spotted':'') + '">';
+    html += '<div class="migrate-bird-icon">' + bird.icon + '</div>';
+    html += '<div class="migrate-bird-info">';
+    html += '<div class="migrate-bird-name">' + bird.name + (spotted ? ' <span style="color:var(--forest3);font-size:10px;">✓ in your list</span>' : '') + '</div>';
+    html += '<div class="migrate-bird-species">' + bird.species + '</div>';
+    html += '<div class="migrate-bird-tip">' + bird.tip + '</div>';
+    // Likelihood pips
+    html += '<div class="migrate-likelihood">';
+    for (var p=0; p<5; p++) {
+      html += '<div class="migrate-pip' + (p < bird.likelihood ? ' filled' : '') + '"></div>';
+    }
+    html += '<span style="font-size:9px;color:var(--ink3);margin-left:4px;">' + ['','Rare','Uncommon','Possible','Likely','Common'][bird.likelihood] + '</span>';
+    html += '</div>';
+    html += '</div></div>';
+  });
+
+  html += '<div class="migrate-section-label">Resident species to find</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">';
+  data.residents.forEach(function(name) {
+    var spotted = spottedNames.has(name.toLowerCase());
+    html += '<div style="background:rgba(14,22,14,0.8);border:1px solid rgba(255,255,255,' + (spotted?'0.12':'0.04') + ');border-radius:8px;padding:5px 10px;font-size:11px;color:' + (spotted?'var(--forest3)':'var(--ink3)') + ';">';
+    html += (spotted?'✓ ':'') + name;
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function changeMigrateMonth(dir) {
+  currentMigrateMonth = (currentMigrateMonth + dir + 12) % 12;
+  renderMigration();
 }
 
 </script>
