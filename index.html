@@ -438,6 +438,56 @@
     @keyframes glide { 0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-6px) rotate(2deg);} }
     .section-bird { display:inline-block; font-size:14px; margin-right:6px; animation:glide 3s ease-in-out infinite; }
     .feather-bg { position:fixed; pointer-events:none; z-index:0; opacity:0.025; font-size:160px; right:-30px; bottom:80px; animation:glide 10s ease-in-out infinite; user-select:none; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       STATS + ACHIEVEMENTS VIEW
+    ═══════════════════════════════════════════════════════════════════ */
+    .stats-view { padding:16px 14px 24px; }
+    .stats-heading { font-family:'Cormorant Garamond',serif; font-size:24px; font-style:italic; color:var(--ink); padding:4px 2px 16px; }
+    .stats-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:20px 0 8px 2px; }
+    .stats-hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
+    .stats-hero-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,255,255,0.05); border-radius:16px; padding:16px 14px; display:flex; flex-direction:column; gap:4px; }
+    .stats-hero-val { font-family:'Josefin Sans',sans-serif; font-size:32px; font-weight:700; color:var(--amber2); line-height:1; }
+    .stats-hero-label { font-size:10px; color:var(--ink3); letter-spacing:0.5px; }
+    .stats-hero-sub { font-size:9px; color:var(--forest3); margin-top:2px; }
+    .stats-hero-card.wide { grid-column:span 2; flex-direction:row; align-items:center; gap:16px; }
+    .stats-hero-card.wide .stats-hero-val { font-size:28px; }
+    /* streak flame */
+    .streak-flame { font-size:28px; flex-shrink:0; }
+    /* monthly chart */
+    .month-chart { display:flex; align-items:flex-end; gap:4px; height:72px; padding:0 2px; }
+    .month-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .month-bar { width:100%; background:rgba(40,160,64,0.15); border-radius:4px 4px 0 0; min-height:3px; transition:height 0.4s ease; position:relative; }
+    .month-bar.current { background:linear-gradient(180deg,rgba(255,209,102,0.5),rgba(193,127,36,0.3)); }
+    .month-bar-count { font-size:8px; color:var(--ink3); }
+    .month-bar-label { font-size:7px; color:var(--ink3); letter-spacing:0.3px; }
+    /* type pie */
+    .type-pie-wrap { display:flex; align-items:center; gap:16px; }
+    .type-pie-legend { display:flex; flex-direction:column; gap:6px; flex:1; }
+    .type-pie-row { display:flex; align-items:center; gap:6px; }
+    .type-pie-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .type-pie-name { font-size:11px; color:var(--ink2); flex:1; }
+    .type-pie-pct { font-size:10px; color:var(--ink3); }
+    /* completion bar */
+    .completion-bar-wrap { background:rgba(0,0,0,0.3); border-radius:8px; height:8px; overflow:hidden; margin-top:8px; }
+    .completion-bar-fill { height:100%; background:linear-gradient(90deg,var(--forest),var(--amber)); border-radius:8px; transition:width 0.6s ease; }
+    /* achievements */
+    .achievements-grid { display:flex; flex-direction:column; gap:8px; }
+    .achievement-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:12px; transition:all 0.2s; }
+    .achievement-card.unlocked { border-color:rgba(255,209,102,0.2); background:rgba(20,28,16,0.95); }
+    .achievement-card.locked { opacity:0.45; filter:grayscale(0.6); }
+    .achievement-icon { font-size:26px; flex-shrink:0; width:40px; text-align:center; }
+    .achievement-text { flex:1; }
+    .achievement-name { font-size:13px; color:var(--ink); font-weight:500; }
+    .achievement-desc { font-size:10px; color:var(--ink3); margin-top:2px; line-height:1.5; }
+    .achievement-badge { font-size:9px; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+    .achievement-badge.unlocked { color:var(--amber2); }
+    .achievement-badge.locked { color:var(--ink3); }
+    /* rarest find */
+    .rarest-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,209,102,0.12); border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; }
+    .rarest-icon { font-size:32px; }
+    .rarest-name { font-size:15px; color:var(--ink); font-weight:500; }
+    .rarest-sub { font-size:10px; color:var(--ink3); margin-top:2px; }
   </style>
 </head>
 <body>
@@ -520,6 +570,10 @@
       </div>
     </div>
 
+    <div class="view" id="view-stats">
+      <div class="stats-view" id="stats-view-inner"></div>
+    </div>
+
     <div class="view" id="view-settings">
       <div class="settings-view">
         <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--ink);padding:4px 2px 16px;">Settings</div>
@@ -596,6 +650,10 @@
     <button class="nav-tab" id="tab-map" onclick="switchTab('map')">
       <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
       Map
+    </button>
+    <button class="nav-tab" id="tab-stats" onclick="switchTab('stats')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Stats
     </button>
     <button class="nav-tab" id="tab-settings" onclick="switchTab('settings')">
       <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -991,6 +1049,7 @@ function switchTab(tab) {
   activeView.style.display = (tab === 'map' ? 'flex' : 'block');
   document.getElementById('tab-' + tab).classList.add('active');
   if (tab === 'map') setTimeout(initMap, 60);
+  if (tab === 'stats') renderStats();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1970,6 +2029,309 @@ window.addEventListener('offline', () => { isOnline = false; updateSyncStatus('o
 
 // Boot
 initAuth();
+
+// ═══════════════════════════════════════════════════════════════════
+// STATS + ACHIEVEMENTS
+// ═══════════════════════════════════════════════════════════════════
+
+var IUCN_RANK = { 'CR': 5, 'EN': 4, 'VU': 3, 'NT': 2, 'LC': 1, 'DD': 0 };
+var IUCN_LABEL = { 'CR': 'Critically Endangered', 'EN': 'Endangered', 'VU': 'Vulnerable', 'NT': 'Near Threatened', 'LC': 'Least Concern', 'DD': 'Data Deficient' };
+var IUCN_COLOR = { 'CR': '#ff4444', 'EN': '#d44', 'VU': '#e8a020', 'NT': '#ffd166', 'LC': '#4fc88a', 'DD': '#888' };
+
+var ACHIEVEMENTS = [
+  // STARTER tier
+  { id:'first_sighting',  tier:'starter',  icon:'🐦', name:'First Contact',       desc:'Log your very first bird sighting.',                                        check: function(b){ return b.length >= 1; } },
+  { id:'first_raptor',    tier:'starter',  icon:'🦅', name:'First Raptor',         desc:'Spot your first raptor — eagle, kite, hawk or harrier.',                    check: function(b){ return b.some(function(s){ return s.type==='Raptor'; }); } },
+  { id:'first_owl',       tier:'starter',  icon:'🦉', name:'Night Owl',            desc:'Log your first owl sighting.',                                              check: function(b){ return b.some(function(s){ return s.type==='Owl'; }); } },
+  { id:'first_kingfisher',tier:'starter',  icon:'💎', name:'Kingfisher Club',      desc:'Spot any kingfisher species.',                                              check: function(b){ return b.some(function(s){ return s.type==='Kingfisher' || (s.name||'').toLowerCase().includes('kingfisher'); }); } },
+  { id:'dawn_patrol',     tier:'starter',  icon:'🌅', name:'Dawn Patrol',          desc:'Log a sighting before 6am.',                                                check: function(b){ return b.some(function(s){ return new Date(s.date||s.created_at).getHours() < 6; }); } },
+  { id:'night_watch',     tier:'starter',  icon:'🌙', name:'Night Watch',          desc:'Log a sighting after 9pm.',                                                 check: function(b){ return b.some(function(s){ var h=new Date(s.date||s.created_at).getHours(); return h >= 21; }); } },
+  { id:'first_photo',     tier:'starter',  icon:'📸', name:'Field Photographer',   desc:'Attach a photo to your first sighting.',                                    check: function(b){ return b.some(function(s){ return !!s.photo; }); } },
+  { id:'first_gps',       tier:'starter',  icon:'📍', name:'On The Map',           desc:'Log your first GPS-tagged sighting.',                                       check: function(b){ return b.some(function(s){ return s.lat && s.lng; }); } },
+
+  // EXPLORER tier
+  { id:'ten_species',     tier:'explorer', icon:'🔟', name:'Ten Species',          desc:'Reach 10 unique species in your life list.',                                check: function(b){ return new Set(b.map(function(s){ return s.name; })).size >= 10; } },
+  { id:'twentyfive_sp',   tier:'explorer', icon:'🌿', name:'Quarter Century',      desc:'Reach 25 unique species.',                                                  check: function(b){ return new Set(b.map(function(s){ return s.name; })).size >= 25; } },
+  { id:'fifty_sightings', tier:'explorer', icon:'📖', name:'Field Notes Vol. II',  desc:'Log 50 total sightings.',                                                   check: function(b){ return b.length >= 50; } },
+  { id:'five_types',      tier:'explorer', icon:'🎨', name:'Mixed Bag',            desc:'Spot birds from 5 different type categories.',                              check: function(b){ return new Set(b.map(function(s){ return s.type; }).filter(Boolean)).size >= 5; } },
+  { id:'waterbird_10',    tier:'explorer', icon:'🦆', name:'Wetlands Watcher',     desc:'Log 10 waterbird or wader sightings.',                                      check: function(b){ return b.filter(function(s){ return s.type==='Waterbird'||s.type==='Wader'; }).length >= 10; } },
+  { id:'gps_10',          tier:'explorer', icon:'🗺️', name:'GPS Spotter',          desc:'Log 10 sightings with GPS coordinates.',                                    check: function(b){ return b.filter(function(s){ return s.lat&&s.lng; }).length >= 10; } },
+  { id:'monsoon_bird',    tier:'explorer', icon:'🌧️', name:'Monsoon Birder',       desc:'Log a sighting during monsoon (June–September).',                           check: function(b){ return b.some(function(s){ var m=new Date(s.date||s.created_at).getMonth(); return m>=5&&m<=8; }); } },
+  { id:'first_threatened',tier:'explorer', icon:'⚠️', name:'Conservation Witness', desc:'Spot a Near Threatened or higher IUCN status species.',                    check: function(b){ return b.some(function(s){ var c=s.profile&&s.profile.conservation; return c==='NT'||c==='VU'||c==='EN'||c==='CR'; }); } },
+
+  // DEDICATED tier
+  { id:'all_kingfishers', tier:'dedicated',icon:'👑', name:'Kingfisher Royale',    desc:'Spot Common, Stork-billed, and White-throated Kingfisher.',                 check: function(b){ var n=new Set(b.map(function(s){ return (s.name||'').toLowerCase(); })); return ['common kingfisher','stork-billed kingfisher','white-throated kingfisher'].every(function(k){ return n.has(k); }); } },
+  { id:'fifty_species',   tier:'dedicated',icon:'🏆', name:'Life Lister',          desc:'Reach 50 unique species.',                                                  check: function(b){ return new Set(b.map(function(s){ return s.name; })).size >= 50; } },
+  { id:'hundred_sightings',tier:'dedicated',icon:'💯', name:'Century',             desc:'Log 100 total sightings.',                                                  check: function(b){ return b.length >= 100; } },
+  { id:'five_raptors',    tier:'dedicated',icon:'🦁', name:'Raptor Watch',         desc:'Spot 5 different raptor species.',                                          check: function(b){ return new Set(b.filter(function(s){ return s.type==='Raptor'; }).map(function(s){ return s.name; })).size >= 5; } },
+  { id:'week_streak',     tier:'dedicated',icon:'🔥', name:'Week Streak',          desc:'Bird in 4 consecutive weeks.',                                              check: function(b){ return calcWeekStreak(b) >= 4; } },
+  { id:'photo_10',        tier:'dedicated',icon:'🎞️', name:'Photo Series',         desc:'Attach photos to 10 sightings.',                                            check: function(b){ return b.filter(function(s){ return s.photo; }).length >= 10; } },
+  { id:'first_endangered',tier:'dedicated',icon:'🔴', name:'Rare Encounter',       desc:'Spot a Vulnerable or higher IUCN status species.',                          check: function(b){ return b.some(function(s){ var c=s.profile&&s.profile.conservation; return c==='VU'||c==='EN'||c==='CR'; }); } },
+
+  // ELITE tier
+  { id:'hundred_species', tier:'elite',    icon:'🌟', name:'Century of Species',   desc:'Reach 100 unique species — serious birder territory.',                      check: function(b){ return new Set(b.map(function(s){ return s.name; })).size >= 100; } },
+  { id:'ten_types',       tier:'elite',    icon:'🔭', name:'Type Collector',       desc:'Spot birds from 10 different type categories.',                             check: function(b){ return new Set(b.map(function(s){ return s.type; }).filter(Boolean)).size >= 10; } },
+  { id:'endangered_3',    tier:'elite',    icon:'🛡️', name:'Guardian Species',     desc:'Spot 3 or more Endangered or Critically Endangered species.',               check: function(b){ return b.filter(function(s){ var c=s.profile&&s.profile.conservation; return c==='EN'||c==='CR'; }).length >= 3; } },
+  { id:'season_complete', tier:'elite',    icon:'🗓️', name:'All Seasons',          desc:'Log sightings in all four seasons.',                                        check: function(b){ var ss=new Set(b.map(function(s){ var m=new Date(s.date||s.created_at).getMonth(); return m<3?'win':m<6?'spr':m<9?'mon':'aut'; })); return ss.size>=4; } }
+];
+
+var TIER_LABELS = { starter:'Starter', explorer:'Explorer', dedicated:'Dedicated', elite:'Elite' };
+var TIER_COLORS = { starter:'#5a8a5a', explorer:'#4fc88a', dedicated:'#ffd166', elite:'#e8a020' };
+
+function calcWeekStreak(sightings) {
+  if (!sightings.length) return 0;
+  var weekSet = {};
+  sightings.forEach(function(s) {
+    var d = new Date(s.date || s.created_at);
+    var startOfYear = new Date(d.getFullYear(), 0, 1);
+    var week = Math.floor((d - startOfYear) / 604800000);
+    weekSet[d.getFullYear() + '-' + week] = true;
+  });
+  var weeks = Object.keys(weekSet).map(function(k) {
+    var p = k.split('-');
+    return parseInt(p[0]) * 100 + parseInt(p[1]);
+  }).sort(function(a,b){ return b-a; });
+  var streak = 1, max = 1;
+  for (var i=1; i<weeks.length; i++) {
+    if (weeks[i-1] - weeks[i] === 1) { streak++; if (streak>max) max=streak; }
+    else streak = 1;
+  }
+  return max;
+}
+
+function calcCurrentWeekStreak(sightings) {
+  if (!sightings.length) return 0;
+  var now = new Date();
+  var startOfYear = new Date(now.getFullYear(), 0, 1);
+  var thisWeek = Math.floor((now - startOfYear) / 604800000);
+  var weekSet = {};
+  sightings.forEach(function(s) {
+    var d = new Date(s.date || s.created_at);
+    var sy = new Date(d.getFullYear(), 0, 1);
+    var w = Math.floor((d - sy) / 604800000);
+    weekSet[d.getFullYear() + '-' + w] = true;
+  });
+  var weeks = Object.keys(weekSet).map(function(k) {
+    var p = k.split('-');
+    return parseInt(p[0]) * 100 + parseInt(p[1]);
+  }).sort(function(a,b){ return b-a; });
+  var currentWeekKey = now.getFullYear() * 100 + thisWeek;
+  var lastWeekKey = currentWeekKey - 1;
+  if (weeks[0] !== currentWeekKey && weeks[0] !== lastWeekKey) return 0;
+  var streak = 1;
+  for (var i=1; i<weeks.length; i++) {
+    if (weeks[i-1] - weeks[i] === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function getIUCNRarest(sightings) {
+  var best = null, bestRank = -1;
+  sightings.forEach(function(s) {
+    var c = s.profile && s.profile.conservation;
+    if (!c) return;
+    var rank = IUCN_RANK[c] || 0;
+    if (rank > bestRank) { bestRank = rank; best = s; }
+  });
+  return best;
+}
+
+function renderStats() {
+  var el = document.getElementById('stats-view-inner');
+  if (!el) return;
+  var b = birds;
+
+  if (!b.length) {
+    el.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:14px;">No sightings yet.<br>Add your first bird to see stats!</div>';
+    return;
+  }
+
+  var totalSightings = b.length;
+  var uniqueSpecies = new Set(b.map(function(s){ return s.name; })).size;
+  var currentStreak = calcCurrentWeekStreak(b);
+  var bestStreak = calcWeekStreak(b);
+  var totalMaster = MASTER.length || 0;
+  var completionPct = totalMaster > 0 ? Math.round((uniqueSpecies / totalMaster) * 100) : 0;
+
+  // IUCN counts
+  var iucnCounts = { CR:0, EN:0, VU:0, NT:0 };
+  var profiledBirds = 0;
+  b.forEach(function(s) {
+    if (s.profile && s.profile.conservation) {
+      profiledBirds++;
+      var c = s.profile.conservation;
+      if (iucnCounts[c] !== undefined) iucnCounts[c]++;
+    }
+  });
+  var threatenedCount = iucnCounts.CR + iucnCounts.EN + iucnCounts.VU + iucnCounts.NT;
+
+  // Rarest by IUCN
+  var rarest = getIUCNRarest(b);
+
+  // Monthly chart (last 6 months)
+  var now = new Date();
+  var monthLabels = [], monthCounts = [];
+  for (var i=5; i>=0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    monthLabels.push(d.toLocaleString('en-IN',{month:'short'}));
+    var mn = d.getMonth(), yr = d.getFullYear();
+    monthCounts.push(b.filter(function(s){ var sd=new Date(s.date||s.created_at); return sd.getMonth()===mn&&sd.getFullYear()===yr; }).length);
+  }
+  var maxMonth = Math.max.apply(null, monthCounts.concat([1]));
+
+  // Type breakdown
+  var typeCounts = {};
+  b.forEach(function(s){ var t=s.type||'Unknown'; typeCounts[t]=(typeCounts[t]||0)+1; });
+  var typeEntries = Object.entries(typeCounts).sort(function(a,z){ return z[1]-a[1]; }).slice(0,5);
+  var PIE_COLORS = ['#28c080','#ffd166','#e05050','#7090e0','#c07840'];
+
+  // Achievements
+  var achieved = ACHIEVEMENTS.map(function(a){ return {id:a.id,tier:a.tier,icon:a.icon,name:a.name,desc:a.desc,unlocked:a.check(b)}; });
+  var unlockedCount = achieved.filter(function(a){ return a.unlocked; }).length;
+
+  var html = '';
+  html += '<div class="stats-heading">Life List Stats</div>';
+
+  // Overview
+  html += '<div class="stats-section-label">Overview</div>';
+  // Most recent sighting date
+  var lastSeen = b.length ? new Date(b.slice().sort(function(a,z){ return new Date(z.date||z.created_at) - new Date(a.date||a.created_at); })[0].date || b[0].created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '-';
+  // Most spotted type
+  var topType = typeEntries.length ? typeEntries[0][0] : '-';
+  // This month count
+  var thisMonthCount = monthCounts[5] || 0;
+
+  html += '<div class="stats-hero-grid">';
+  html += '<div class="stats-hero-card"><div class="stats-hero-val">'+totalSightings+'</div><div class="stats-hero-label">Birds spotted</div></div>';
+  html += '<div class="stats-hero-card"><div class="stats-hero-val">'+thisMonthCount+'</div><div class="stats-hero-label">This month</div></div>';
+  html += '<div class="stats-hero-card"><div class="stats-hero-val" style="font-size:14px;padding-top:4px;">'+lastSeen+'</div><div class="stats-hero-label">Last sighting</div></div>';
+  html += '<div class="stats-hero-card"><div class="stats-hero-val" style="font-size:15px;padding-top:2px;">'+topType+'</div><div class="stats-hero-label">Top type</div></div>';
+  html += '<div class="stats-hero-card wide"><span class="streak-flame">🔥</span><div>';
+  html += '<div class="stats-hero-val">'+currentStreak+' week'+(currentStreak!==1?'s':'')+'</div>';
+  html += '<div class="stats-hero-label">Active week streak</div>';
+  html += '<div class="stats-hero-sub">Best: '+bestStreak+' weeks</div>';
+  html += '</div></div>';
+
+  // Threatened species counter
+  if (threatenedCount > 0 || profiledBirds > 0) {
+    html += '<div class="stats-hero-card wide" style="border-color:rgba(255,100,100,0.15);flex-direction:column;gap:12px;">';
+    // Top row: big number + label
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    html += '<div class="stats-hero-val" style="font-size:36px;color:#e05050;line-height:1;">'+threatenedCount+'</div>';
+    html += '<div class="stats-hero-label" style="font-size:11px;">Threatened species<br>spotted</div>';
+    html += '</div>';
+    // Bottom row: IUCN pill breakdown
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    var iucnBreakdown = [{code:'CR',color:'#ff4444'},{code:'EN',color:'#e05050'},{code:'VU',color:'#e8a020'},{code:'NT',color:'#ffd166'}];
+    iucnBreakdown.forEach(function(item) {
+      if (iucnCounts[item.code]) {
+        html += '<div style="background:rgba(0,0,0,0.3);border:1px solid '+item.color+'33;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;">';
+        html += '<span style="font-size:10px;font-weight:700;color:'+item.color+';">'+item.code+'</span>';
+        html += '<span style="font-size:13px;font-weight:600;color:var(--ink);">'+iucnCounts[item.code]+'</span>';
+        html += '</div>';
+      }
+    });
+    html += '</div>';
+    if (profiledBirds < totalSightings) {
+      html += '<div style="font-size:9px;color:var(--ink3);border-top:1px solid rgba(255,255,255,0.04);padding-top:8px;">'+profiledBirds+' of '+totalSightings+' birds have IUCN data — open bird details to load more.</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Rarest find by IUCN
+  if (rarest) {
+    var rc = rarest.profile.conservation;
+    html += '<div class="stats-section-label">Rarest find</div>';
+    html += '<div class="rarest-card">';
+    html += '<div class="rarest-icon">'+habitatEmoji(rarest.type)+'</div>';
+    html += '<div style="flex:1"><div class="rarest-name">'+rarest.name+'</div>';
+    html += '<div class="rarest-sub">'+(rarest.species?'<i>'+rarest.species+'</i> &nbsp;&middot;&nbsp; ':'')+IUCN_LABEL[rc]+'</div></div>';
+    html += '<div style="font-size:11px;font-weight:700;color:'+IUCN_COLOR[rc]+';">'+rc+'</div>';
+    html += '</div>';
+  }
+
+  // Monthly chart
+  html += '<div class="stats-section-label">Sightings by month</div>';
+  html += '<div class="stats-hero-card"><div class="month-chart">';
+  for (var mi=0; mi<6; mi++) {
+    var barH = Math.round((monthCounts[mi]/maxMonth)*56)+4;
+    var cur = mi===5 ? ' current' : '';
+    html += '<div class="month-bar-wrap">';
+    html += '<div class="month-bar-count">'+(monthCounts[mi]||'')+'</div>';
+    html += '<div class="month-bar'+cur+'" style="height:'+barH+'px"></div>';
+    html += '<div class="month-bar-label">'+monthLabels[mi]+'</div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  // Type pie
+  if (typeEntries.length && totalSightings > 0) {
+    html += '<div class="stats-section-label">By type</div>';
+    html += '<div class="stats-hero-card"><div class="type-pie-wrap">';
+    var svgPaths = '';
+    var angle = -Math.PI/2;
+    for (var ti=0; ti<typeEntries.length; ti++) {
+      var pct = typeEntries[ti][1] / totalSightings;
+      var sweep = pct * 2 * Math.PI;
+      var x1 = (40 + 38*Math.cos(angle)).toFixed(1);
+      var y1 = (40 + 38*Math.sin(angle)).toFixed(1);
+      angle += sweep;
+      var x2 = (40 + 38*Math.cos(angle)).toFixed(1);
+      var y2 = (40 + 38*Math.sin(angle)).toFixed(1);
+      var large = sweep > Math.PI ? 1 : 0;
+      svgPaths += '<path d="M40 40 L'+x1+' '+y1+' A38 38 0 '+large+' 1 '+x2+' '+y2+' Z" fill="'+PIE_COLORS[ti]+'" opacity="0.85"/>';
+    }
+    html += '<svg width="80" height="80" viewBox="0 0 80 80">'+svgPaths+'</svg>';
+    html += '<div class="type-pie-legend">';
+    for (var li=0; li<typeEntries.length; li++) {
+      var lpct = Math.round(typeEntries[li][1]/totalSightings*100);
+      html += '<div class="type-pie-row"><div class="type-pie-dot" style="background:'+PIE_COLORS[li]+'"></div>';
+      html += '<div class="type-pie-name">'+typeEntries[li][0]+'</div>';
+      html += '<div class="type-pie-pct">'+lpct+'%</div></div>';
+    }
+    html += '</div></div></div>';
+  }
+
+  // Completion
+  if (totalMaster > 0) {
+    html += '<div class="stats-section-label">Life list completion</div>';
+    html += '<div class="stats-hero-card">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;">';
+    html += '<div class="stats-hero-val" style="font-size:24px;">'+completionPct+'%</div>';
+    html += '<div class="stats-hero-sub">'+uniqueSpecies+' of '+totalMaster+' species</div>';
+    html += '</div>';
+    html += '<div class="completion-bar-wrap"><div class="completion-bar-fill" style="width:'+completionPct+'%"></div></div>';
+    html += '</div>';
+  }
+
+  // Achievements grouped by tier
+  html += '<div class="stats-section-label">Achievements &nbsp;<span style="color:var(--amber2);font-size:10px;">'+unlockedCount+'/'+ACHIEVEMENTS.length+'</span></div>';
+  var tiers = ['starter','explorer','dedicated','elite'];
+  tiers.forEach(function(tier) {
+    var tierAchievements = achieved.filter(function(a){ return a.tier===tier; });
+    var tierUnlocked = tierAchievements.filter(function(a){ return a.unlocked; }).length;
+    html += '<div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;margin:12px 2px 6px;display:flex;align-items:center;gap:6px;">';
+    html += '<span style="color:'+TIER_COLORS[tier]+';">'+TIER_LABELS[tier]+'</span>';
+    html += '<span style="color:var(--ink3);">'+tierUnlocked+'/'+tierAchievements.length+'</span>';
+    html += '</div>';
+    html += '<div class="achievements-grid">';
+    tierAchievements.forEach(function(a) {
+      html += '<div class="achievement-card '+(a.unlocked?'unlocked':'locked')+'">';
+      html += '<div class="achievement-icon">'+a.icon+'</div>';
+      html += '<div class="achievement-text">';
+      html += '<div class="achievement-name">'+a.name+'</div>';
+      html += '<div class="achievement-desc">'+a.desc+'</div>';
+      html += '<div class="achievement-badge '+(a.unlocked?'unlocked':'locked')+'">'+(a.unlocked?'✦ Unlocked':'Locked')+'</div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
+}
+
 </script>
 </body>
 </html>
