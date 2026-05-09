@@ -439,6 +439,13 @@
     .section-bird { display:inline-block; font-size:14px; margin-right:6px; animation:glide 3s ease-in-out infinite; }
     .feather-bg { position:fixed; pointer-events:none; z-index:0; opacity:0.025; font-size:160px; right:-30px; bottom:80px; animation:glide 10s ease-in-out infinite; user-select:none; }
 
+
+    /* IUCN STATUS BADGES */
+    .iucn-badge { display:inline-flex; align-items:center; gap:3px; border-radius:4px; padding:2px 6px; font-size:8px; font-weight:700; letter-spacing:0.5px; border:1px solid; line-height:1.4; }
+    .iucn-cr { background:rgba(255,50,50,0.12); color:#ff4444; border-color:rgba(255,50,50,0.25); }
+    .iucn-en { background:rgba(220,80,60,0.12); color:#e05050; border-color:rgba(220,80,60,0.25); }
+    .iucn-vu { background:rgba(232,160,32,0.12); color:#e8a020; border-color:rgba(232,160,32,0.25); }
+    .iucn-nt { background:rgba(255,209,102,0.12); color:#ffd166; border-color:rgba(255,209,102,0.25); }
     /* ═══════════════════════════════════════════════════════════════════
        STATS + ACHIEVEMENTS VIEW
     ═══════════════════════════════════════════════════════════════════ */
@@ -1052,6 +1059,14 @@ function switchTab(tab) {
   if (tab === 'stats') renderStats();
 }
 
+
+function iucnBadge(bird) {
+  var c = bird && bird.profile && bird.profile.conservation;
+  var map = { CR:'Critically Endangered', EN:'Endangered', VU:'Vulnerable', NT:'Near Threatened' };
+  if (!c || !map[c]) return '';
+  return '<span class="iucn-badge iucn-'+c.toLowerCase()+'">'+c+' · '+map[c]+'</span>';
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // POKÉDEX RENDER
 // ═══════════════════════════════════════════════════════════════════
@@ -1143,6 +1158,7 @@ function renderPokedex() {
               <span class="tag tag-${sizeClass(userBird.size)}">${userBird.size || ''}</span>
               ${userBird.lat && userBird.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
             </div>
+            ${iucnBadge(userBird) ? `<div style="margin-top:4px;">${iucnBadge(userBird)}</div>` : ''}
           </div>
         </div>`;
       } else {
@@ -1268,6 +1284,7 @@ function renderCatalogue() {
             <span class="tag tag-${typeClass(b.type)}">${b.type || 'Unknown'}</span>
             <span class="tag tag-${sizeClass(b.size)}">${b.size || ''}</span>
             ${b.lat && b.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
+            ${iucnBadge(b)}
           </div>
         </div>
         <div class="cat-row-date">${b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</div>
