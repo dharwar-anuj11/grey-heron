@@ -86,7 +86,7 @@
     .topbar-add:hover { transform:scale(1.1) rotate(90deg); box-shadow:0 6px 32px rgba(255,209,102,0.4); }
     .topbar-add:active { transform:scale(0.92) rotate(90deg); }
 
-    .content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; min-height:0; scroll-behavior:smooth; }
+    .content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; min-height:0; scroll-behavior:smooth; padding-bottom:80px; }
     .content::-webkit-scrollbar { width:3px; }
     .content::-webkit-scrollbar-track { background:transparent; }
     .content::-webkit-scrollbar-thumb { background:rgba(40,160,64,0.15); border-radius:2px; }
@@ -230,7 +230,7 @@
     .undiscovered-overlay span { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); font-weight:500; }
 
     /* ── CATALOGUE VIEW ───────────────── */
-    .catalogue-header { padding:16px 16px 12px; display:flex; gap:10px; align-items:center; }
+    .catalogue-header { padding:12px 16px 10px; display:flex; gap:10px; align-items:center; position:sticky; top:41px; z-index:10; background:var(--p); }
     .search-wrap { position:relative; flex:1; }
     .search-wrap svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink3); }
     .search-input { width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:11px 14px 11px 36px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:all 0.25s; }
@@ -238,7 +238,7 @@
     .search-input::placeholder { color:rgba(90,138,90,0.5); font-style:italic; }
 
     .cat-tabs-wrap {
-      position:sticky; top:0; z-index:8;
+      position:sticky; top:82px; z-index:8;
       background:linear-gradient(180deg, var(--p) 80%, rgba(7,13,7,0));
       padding:0 0 8px;
     }
@@ -265,12 +265,15 @@
     }
     .cat-tab.active .cat-tab-count { color:var(--amber2); opacity:0.8; }
 
-    .cat-list { padding:0 16px 80px; }
+    .cat-list { padding:0 16px 80px; overflow-y:auto; flex:1; }
+    #view-catalogue { display:none; flex-direction:column; }
+    #view-catalogue.active { display:flex; }
+    #journal-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
     .cat-section-header {
       font-family:'Playfair Display',serif; font-size:15px; font-weight:700;
       color:var(--amber2); padding:16px 0 10px; display:flex; align-items:center; gap:8px;
-      position:sticky; top:42px; z-index:7;
-      background:linear-gradient(180deg, var(--p) 70%, rgba(7,13,7,0));
+      position:sticky; top:0; z-index:7;
+      background:linear-gradient(180deg, var(--p) 80%, rgba(7,13,7,0));
     }
     .cat-section-header::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(255,209,102,0.15), transparent); }
     .cat-section-count { font-size:9px; letter-spacing:1px; color:var(--ink3); font-family:'DM Sans',sans-serif; font-weight:400; }
@@ -467,8 +470,67 @@
     .migrate-pip.filled { background:var(--forest3); }
     .migrate-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:16px 0 8px 2px; }
 
+
+    /* HOTSPOT EXPANDABLE */
+    .hotspot-expand-btn { width:100%; margin-top:10px; padding:6px; background:none; border:1px solid rgba(255,255,255,0.06); border-radius:8px; color:var(--ink3); font-size:11px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+    .hotspot-expand-btn:hover { border-color:rgba(40,160,64,0.2); color:var(--forest3); }
+    .hotspot-species-list { margin-top:8px; display:none; }
+    .hotspot-species-list.open { display:block; }
+    .hotspot-species-chip { display:inline-block; margin:3px 3px 0 0; padding:3px 8px; background:rgba(40,160,64,0.06); border:1px solid rgba(40,160,64,0.1); border-radius:6px; font-size:10px; color:var(--ink2); }
     /* SHARE CARD */
     #share-canvas { display:none; }
+
+
+
+    /* FLOATING ACTION BUTTON */
+    .fab { position:fixed; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px); right:16px; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--amber2)); box-shadow:0 6px 24px rgba(255,209,102,0.3); border:none; color:var(--p); font-size:28px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:100; transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.25s; line-height:1; }
+    .fab:hover { transform:scale(1.1) rotate(90deg); box-shadow:0 8px 32px rgba(255,209,102,0.45); }
+    .fab:active { transform:scale(0.92); }
+    /* SIDEBAR */
+    #sidebar { transform:translateX(-100%); }
+    #sidebar.open { transform:translateX(0); }
+    .sidebar-section { padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .sidebar-section-label { font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px; }
+    .sidebar-item { display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer;color:var(--ink2);font-size:13px;border:none;background:none;width:100%;text-align:left; }
+    .sidebar-item:hover { color:var(--ink); }
+    .sidebar-item svg { width:18px;height:18px;flex-shrink:0;color:var(--ink3); }
+    /* MAP SUB-TABS */
+    .map-tabs { display:flex; gap:0; border-bottom:1px solid rgba(255,255,255,0.05); flex-shrink:0; }
+    .map-tab { flex:1; padding:10px 6px; background:none; border:none; border-bottom:2px solid transparent; color:var(--ink3); font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; transition:all 0.2s; letter-spacing:0.3px; }
+    .map-tab.active { color:var(--amber2); border-bottom-color:var(--amber2); }
+
+    /* DISCOVER VIEW */
+    .discover-view { padding:14px 14px 24px; }
+    .discover-heading { font-family:'Cormorant Garamond',serif; font-size:20px; font-style:italic; color:var(--ink); margin-bottom:4px; }
+    .discover-sub { font-size:11px; color:var(--ink3); margin-bottom:14px; line-height:1.6; }
+    .discover-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:16px 0 8px 2px; }
+    .discover-card { background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.2s; }
+    .discover-card:hover { border-color:rgba(40,160,64,0.2); }
+    .discover-card.new-species { border-color:rgba(255,209,102,0.15); background:rgba(20,24,14,0.95); }
+    .discover-card-icon { font-size:26px; width:38px; text-align:center; flex-shrink:0; }
+    .discover-card-info { flex:1; min-width:0; }
+    .discover-card-name { font-size:14px; color:var(--ink); font-weight:500; }
+    .discover-card-meta { font-size:10px; color:var(--ink3); margin-top:3px; line-height:1.5; }
+    .discover-card-badge { font-size:9px; letter-spacing:0.5px; margin-top:4px; }
+    .discover-card-badge.new { color:var(--amber2); }
+    .discover-card-badge.have { color:var(--forest3); }
+    .discover-dist { font-size:10px; color:var(--ink3); text-align:right; flex-shrink:0; }
+    .discover-rarity-banner { background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.15); border-radius:14px; padding:14px; margin-bottom:10px; }
+    .discover-rarity-title { font-size:12px; color:#e05050; font-weight:600; margin-bottom:6px; letter-spacing:0.3px; }
+    .discover-rarity-name { font-size:15px; color:var(--ink); font-weight:500; }
+    .discover-rarity-meta { font-size:10px; color:var(--ink3); margin-top:3px; }
+    .discover-load-btn { width:100%; padding:12px; background:rgba(40,160,64,0.08); border:1px solid rgba(40,160,64,0.15); border-radius:12px; color:var(--forest3); font-size:13px; cursor:pointer; margin-top:8px; font-family:'DM Sans',sans-serif; }
+    .discover-load-btn:hover { background:rgba(40,160,64,0.14); }
+    .hotspot-card { background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:14px; margin-bottom:8px; }
+    .hotspot-name { font-size:14px; color:var(--ink); font-weight:500; margin-bottom:4px; }
+    .hotspot-meta { font-size:10px; color:var(--ink3); line-height:1.6; }
+    .hotspot-species-count { font-family:'Josefin Sans',sans-serif; font-size:22px; color:var(--amber2); font-weight:700; }
+    .rarity-flash { position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:999; background:rgba(20,10,10,0.97); border:1px solid rgba(255,80,80,0.3); border-radius:14px; padding:12px 16px; max-width:340px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.6); display:none; cursor:pointer; }
+    .rarity-flash.show { display:block; animation:slideDown 0.3s ease; }
+    @keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+    .rarity-flash-title { font-size:11px; color:#e05050; letter-spacing:0.5px; margin-bottom:4px; }
+    .rarity-flash-body { font-size:13px; color:var(--ink); line-height:1.5; }
+    .rarity-flash-close { position:absolute; top:8px; right:12px; color:var(--ink3); font-size:16px; background:none; border:none; cursor:pointer; }
     /* IUCN STATUS BADGES */
     .iucn-badge { display:inline-flex; align-items:center; gap:3px; border-radius:4px; padding:2px 6px; font-size:8px; font-weight:700; letter-spacing:0.5px; border:1px solid; line-height:1.4; }
     .iucn-cr { background:rgba(255,50,50,0.12); color:#ff4444; border-color:rgba(255,50,50,0.25); }
@@ -524,6 +586,69 @@
     .rarest-icon { font-size:32px; }
     .rarest-name { font-size:15px; color:var(--ink); font-weight:500; }
     .rarest-sub { font-size:10px; color:var(--ink3); margin-top:2px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       AMBIENT NATURE ANIMATIONS
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Feathers drifting down in Pokédex background */
+    @keyframes featherDrift1 {
+      0%   { transform: translateY(-40px) translateX(0px) rotate(-8deg); opacity:0; }
+      8%   { opacity: 0.055; }
+      92%  { opacity: 0.055; }
+      100% { transform: translateY(110vh) translateX(30px) rotate(12deg); opacity:0; }
+    }
+    @keyframes featherDrift2 {
+      0%   { transform: translateY(-40px) translateX(0px) rotate(6deg); opacity:0; }
+      8%   { opacity: 0.04; }
+      92%  { opacity: 0.04; }
+      100% { transform: translateY(110vh) translateX(-24px) rotate(-10deg); opacity:0; }
+    }
+    @keyframes featherDrift3 {
+      0%   { transform: translateY(-40px) translateX(0px) rotate(-3deg); opacity:0; }
+      10%  { opacity: 0.05; }
+      90%  { opacity: 0.05; }
+      100% { transform: translateY(110vh) translateX(18px) rotate(8deg); opacity:0; }
+    }
+    .feather {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .feather-1 { left:12%; top:0; animation: featherDrift1 20s 2s ease-in-out infinite; }
+    .feather-2 { left:58%; top:0; animation: featherDrift2 25s 8s ease-in-out infinite; }
+    .feather-3 { left:80%; top:0; animation: featherDrift3 17s 14s ease-in-out infinite; }
+
+    /* Pulse on ⚡ discover elements */
+    @keyframes radarPulse {
+      0%,100% { opacity: 0.7; }
+      50%      { opacity: 1.0; }
+    }
+    .pulse-radar { animation: radarPulse 2s ease-in-out infinite; }
+    #dtab-nearby { animation: radarPulse 2.2s ease-in-out infinite; }
+
+    /* Glow on streak fire */
+    @keyframes fireGlow {
+      0%,100% { text-shadow: 0 0 6px rgba(255,140,0,0.15), 0 0 12px rgba(255,80,0,0.08); }
+      50%      { text-shadow: 0 0 14px rgba(255,140,0,0.3), 0 0 28px rgba(255,80,0,0.18), 0 0 40px rgba(255,60,0,0.08); }
+    }
+    .streak-flame { font-size:28px; flex-shrink:0; animation: fireGlow 3s ease-in-out infinite; }
+
+    /* Perched bird bob */
+    @keyframes headBob {
+      0%,100%  { transform: rotate(0deg); }
+      20%      { transform: rotate(-6deg); }
+      40%      { transform: rotate(0deg); }
+      55%      { transform: rotate(-4deg); }
+      70%      { transform: rotate(0deg); }
+    }
+    @keyframes bodyBob {
+      0%,100%  { transform: translateY(0px); }
+      50%      { transform: translateY(-1px); }
+    }
+    .perched-bird-head { transform-origin: 50% 90%; animation: headBob 4s 1s ease-in-out infinite; }
+    .perched-bird-body { animation: bodyBob 4s ease-in-out infinite; }
+    .perched-bird { pointer-events:none; opacity:0.18; }
   </style>
 </head>
 <body>
@@ -554,11 +679,11 @@
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <svg style="position:absolute;top:8px;left:50%;transform:translateX(-50%);pointer-events:none;opacity:0.18;z-index:0;" width="300" height="40" viewBox="0 0 300 40">
-      <path d="M30 20 C25 14 18 13 14 17 C18 19 24 18 30 20 C36 14 43 13 47 17 C43 19 36 18 30 20Z" fill="#ffc947"><animateTransform attributeName="transform" type="translate" values="0 0;240 -5;0 0" dur="12s" repeatCount="indefinite"/></path>
-      <path d="M80 28 C76 23 71 22 68 25 C71 27 76 26 80 28 C84 23 89 22 92 25 C89 27 84 26 80 28Z" fill="#4fc88a"><animateTransform attributeName="transform" type="translate" values="0 0;180 -8;0 0" dur="17s" repeatCount="indefinite"/></path>
-    </svg>
+
     <div class="topbar-logo" style="position:relative;z-index:1;">
+      <button onclick="openSidebar()" aria-label="Settings" style="background:none;border:none;cursor:pointer;padding:6px;color:var(--ink2);display:flex;align-items:center;justify-content:center;margin-right:2px;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="22" height="22"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;">
         <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
           <path d="M16 8 C10 2, 2 4, 0 10 C4 12, 10 11, 16 8Z" fill="rgba(255,255,255,0.8)"/>
@@ -569,11 +694,16 @@
         </svg>
       </div>
       <div class="topbar-logo-text">Grey <span>Heron</span></div>
+      <svg style="position:absolute;top:6px;left:0;width:100%;height:40px;pointer-events:none;opacity:0.14;z-index:0;overflow:visible;" viewBox="0 0 400 40" preserveAspectRatio="none">
+        <path d="M55 15 C52 11 48 10 46 13 C48 14 52 13.5 55 15 C58 11 62 10 64 13 C62 14 58 13.5 55 15Z" fill="#a8cca8">
+          <animateTransform attributeName="transform" type="translate" values="0 0;200 -3;0 0" dur="22s" repeatCount="indefinite"/>
+        </path>
+      </svg>
     </div>
     <div class="topbar-right">
-      <div class="sync-status offline" id="sync-status"><span>●</span> <span id="sync-text">Offline</span></div>
+      <div id="sync-status" title="Offline" style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;transition:background 0.3s;"></div>
       <div class="topbar-stat"><b id="stat-total">0</b><br>birds</div>
-      <button class="topbar-add" onclick="openAdd()">+</button>
+
     </div>
   </div>
 
@@ -583,39 +713,79 @@
       <div class="pdex-tabs-wrap">
         <div class="pdex-tabs" id="pdex-tabs"></div>
       </div>
-      <div id="pdex-grid-area"></div>
+      <div id="pdex-grid-area" style="position:relative;">
+        <!-- Ambient feather 1 -->
+        <svg class="feather feather-1" width="14" height="32" viewBox="0 0 14 32"><path d="M7 0 C5 8,2 14,3 20 C4 26,7 30,7 32 C7 30,10 26,11 20 C12 14,9 8,7 0Z" fill="#a8cca8"/><path d="M7 4 C6 10,4 16,5 22" stroke="#a8cca8" stroke-width="0.5" fill="none" opacity="0.5"/></svg>
+        <!-- Ambient feather 2 -->
+        <svg class="feather feather-2" width="10" height="24" viewBox="0 0 10 24"><path d="M5 0 C4 6,2 10,2 15 C2 19,5 23,5 24 C5 23,8 19,8 15 C8 10,6 6,5 0Z" fill="#ffd166"/><path d="M5 3 C4 8,3 13,4 17" stroke="#ffd166" stroke-width="0.5" fill="none" opacity="0.5"/></svg>
+        <!-- Ambient feather 3 -->
+        <svg class="feather feather-3" width="12" height="28" viewBox="0 0 12 28"><path d="M6 0 C5 7,2 12,3 18 C4 23,6 27,6 28 C6 27,9 23,10 18 C11 12,8 7,6 0Z" fill="#a8cca8"/></svg>
+      </div>
     </div>
 
-    <div class="view" id="view-catalogue">
-      <div class="catalogue-header">
-        <div class="search-wrap">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" class="search-input" id="search-input" placeholder="Search field notes..." oninput="renderCatalogue()"/>
+    <div class="view" id="view-catalogue" style="display:none;flex-direction:column;">
+      <div class="map-tabs" style="flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--p);">
+        <button class="map-tab active" id="jtab-journal" onclick="switchJournalTab('journal')">Journal</button>
+        <button class="map-tab" id="jtab-map" onclick="switchJournalTab('map')">Map</button>
+      </div>
+      <div id="journal-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="catalogue-header" id="cat-search-bar" style="display:none;">
+          <div class="search-wrap" style="flex:1;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search field notes..." oninput="renderCatalogue()" autofocus/>
+          </div>
+          <button onclick="toggleJournalSearch()" style="background:none;border:none;color:var(--ink3);font-size:18px;padding:4px 8px;cursor:pointer;">✕</button>
+        </div>
+        <div id="cat-search-toggle" style="display:flex;justify-content:flex-end;padding:8px 16px 4px;position:sticky;top:41px;z-index:9;background:var(--p);">
+          <button onclick="toggleJournalSearch()" style="background:none;border:none;cursor:pointer;color:var(--ink3);display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Search
+          </button>
+        </div>
+        <div class="cat-tabs-wrap">
+          <div class="cat-tabs" id="type-filters"></div>
+        </div>
+        <div class="cat-list" id="cat-list"></div>
+      </div>
+      <div id="map-panel-journal" style="flex:1;display:none;flex-direction:column;">
+        <div class="map-view">
+          <div id="map-el"></div>
+          <div class="map-info-bar" id="map-info-bar">Loading map...</div>
         </div>
       </div>
-      <div class="cat-tabs-wrap">
-        <div class="cat-tabs" id="type-filters"></div>
-      </div>
-      <div class="cat-list" id="cat-list"></div>
     </div>
 
-    <div class="view" id="view-map" style="display:none;flex-direction:column;">
-      <div class="map-view">
-        <div id="map-el"></div>
-        <div class="map-info-bar" id="map-info-bar">Loading map...</div>
+
+    <!-- DISCOVER VIEW (main tab) -->
+    <div class="view" id="view-discover" style="display:none;flex-direction:column;">
+      <div class="map-tabs" style="flex-shrink:0;position:sticky;top:0;z-index:9;background:var(--p);">
+        <button class="map-tab active" id="dtab-nearby" onclick="switchDiscoverTab('nearby')">⚡ Nearby</button>
+        <button class="map-tab" id="dtab-hotspots" onclick="switchDiscoverTab('hotspots')">Hotspots</button>
+        <button class="map-tab" id="dtab-migrate" onclick="switchDiscoverTab('migrate')">Migration</button>
+      </div>
+      <div style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;">
+        <div id="discover-nearby-inner" class="discover-view"></div>
+        <div id="discover-hotspots-inner" class="discover-view" style="display:none;"></div>
+        <div id="discover-migrate-inner" class="discover-view" style="display:none;"></div>
       </div>
     </div>
 
-    <div class="view" id="view-stats">
-      <div class="stats-tabs">
-        <button class="stats-tab active" id="stab-stats" onclick="switchStatsTab('stats')">Stats</button>
-        <button class="stats-tab" id="stab-migrate" onclick="switchStatsTab('migrate')">Migration</button>
+    <!-- SIDEBAR OVERLAY -->
+    <div id="sidebar-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:800;backdrop-filter:blur(2px);"></div>
+    <div id="sidebar" style="position:fixed;left:0;top:0;bottom:0;width:280px;background:#0b130b;border-right:1px solid rgba(255,255,255,0.06);z-index:801;transition:transform 0.3s ease;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);">
+      <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--ink);">Grey <span style="color:var(--amber2);">Heron</span></div>
+          <button onclick="closeSidebar()" style="background:none;border:none;color:var(--ink3);font-size:22px;cursor:pointer;">×</button>
+        </div>
+        <div style="font-size:10px;color:var(--ink3);">Bird spotting companion</div>
       </div>
-      <div class="stats-view" id="stats-view-inner"></div>
-      <div class="stats-view" id="migrate-view-inner" style="display:none;"></div>
+      <!-- Settings content lives here directly -->
+      <div id="sidebar-settings-content" style="padding-bottom:40px;"></div>
     </div>
 
-    <div class="view" id="view-settings">
+    <!-- Settings view (hidden, content mirrored to sidebar) -->
+    <div class="view" id="view-settings" style="display:none!important;">
       <div class="settings-view">
         <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--ink);padding:4px 2px 16px;">Settings</div>
 
@@ -688,20 +858,23 @@
       <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Journal
     </button>
-    <button class="nav-tab" id="tab-map" onclick="switchTab('map')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-      Map
+    <button class="nav-tab" id="tab-discover" onclick="switchTab('discover')" style="position:relative;">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      Discover
+      <span id="discover-badge" style="display:none;position:absolute;top:6px;right:10px;background:#e05050;color:white;font-size:8px;font-weight:700;border-radius:8px;padding:1px 5px;line-height:1.5;"></span>
     </button>
     <button class="nav-tab" id="tab-stats" onclick="switchTab('stats')">
       <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Stats
     </button>
-    <button class="nav-tab" id="tab-settings" onclick="switchTab('settings')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Settings
-    </button>
   </nav>
   <div id="toast" class="toast"></div>
+<button class="fab" onclick="openAdd()" aria-label="Add sighting">+</button>
+<div class="rarity-flash" id="rarity-flash">
+  <button class="rarity-flash-close" onclick="document.getElementById('rarity-flash').classList.remove('show')">×</button>
+  <div class="rarity-flash-title">⚡ RARITY ALERT · Near Bengaluru</div>
+  <div class="rarity-flash-body" id="rarity-flash-body"></div>
+</div>
 <canvas id="share-canvas"></canvas>
 </div>
 
@@ -1036,6 +1209,9 @@ async function loadAllData() {
     else { birds = await getFromCache('birds') || []; }
   } else { birds = await getFromCache('birds') || []; }
   updateStats(); renderPokedex(); renderCatalogue();
+  setTimeout(checkRarityOnLoad, 3000);
+  setTimeout(updateDiscoverBadge, 4000);
+  populateSidebar();
   updateSyncStatus('synced');
 }
 
@@ -1070,10 +1246,10 @@ function updateStats() {
 
 function updateSyncStatus(status) {
   const el = document.getElementById('sync-status');
-  const text = document.getElementById('sync-text');
-  if (status === 'synced') { el.className = 'sync-status online'; text.textContent = 'Synced ✓'; }
-  else if (status === 'online') { el.className = 'sync-status online'; text.textContent = 'Syncing...'; }
-  else { el.className = 'sync-status offline'; text.textContent = 'Offline'; }
+  if (!el) return;
+  if (status === 'synced') { el.style.background = 'var(--forest3)'; el.title = 'Synced'; }
+  else if (status === 'online') { el.style.background = 'var(--forest3)'; el.title = 'Syncing...'; }
+  else { el.style.background = 'var(--amber)'; el.title = 'Offline'; }
 }
 
 function showToast(msg, type='success') {
@@ -1088,11 +1264,17 @@ function switchTab(tab) {
   document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   const activeView = document.getElementById('view-' + tab);
+  if (!activeView) return;
   activeView.classList.add('active');
-  activeView.style.display = (tab === 'map' ? 'flex' : 'block');
-  document.getElementById('tab-' + tab).classList.add('active');
+  activeView.style.display = (tab === 'map' || tab === 'discover' || tab === 'catalogue') ? 'flex' : 'block';
+  const tabBtn = document.getElementById('tab-' + tab);
+  if (tabBtn) tabBtn.classList.add('active');
   if (tab === 'map') setTimeout(initMap, 60);
   if (tab === 'stats') renderStats();
+  if (tab === 'discover') {
+    document.getElementById('discover-badge').style.display = 'none';
+    switchDiscoverTab(currentDiscoverTab || 'nearby');
+  }
 }
 
 
@@ -1191,8 +1373,6 @@ function renderPokedex() {
             <div class="pdex-species">${userBird.species || ''}</div>
             <div class="pdex-tags">
               <span class="tag tag-${typeClass(userBird.type)}">${userBird.type || '—'}</span>
-              <span class="tag tag-${sizeClass(userBird.size)}">${userBird.size || ''}</span>
-              ${userBird.lat && userBird.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
             </div>
             ${iucnBadge(userBird) ? `<div style="margin-top:4px;">${iucnBadge(userBird)}</div>` : ''}
           </div>
@@ -1550,6 +1730,7 @@ const MAP = {
 
 function initMap(){
   const infoBar=document.getElementById('map-info-bar');
+  if (!document.getElementById('map-el')) return;
   const geoBirds=birds.filter(b=>b.lat&&b.lng);
   infoBar.textContent=`${geoBirds.length} of ${birds.length} sightings geotagged — drag to pan, scroll/pinch to zoom, tap pin to view`;
   requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ MAP.init('map-el'); }); });
@@ -2743,9 +2924,498 @@ function renderMigration() {
   el.innerHTML = html;
 }
 
+function renderMigrationInto(targetId) {
+  var saved = currentMigrateMonth;
+  var origEl = document.getElementById('migrate-view-inner');
+  var targetEl = document.getElementById(targetId);
+  if (!targetEl) return;
+  // temporarily swap target
+  targetEl.id = 'migrate-view-inner';
+  renderMigration();
+  targetEl.id = targetId;
+  if (origEl) origEl.id = 'migrate-view-inner';
+}
+
 function changeMigrateMonth(dir) {
   currentMigrateMonth = (currentMigrateMonth + dir + 12) % 12;
   renderMigration();
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// eBIRD INTEGRATION
+// ═══════════════════════════════════════════════════════════════════
+var EBIRD_KEY = 'f2a1re6pkv40';
+var EBIRD_BASE = 'https://api.ebird.org/v2';
+var BLR_LAT = 12.9716;
+var BLR_LNG = 77.5946;
+var userLat = BLR_LAT, userLng = BLR_LNG;
+var ebirdCache = {};
+
+// getLocation() defined in nav_discover section below
+
+function switchMapTab(tab) {
+  document.getElementById('map-panel').style.display = tab === 'map' ? 'flex' : 'none';
+  document.getElementById('discover-panel').style.display = tab === 'discover' ? 'block' : 'none';
+  document.getElementById('hotspots-panel').style.display = tab === 'hotspots' ? 'block' : 'none';
+  document.querySelectorAll('.map-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('mtab-' + tab).classList.add('active');
+  if (tab === 'map') setTimeout(initMap, 60);
+  if (tab === 'discover') renderDiscover();
+  if (tab === 'hotspots') renderHotspots();
+}
+
+// ── NEARBY OBSERVATIONS ──────────────────────────────────────────
+async function fetchNearby(lat, lng, dist, days) {
+  var cacheKey = 'nearby_' + lat.toFixed(2) + '_' + lng.toFixed(2);
+  if (ebirdCache[cacheKey]) return ebirdCache[cacheKey];
+  try {
+    var url = EBIRD_BASE + '/data/obs/geo/recent?lat=' + lat + '&lng=' + lng +
+      '&dist=' + (dist||25) + '&back=' + (days||7) + '&maxResults=100&includeProvisional=true';
+    var res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!res.ok) throw new Error('eBird API error ' + res.status);
+    var data = await res.json();
+    ebirdCache[cacheKey] = data;
+    return data;
+  } catch(e) { console.error('eBird nearby error:', e); return []; }
+}
+
+// ── NOTABLE (RARITY) OBSERVATIONS ────────────────────────────────
+async function fetchNotable(lat, lng, dist) {
+  var cacheKey = 'notable_' + lat.toFixed(2) + '_' + lng.toFixed(2);
+  if (ebirdCache[cacheKey]) return ebirdCache[cacheKey];
+  try {
+    var url = EBIRD_BASE + '/data/obs/geo/recent/notable?lat=' + lat + '&lng=' + lng +
+      '&dist=' + (dist||50) + '&back=14&maxResults=20&detail=full';
+    var res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!res.ok) throw new Error('eBird notable error ' + res.status);
+    var data = await res.json();
+    ebirdCache[cacheKey] = data;
+    return data;
+  } catch(e) { console.error('eBird notable error:', e); return []; }
+}
+
+// ── HOTSPOTS ─────────────────────────────────────────────────────
+async function fetchHotspots(lat, lng, dist) {
+  var cacheKey = 'hotspots_' + lat.toFixed(2) + '_' + lng.toFixed(2);
+  if (ebirdCache[cacheKey]) return ebirdCache[cacheKey];
+  try {
+    var url = EBIRD_BASE + '/ref/hotspot/geo?lat=' + lat + '&lng=' + lng +
+      '&dist=' + (dist||25) + '&back=30&fmt=json';
+    var res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!res.ok) throw new Error('eBird hotspots error ' + res.status);
+    var data = await res.json();
+    ebirdCache[cacheKey] = data;
+    return data;
+  } catch(e) { console.error('eBird hotspots error:', e); return []; }
+}
+
+function distKm(lat1, lng1, lat2, lng2) {
+  var R = 6371;
+  var dLat = (lat2-lat1)*Math.PI/180;
+  var dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function daysAgo(dateStr) {
+  var d = new Date(dateStr.replace(' ','T'));
+  var diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+  return diff === 0 ? 'today' : diff === 1 ? 'yesterday' : diff + ' days ago';
+}
+
+// ── RENDER DISCOVER ───────────────────────────────────────────────
+async function renderDiscover(targetId) {
+  var el = document.getElementById(targetId || 'discover-inner');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:48px 20px;text-align:center;pointer-events:none;"><svg class="perched-bird" width="56" height="52" viewBox="0 0 56 52" fill="none" xmlns="http://www.w3.org/2000/svg"><g class="perched-bird-body"><ellipse cx="28" cy="34" rx="11" ry="8" fill="currentColor" opacity="0.6"/><g class="perched-bird-head"><ellipse cx="28" cy="22" rx="7" ry="6.5" fill="currentColor" opacity="0.8"/><ellipse cx="31" cy="20" rx="1.2" ry="1.2" fill="var(--p)" opacity="0.9"/><path d="M34 21 L38 22 L34 23Z" fill="currentColor" opacity="0.7"/></g><path d="M20 40 L16 48 M28 42 L28 48 M36 40 L40 48" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><path d="M17 42 Q10 36 8 30" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/><path d="M39 42 Q46 36 48 30" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/></g><line x1="8" y1="48" x2="48" y2="48" stroke="currentColor" stroke-width="1" opacity="0.2"/></svg>' + '<div style="color:var(--ink3);font-size:12px;margin-top:8px;">Finding birds near you...</div></div>';
+
+  await getLocation();
+  var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
+
+  var nearby = await fetchNearby(userLat, userLng, 25, 7);
+  var notable = await fetchNotable(userLat, userLng, 50);
+
+  if (!nearby.length && !notable.length) {
+    el.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:13px;">Could not load eBird data.<br>Check your connection and try again.</div>';
+    return;
+  }
+
+  var html = '<div class="discover-heading">What\'s Around You</div>';
+  html += '<div class="discover-sub">Birds spotted within 25km in the last 7 days, via eBird. Stars = species not in your list yet.</div>';
+
+  // Rarity alerts section
+  if (notable.length) {
+    html += '<div class="discover-section-label pulse-radar">⚡ Rarity alerts</div>';
+    notable.slice(0, 4).forEach(function(obs) {
+      var isNew = !myBirdNames.has((obs.comName||'').toLowerCase().trim());
+      var dist = distKm(userLat, userLng, obs.lat, obs.lng);
+      var rmapsUrl = obs.lat && obs.lng ? 'https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng : null;
+      html += '<div class="discover-rarity-banner" style="display:flex;align-items:center;gap:10px;">';
+      html += '<div style="flex:1;">';
+      html += '<div class="discover-rarity-title" style="margin-bottom:2px;">⚡ ' + dist.toFixed(1) + 'km · ' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div class="discover-rarity-name">' + obs.comName + (isNew ? ' <span style="color:var(--amber2);font-size:10px;">★ New</span>' : '') + '</div>';
+      html += '<div style="font-size:10px;color:var(--ink3);font-style:italic;">' + (obs.sciName||'') + '</div>';
+      html += '</div>';
+      if (rmapsUrl) html += '<a href="' + rmapsUrl + '" target="_blank" style="flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:50%;color:#4285f4;font-size:16px;text-decoration:none;">📍</a>';
+      html += '</div>';
+    });
+  }
+
+  // New species to find
+  var newSpecies = nearby.filter(function(obs) {
+    return !myBirdNames.has((obs.comName||'').toLowerCase().trim());
+  });
+  var haveSpecies = nearby.filter(function(obs) {
+    return myBirdNames.has((obs.comName||'').toLowerCase().trim());
+  });
+
+  if (newSpecies.length) {
+    html += '<div class="discover-section-label">★ New species near you (' + newSpecies.length + ')</div>';
+    newSpecies.slice(0, 15).forEach(function(obs) {
+      var dist = distKm(userLat, userLng, obs.lat, obs.lng);
+      var nmapsUrl = obs.lat && obs.lng ? 'https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng : null;
+      html += '<div class="discover-card new-species">';
+      html += '<div class="discover-card-icon">' + habitatEmoji(null) + '</div>';
+      html += '<div class="discover-card-info">';
+      html += '<div class="discover-card-name">' + obs.comName + '</div>';
+      html += '<div class="discover-card-meta"><i>' + (obs.sciName||'') + '</i><br>' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;">';
+      html += '<div class="discover-card-badge new" style="flex:1;">★ Add to your list</div>';
+      if (nmapsUrl) html += '<a href="' + nmapsUrl + '" target="_blank" style="padding:3px 8px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:6px;color:#4285f4;font-size:10px;font-weight:600;text-decoration:none;white-space:nowrap;">📍 Maps</a>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="discover-dist">' + dist.toFixed(1) + 'km</div>';
+      html += '</div>';
+    });
+    if (newSpecies.length > 15) {
+      html += '<div style="text-align:center;font-size:11px;color:var(--ink3);margin:8px 0;">+ ' + (newSpecies.length-15) + ' more species nearby</div>';
+    }
+  }
+
+  // Already have
+  if (haveSpecies.length) {
+    html += '<div class="discover-section-label">✓ Already in your list (' + haveSpecies.length + ')</div>';
+    haveSpecies.slice(0, 8).forEach(function(obs) {
+      var dist = distKm(userLat, userLng, obs.lat, obs.lng);
+      html += '<div class="discover-card" style="opacity:0.6;">';
+      html += '<div class="discover-card-icon">' + habitatEmoji(null) + '</div>';
+      html += '<div class="discover-card-info">';
+      html += '<div class="discover-card-name">' + obs.comName + '</div>';
+      html += '<div class="discover-card-meta">' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div class="discover-card-badge have">✓ Logged</div>';
+      html += '</div>';
+      html += '<div class="discover-dist">' + dist.toFixed(1) + 'km</div>';
+      html += '</div>';
+    });
+  }
+
+  el.innerHTML = html;
+
+  // Rarity flash already shown on load — skip in discover tab
+}
+
+// ── RENDER HOTSPOTS ───────────────────────────────────────────────
+async function fetchHotspotSpecies(locId) {
+  var cacheKey = 'hsp_' + locId;
+  if (ebirdCache[cacheKey]) return ebirdCache[cacheKey];
+  try {
+    var url = EBIRD_BASE + '/data/obs/' + locId + '/recent?maxResults=20&back=14';
+    var res = await fetch(url, { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!res.ok) return [];
+    var data = await res.json();
+    ebirdCache[cacheKey] = data;
+    return data;
+  } catch(e) { return []; }
+}
+
+function toggleHotspotSpecies(locId) {
+  var list = document.getElementById('hsp-list-' + locId);
+  var btn = document.getElementById('hsp-btn-' + locId);
+  if (!list) return;
+  if (list.classList.contains('open')) {
+    list.classList.remove('open');
+    btn.textContent = '▸ Show recent sightings';
+    return;
+  }
+  // Already loaded
+  if (list.dataset.loaded) { list.classList.add('open'); btn.textContent = '▾ Hide recent sightings'; return; }
+  btn.textContent = 'Loading...';
+  fetchHotspotSpecies(locId).then(function(obs) {
+    if (!obs.length) { btn.textContent = 'No recent sightings found'; return; }
+    var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
+    var html = '';
+    obs.forEach(function(o) {
+      var isNew = !myBirdNames.has((o.comName||'').toLowerCase().trim());
+      html += '<span class="hotspot-species-chip" style="' + (isNew ? 'border-color:rgba(255,209,102,0.2);color:var(--amber2);' : '') + '">';
+      html += (isNew ? '★ ' : '') + o.comName;
+      html += '</span>';
+    });
+    list.innerHTML = html;
+    list.dataset.loaded = '1';
+    list.classList.add('open');
+    btn.textContent = '▾ Hide recent sightings';
+  });
+}
+
+async function renderHotspots(targetId) {
+  var el = document.getElementById(targetId || 'hotspots-inner');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:48px 20px;text-align:center;pointer-events:none;"><svg class="perched-bird" width="56" height="52" viewBox="0 0 56 52" fill="none" xmlns="http://www.w3.org/2000/svg"><g class="perched-bird-body"><ellipse cx="28" cy="34" rx="11" ry="8" fill="currentColor" opacity="0.6"/><g class="perched-bird-head"><ellipse cx="28" cy="22" rx="7" ry="6.5" fill="currentColor" opacity="0.8"/><ellipse cx="31" cy="20" rx="1.2" ry="1.2" fill="var(--p)" opacity="0.9"/><path d="M34 21 L38 22 L34 23Z" fill="currentColor" opacity="0.7"/></g><path d="M20 40 L16 48 M28 42 L28 48 M36 40 L40 48" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/><path d="M17 42 Q10 36 8 30" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/><path d="M39 42 Q46 36 48 30" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.4"/></g><line x1="8" y1="48" x2="48" y2="48" stroke="currentColor" stroke-width="1" opacity="0.2"/></svg>' + '<div style="color:var(--ink3);font-size:12px;margin-top:8px;">Loading hotspots...</div></div>';
+
+  await getLocation();
+  var hotspots = await fetchHotspots(userLat, userLng, 25);
+
+  if (!hotspots.length) {
+    el.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--ink3);font-size:13px;">No hotspots found nearby.<br>Try again later.</div>';
+    return;
+  }
+
+  // Sort by distance ascending
+  hotspots.sort(function(a,b){
+    return distKm(userLat, userLng, a.lat, a.lng) - distKm(userLat, userLng, b.lat, b.lng);
+  });
+
+  var html = '<div class="discover-heading">Birding Hotspots</div>';
+  html += '<div class="discover-sub">eBird hotspots within 25km, sorted by distance. Tap Maps to navigate, or eBird to see recent sightings.</div>';
+  html += '<div class="discover-section-label">Nearby hotspots (' + hotspots.length + ')</div>';
+
+  hotspots.slice(0, 20).forEach(function(h) {
+    var dist = distKm(userLat, userLng, h.lat, h.lng);
+    var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng;
+    var ebirdUrl = 'https://ebird.org/hotspot/' + h.locId;
+    html += '<div class="hotspot-card">';
+    html += '<div style="display:flex;align-items:center;gap:12px;">';
+    html += '<div style="flex-shrink:0;text-align:center;">';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--ink2);">' + dist.toFixed(1) + 'km</div>';
+    html += '<div style="font-size:8px;color:var(--ink3);">away</div>';
+    html += '</div>';
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div class="hotspot-name">' + h.locName + '</div>';
+    html += '<div class="hotspot-meta">';
+    html += (h.numSpeciesAllTime ? h.numSpeciesAllTime + ' species recorded' : '');
+    if (h.latestObsDt) html += ' · Last birded ' + daysAgo(h.latestObsDt);
+    html += '</div>';
+    html += '<div style="display:flex;gap:6px;margin-top:8px;">';
+    html += '<a href="' + mapsUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:8px;color:#4285f4;font-size:11px;font-weight:600;text-decoration:none;">📍 Maps</a>';
+    html += '<a href="' + ebirdUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:8px;color:var(--forest3);font-size:11px;font-weight:600;text-decoration:none;">🐦 eBird</a>';
+    html += '</div>';
+    html += '<button class="hotspot-expand-btn" id="hsp-btn-' + h.locId + '" onclick="toggleHotspotSpecies(\'' + h.locId + '\')">▸ Show recent sightings</button>';
+    html += '<div class="hotspot-species-list" id="hsp-list-' + h.locId + '"></div>';
+    html += '</div></div></div>';
+  });
+
+  el.innerHTML = html;
+}
+
+// ── ON LOAD: check for rarity alerts ─────────────────────────────
+var rarityAlertShown = false;
+async function checkRarityOnLoad() {
+  if (rarityAlertShown) return;
+  try {
+    await getLocation();
+    var notable = await fetchNotable(userLat, userLng, 50);
+    if (!notable.length) return;
+    var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
+    var newRarity = notable.find(function(obs){ return !myBirdNames.has((obs.comName||'').toLowerCase().trim()); });
+    if (newRarity) {
+      var dist = distKm(userLat, userLng, newRarity.lat, newRarity.lng);
+      document.getElementById('rarity-flash-body').innerHTML =
+        '<b>' + newRarity.comName + '</b> spotted at ' + (newRarity.locName||'nearby') +
+        ', ' + daysAgo(newRarity.obsDt) + ' · ' + dist.toFixed(1) + 'km away';
+      rarityAlertShown = true;
+      document.getElementById('rarity-flash').classList.add('show');
+      setTimeout(function(){ document.getElementById('rarity-flash').classList.remove('show'); }, 10000);
+    }
+  } catch(e) {}
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════════════════
+function openSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebar-overlay');
+  if (!sidebar) { console.error('Sidebar element not found'); return; }
+  sidebar.classList.add('open');
+  sidebar.style.transform = 'translateX(0)';
+  if (overlay) { overlay.style.display = 'block'; }
+  populateSidebar();
+}
+
+function closeSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('open');
+  sidebar.style.transform = '';
+  document.getElementById('sidebar-overlay').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DISCOVER TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════
+var currentDiscoverTab = 'nearby';
+
+function switchDiscoverTab(tab) {
+  currentDiscoverTab = tab;
+  ['nearby','hotspots','migrate'].forEach(function(t) {
+    var el = document.getElementById('discover-' + t + '-inner');
+    var btn = document.getElementById('dtab-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'nearby') renderDiscoverNearby();
+  if (tab === 'hotspots') renderDiscoverHotspots();
+  if (tab === 'migrate') renderDiscoverMigration();
+}
+
+function renderDiscoverNearby() {
+  var el = document.getElementById('discover-nearby-inner');
+  if (!el || el.dataset.loaded) return;
+  renderDiscover('discover-nearby-inner');
+  el.dataset.loaded = '1';
+}
+
+function renderDiscoverHotspots() {
+  var el = document.getElementById('discover-hotspots-inner');
+  if (!el || el.dataset.loaded) return;
+  renderHotspots('discover-hotspots-inner');
+  el.dataset.loaded = '1';
+}
+
+function renderDiscoverMigration() {
+  var el = document.getElementById('discover-migrate-inner');
+  if (!el || el.dataset.loaded) return;
+  // Reuse migration render but target this element
+  currentMigrateMonth = new Date().getMonth();
+  renderMigrationInto('discover-migrate-inner');
+  el.dataset.loaded = '1';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOCATION CACHE FIX
+// ═══════════════════════════════════════════════════════════════════
+var locationResolved = false;
+var locationPromise = null;
+
+function getLocation() {
+  if (locationResolved) return Promise.resolve();
+  if (locationPromise) return locationPromise;
+  locationPromise = new Promise(function(resolve) {
+    if (!navigator.geolocation) { locationResolved = true; resolve(); return; }
+    // Check permission state first — never prompt if denied, never re-prompt if granted
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+        if (result.state === 'denied') {
+          // Permission denied — silently use Bangalore fallback
+          locationResolved = true; resolve(); return;
+        }
+        if (result.state === 'granted') {
+          // Already granted — fetch silently, no prompt
+          navigator.geolocation.getCurrentPosition(
+            function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
+            function() { locationResolved = true; resolve(); },
+            { timeout: 6000, maximumAge: 300000 }
+          );
+          return;
+        }
+        // state === 'prompt' — ask once, user hasn't decided yet
+        navigator.geolocation.getCurrentPosition(
+          function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
+          function() { locationResolved = true; resolve(); },
+          { timeout: 6000, maximumAge: 300000 }
+        );
+      }).catch(function() {
+        // permissions API failed — fall back to direct request
+        navigator.geolocation.getCurrentPosition(
+          function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
+          function() { locationResolved = true; resolve(); },
+          { timeout: 6000, maximumAge: 300000 }
+        );
+      });
+    } else {
+      // No permissions API (older browsers) — just request directly
+      navigator.geolocation.getCurrentPosition(
+        function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
+        function() { locationResolved = true; resolve(); },
+        { timeout: 6000, maximumAge: 300000 }
+      );
+    }
+  });
+  return locationPromise;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DISCOVER BADGE (shows new species count on nav tab)
+// ═══════════════════════════════════════════════════════════════════
+async function updateDiscoverBadge() {
+  try {
+    await getLocation();
+    var nearby = await fetchNearby(userLat, userLng, 25, 7);
+    var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
+    var newCount = nearby.filter(function(obs){
+      return !myBirdNames.has((obs.comName||'').toLowerCase().trim());
+    }).length;
+    var badge = document.getElementById('discover-badge');
+    if (badge && newCount > 0) {
+      badge.textContent = newCount > 99 ? '99+' : newCount;
+      badge.style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// JOURNAL SUB-TABS (Journal / Map)
+// ═══════════════════════════════════════════════════════════════════
+function switchJournalTab(tab) {
+  var journalPanel = document.getElementById('journal-panel');
+  var mapPanel = document.getElementById('map-panel-journal');
+  var jtabJournal = document.getElementById('jtab-journal');
+  var jtabMap = document.getElementById('jtab-map');
+  if (tab === 'journal') {
+    if (journalPanel) journalPanel.style.display = 'flex';
+    if (mapPanel) mapPanel.style.display = 'none';
+    if (jtabJournal) jtabJournal.classList.add('active');
+    if (jtabMap) jtabMap.classList.remove('active');
+  } else {
+    if (journalPanel) journalPanel.style.display = 'none';
+    if (mapPanel) mapPanel.style.display = 'flex';
+    if (jtabJournal) jtabJournal.classList.remove('active');
+    if (jtabMap) jtabMap.classList.add('active');
+    setTimeout(initMap, 60);
+  }
+}
+
+// ── Populate sidebar settings on load ────────────────────────────
+function populateSidebar() {
+  var settingsEl = document.getElementById('view-settings');
+  var sidebarEl = document.getElementById('sidebar-settings-content');
+  if (settingsEl && sidebarEl && !sidebarEl.innerHTML.trim()) {
+    sidebarEl.innerHTML = settingsEl.innerHTML;
+    // Re-run settings init scripts
+    setTimeout(function() {
+      if (typeof checkApiKeyStatus === 'function') checkApiKeyStatus();
+    }, 100);
+  }
+}
+
+
+function toggleJournalSearch() {
+  var bar = document.getElementById('cat-search-bar');
+  var toggle = document.getElementById('cat-search-toggle');
+  var input = document.getElementById('search-input');
+  if (bar.style.display === 'none' || !bar.style.display) {
+    bar.style.display = 'flex';
+    toggle.style.display = 'none';
+    if (input) setTimeout(function(){ input.focus(); }, 50);
+  } else {
+    bar.style.display = 'none';
+    toggle.style.display = 'flex';
+    if (input) { input.value = ''; renderCatalogue(); }
+  }
 }
 
 </script>
