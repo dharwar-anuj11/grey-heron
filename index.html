@@ -67,8 +67,8 @@
       content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
       background:linear-gradient(90deg, transparent 5%, rgba(40,160,64,0.2) 30%, rgba(255,209,102,0.12) 60%, transparent 95%);
     }
-    .topbar-logo { display:flex; align-items:center; gap:10px; }
-    .topbar-logo-text { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:rgba(255,255,255,0.9); letter-spacing:-0.5px; }
+    .topbar-logo { display:flex; align-items:center; gap:8px; }
+    .topbar-logo-text { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:rgba(255,255,255,0.92); letter-spacing:-0.3px; }
     .topbar-logo-text span { color:var(--amber2); font-style:italic; }
     .topbar-right { display:flex; align-items:center; gap:14px; }
     .sync-status { font-size:9px; color:var(--ink3); display:flex; align-items:center; gap:4px; letter-spacing:0.5px; }
@@ -118,6 +118,12 @@
       background:var(--amber2); border-radius:0 0 4px 4px;
       box-shadow:0 0 12px rgba(255,209,102,0.4);
     }
+    .nav-tab.active::after {
+      content:''; position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+      width:4px; height:4px; border-radius:50%;
+      background:var(--amber2);
+      box-shadow:0 0 6px rgba(255,209,102,0.8), 0 0 12px rgba(255,209,102,0.4);
+    }
     .nav-tab.active svg { filter:drop-shadow(0 0 8px rgba(255,209,102,0.5)); transform:scale(1.1); }
     .nav-tab:active { transform:scale(0.92); }
 
@@ -139,23 +145,30 @@
     .pdex-tabs::-webkit-scrollbar { display:none; }
     .pdex-tab {
       padding:8px 14px; border:none; background:none; cursor:pointer;
-      font-size:11px; letter-spacing:0.3px; color:var(--ink3);
-      white-space:nowrap; flex-shrink:0; transition:all 0.2s;
+      font-size:11px; letter-spacing:0.3px; color:rgba(255,255,255,0.18);
+      white-space:nowrap; flex-shrink:0; transition:all 0.25s;
       font-family:'DM Sans',sans-serif; font-weight:400;
       position:relative; border-bottom:2px solid transparent;
     }
     .pdex-tab:hover { color:var(--ink2); }
     .pdex-tab.active {
-      color:var(--amber2); font-weight:500;
+      color:var(--amber2); font-weight:600;
       border-bottom-color:var(--amber2);
+      text-shadow:0 0 20px rgba(255,209,102,0.35);
+    }
+    .pdex-tab.active::after {
+      content:''; position:absolute; bottom:-1px; left:20%; right:20%; height:2px;
+      background:var(--amber2); border-radius:2px;
+      box-shadow:0 0 10px rgba(255,209,102,0.6), 0 0 20px rgba(255,209,102,0.2);
+      filter:blur(0.5px);
     }
     .pdex-tab .pdex-tab-frac {
       display:inline-block; margin-left:4px;
-      font-size:8px; color:var(--ink3); opacity:0.5;
+      font-size:8px; color:var(--ink3); opacity:0.4;
     }
-    .pdex-tab.active .pdex-tab-frac { color:var(--amber2); opacity:0.7; }
+    .pdex-tab.active .pdex-tab-frac { color:var(--amber2); opacity:0.6; }
     .pdex-tab.has-birds { color:var(--ink2); }
-    .pdex-tab.has-birds .pdex-tab-frac { opacity:0.7; }
+    .pdex-tab.has-birds .pdex-tab-frac { opacity:0.6; }
 
     .pokedex-section { padding:4px 14px 8px; position:relative; }
     .pokedex-section+.pokedex-section { padding-top:4px; }
@@ -163,30 +176,32 @@
       display:flex; align-items:center; justify-content:space-between;
       margin-bottom:12px; padding:12px 2px 8px;
       position:sticky; top:40px; z-index:7;
-      background:linear-gradient(180deg, var(--p) 70%, rgba(7,13,7,0));
+      background:linear-gradient(180deg, var(--p) 75%, rgba(7,13,7,0));
     }
     .section-title {
       font-family:'Playfair Display',serif; font-size:17px; font-weight:700;
       color:var(--amber2); letter-spacing:-0.3px;
     }
     .section-count {
-      font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3);
-      background:rgba(255,255,255,0.03); padding:4px 10px; border-radius:99px;
-      border:1px solid rgba(255,255,255,0.05);
+      font-size:8px; letter-spacing:1px; color:var(--amber2); opacity:0.7;
+      background:rgba(255,209,102,0.06); padding:3px 10px; border-radius:99px;
+      border:1px solid rgba(255,209,102,0.12);
+      font-family:'Josefin Sans',sans-serif; font-weight:600;
     }
-    .pokedex-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .pokedex-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; align-items:start; }
 
     .pdex-card {
       background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:var(--r);
       overflow:hidden; cursor:pointer; transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
       box-shadow:0 2px 16px var(--sh); position:relative;
     }
-    .pdex-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(40,160,64,0.15); border-color:rgba(40,160,64,0.2); }
+    .pdex-card:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(40,160,64,0.15); border-color:rgba(40,160,64,0.2); }
+    .pdex-card:active { transform:scale(0.97); box-shadow:0 2px 8px rgba(0,0,0,0.3); transition:transform 0.1s; }
     .pdex-card.undiscovered { opacity:0.4; }
     .pdex-card.undiscovered:hover { transform:none; box-shadow:0 2px 12px var(--sh); opacity:0.55; }
 
-    .pdex-img { width:100%; height:88px; background:linear-gradient(160deg, rgba(14,22,14,0.9), rgba(7,13,7,0.95)); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
-    .pdex-img img { width:100%; height:88px; object-fit:cover; transition:transform 0.3s; }
+    .pdex-img { width:100%; height:100px; background:linear-gradient(160deg, rgba(14,22,14,0.9), rgba(7,13,7,0.95)); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+    .pdex-img img { width:100%; height:100px; object-fit:cover; transition:transform 0.3s; }
     .pdex-card:hover .pdex-img img { transform:scale(1.05); }
     .pdex-num {
       position:absolute; top:5px; left:5px;
@@ -194,9 +209,9 @@
       border-radius:6px; padding:2px 6px;
       font-size:8px; letter-spacing:1px; color:rgba(255,255,255,0.5); font-weight:500;
     }
-    .pdex-body { padding:8px 9px 10px; }
-    .pdex-name { font-family:'Playfair Display',serif; font-size:11px; font-weight:700; color:var(--ink); line-height:1.25; margin-bottom:2px; }
-    .pdex-species { font-size:8px; letter-spacing:0.3px; color:var(--ink3); font-style:italic; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pdex-body { padding:7px 8px 9px; min-height:56px; display:flex; flex-direction:column; }
+    .pdex-name { font-family:'Playfair Display',serif; font-size:12px; font-weight:700; color:var(--ink); line-height:1.2; margin-bottom:1px; }
+    .pdex-species { font-size:9px; letter-spacing:0.2px; color:var(--ink3); font-style:italic; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pdex-tags { display:flex; gap:3px; flex-wrap:wrap; }
     .tag { font-size:7px; letter-spacing:0.6px; text-transform:uppercase; padding:2px 6px; border-radius:99px; border:1px solid; font-weight:500; }
     .tag-raptor{background:rgba(200,120,40,0.1);color:#c87828;border-color:rgba(200,120,40,0.2);}
@@ -226,11 +241,10 @@
     .tag-crow{background:rgba(80,80,100,0.08);color:#9090b0;border-color:rgba(80,80,100,0.15);}
     .tag-flycatcher{background:rgba(40,160,120,0.08);color:#28c080;border-color:rgba(40,160,120,0.15);}
 
-    .undiscovered-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
-    .undiscovered-overlay span { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); font-weight:500; }
+    .undiscovered-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:var(--ink3); }
 
     /* ── CATALOGUE VIEW ───────────────── */
-    .catalogue-header { padding:12px 16px 10px; display:flex; gap:10px; align-items:center; position:sticky; top:41px; z-index:10; background:var(--p); }
+    .catalogue-header { padding:10px 16px; display:flex; gap:10px; align-items:center; position:sticky; top:82px; z-index:10; background:var(--p); }
     .search-wrap { position:relative; flex:1; }
     .search-wrap svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink3); }
     .search-input { width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:11px 14px 11px 36px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:all 0.25s; }
@@ -238,7 +252,7 @@
     .search-input::placeholder { color:rgba(90,138,90,0.5); font-style:italic; }
 
     .cat-tabs-wrap {
-      position:sticky; top:82px; z-index:8;
+      position:sticky; top:41px; z-index:8;
       background:linear-gradient(180deg, var(--p) 80%, rgba(7,13,7,0));
       padding:0 0 8px;
     }
@@ -277,13 +291,13 @@
     }
     .cat-section-header::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, rgba(255,209,102,0.15), transparent); }
     .cat-section-count { font-size:9px; letter-spacing:1px; color:var(--ink3); font-family:'DM Sans',sans-serif; font-weight:400; }
-    .cat-row { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:var(--r); padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.25s; }
+    .cat-row { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:10px 12px; margin-bottom:6px; cursor:pointer; transition:all 0.25s; }
     .cat-row:hover { border-color:rgba(40,160,64,0.15); transform:translateX(4px); background:rgba(14,24,14,0.9); }
-    .cat-row-thumb { width:52px; height:52px; border-radius:10px; background:rgba(14,24,14,0.8); overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:24px; }
-    .cat-row-thumb img { width:52px; height:52px; object-fit:cover; }
+    .cat-row-thumb { width:48px; height:48px; border-radius:9px; background:rgba(14,24,14,0.8); overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .cat-row-thumb img { width:48px; height:48px; object-fit:cover; }
     .cat-row-info { flex:1; min-width:0; }
-    .cat-row-name { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:var(--ink); line-height:1.15; }
-    .cat-row-sub { font-size:10px; color:var(--ink3); font-style:italic; margin:2px 0 6px; }
+    .cat-row-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:var(--ink); line-height:1.15; }
+    .cat-row-sub { font-size:10px; color:var(--ink3); font-style:italic; margin:1px 0 4px; }
     .cat-row-tags { display:flex; gap:4px; flex-wrap:wrap; }
     .cat-row-date { font-size:9px; color:var(--ink3); flex-shrink:0; text-align:right; }
 
@@ -483,7 +497,7 @@
 
 
     /* FLOATING ACTION BUTTON */
-    .fab { position:fixed; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px); right:16px; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--amber2)); box-shadow:0 6px 24px rgba(255,209,102,0.3); border:none; color:var(--p); font-size:28px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:100; transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.25s; line-height:1; }
+    .fab { position:fixed; bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px); right:14px; width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg,var(--amber),var(--amber2)); box-shadow:0 4px 16px rgba(255,209,102,0.25); border:none; color:var(--p); font-size:22px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:100; transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.25s; line-height:1; }
     .fab:hover { transform:scale(1.1) rotate(90deg); box-shadow:0 8px 32px rgba(255,209,102,0.45); }
     .fab:active { transform:scale(0.92); }
     /* SIDEBAR */
@@ -500,24 +514,24 @@
     .map-tab.active { color:var(--amber2); border-bottom-color:var(--amber2); }
 
     /* DISCOVER VIEW */
-    .discover-view { padding:14px 14px 24px; }
+    .discover-view { padding:12px 12px 80px; }
     .discover-heading { font-family:'Cormorant Garamond',serif; font-size:20px; font-style:italic; color:var(--ink); margin-bottom:4px; }
     .discover-sub { font-size:11px; color:var(--ink3); margin-bottom:14px; line-height:1.6; }
     .discover-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:16px 0 8px 2px; }
-    .discover-card { background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.2s; }
+    .discover-card { background:var(--card); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:10px 12px; margin-bottom:6px; display:flex; align-items:center; gap:10px; cursor:pointer; transition:all 0.2s; }
     .discover-card:hover { border-color:rgba(40,160,64,0.2); }
     .discover-card.new-species { border-color:rgba(255,209,102,0.15); background:rgba(20,24,14,0.95); }
-    .discover-card-icon { font-size:26px; width:38px; text-align:center; flex-shrink:0; }
+    .discover-card-icon { font-size:22px; width:30px; text-align:center; flex-shrink:0; }
     .discover-card-info { flex:1; min-width:0; }
-    .discover-card-name { font-size:14px; color:var(--ink); font-weight:500; }
-    .discover-card-meta { font-size:10px; color:var(--ink3); margin-top:3px; line-height:1.5; }
-    .discover-card-badge { font-size:9px; letter-spacing:0.5px; margin-top:4px; }
+    .discover-card-name { font-size:13px; color:var(--ink); font-weight:500; line-height:1.3; }
+    .discover-card-meta { font-size:10px; color:var(--ink3); margin-top:1px; line-height:1.4; }
+    .discover-card-badge { font-size:9px; letter-spacing:0.5px; margin-top:2px; }
     .discover-card-badge.new { color:var(--amber2); }
     .discover-card-badge.have { color:var(--forest3); }
     .discover-dist { font-size:10px; color:var(--ink3); text-align:right; flex-shrink:0; }
-    .discover-rarity-banner { background:rgba(255,80,80,0.08); border:1px solid rgba(255,80,80,0.15); border-radius:14px; padding:14px; margin-bottom:10px; }
-    .discover-rarity-title { font-size:12px; color:#e05050; font-weight:600; margin-bottom:6px; letter-spacing:0.3px; }
-    .discover-rarity-name { font-size:15px; color:var(--ink); font-weight:500; }
+    .discover-rarity-banner { background:rgba(14,22,14,0.95); border:1px solid rgba(255,209,102,0.12); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+    .discover-rarity-title { font-size:9px; color:var(--amber2); font-weight:600; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:3px; }
+    .discover-rarity-name { font-size:14px; color:var(--ink); font-weight:600; }
     .discover-rarity-meta { font-size:10px; color:var(--ink3); margin-top:3px; }
     .discover-load-btn { width:100%; padding:12px; background:rgba(40,160,64,0.08); border:1px solid rgba(40,160,64,0.15); border-radius:12px; color:var(--forest3); font-size:13px; cursor:pointer; margin-top:8px; font-family:'DM Sans',sans-serif; }
     .discover-load-btn:hover { background:rgba(40,160,64,0.14); }
@@ -532,7 +546,7 @@
     .rarity-flash-body { font-size:13px; color:var(--ink); line-height:1.5; }
     .rarity-flash-close { position:absolute; top:8px; right:12px; color:var(--ink3); font-size:16px; background:none; border:none; cursor:pointer; }
     /* IUCN STATUS BADGES */
-    .iucn-badge { display:inline-flex; align-items:center; gap:3px; border-radius:4px; padding:2px 6px; font-size:8px; font-weight:700; letter-spacing:0.5px; border:1px solid; line-height:1.4; }
+    .iucn-badge { display:inline-flex; align-items:center; gap:3px; border-radius:99px; padding:2px 7px; font-size:7px; font-weight:600; letter-spacing:0.4px; border:1px solid; line-height:1.4; text-transform:uppercase; white-space:nowrap; }
     .iucn-cr { background:rgba(255,50,50,0.12); color:#ff4444; border-color:rgba(255,50,50,0.25); }
     .iucn-en { background:rgba(220,80,60,0.12); color:#e05050; border-color:rgba(220,80,60,0.25); }
     .iucn-vu { background:rgba(232,160,32,0.12); color:#e8a020; border-color:rgba(232,160,32,0.25); }
@@ -540,12 +554,12 @@
     /* ═══════════════════════════════════════════════════════════════════
        STATS + ACHIEVEMENTS VIEW
     ═══════════════════════════════════════════════════════════════════ */
-    .stats-view { padding:16px 14px 24px; }
-    .stats-heading { font-family:'Cormorant Garamond',serif; font-size:24px; font-style:italic; color:var(--ink); padding:4px 2px 16px; }
-    .stats-section-label { font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink3); margin:20px 0 8px 2px; }
-    .stats-hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
-    .stats-hero-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,255,255,0.05); border-radius:16px; padding:16px 14px; display:flex; flex-direction:column; gap:4px; }
-    .stats-hero-val { font-family:'Josefin Sans',sans-serif; font-size:32px; font-weight:700; color:var(--amber2); line-height:1; }
+    .stats-view { padding:12px 12px 80px; }
+    .stats-heading { font-family:'Cormorant Garamond',serif; font-size:20px; font-style:italic; color:var(--ink); padding:4px 2px 10px; }
+    .stats-section-label { font-size:9px; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink3); margin:14px 0 6px 2px; }
+    .stats-hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px; }
+    .stats-hero-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:12px 12px; display:flex; flex-direction:column; gap:3px; }
+    .stats-hero-val { font-family:'Josefin Sans',sans-serif; font-size:26px; font-weight:700; color:var(--amber2); line-height:1; }
     .stats-hero-label { font-size:10px; color:var(--ink3); letter-spacing:0.5px; }
     .stats-hero-sub { font-size:9px; color:var(--forest3); margin-top:2px; }
     .stats-hero-card.wide { grid-column:span 2; flex-direction:row; align-items:center; gap:16px; }
@@ -553,12 +567,12 @@
     /* streak flame */
     .streak-flame { font-size:28px; flex-shrink:0; }
     /* monthly chart */
-    .month-chart { display:flex; align-items:flex-end; gap:4px; height:72px; padding:0 2px; }
-    .month-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
-    .month-bar { width:100%; background:rgba(40,160,64,0.15); border-radius:4px 4px 0 0; min-height:3px; transition:height 0.4s ease; position:relative; }
-    .month-bar.current { background:linear-gradient(180deg,rgba(255,209,102,0.5),rgba(193,127,36,0.3)); }
-    .month-bar-count { font-size:8px; color:var(--ink3); }
-    .month-bar-label { font-size:7px; color:var(--ink3); letter-spacing:0.3px; }
+    .month-chart { display:flex; align-items:flex-end; gap:4px; height:60px; padding:0 2px; }
+    .month-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+    .month-bar { width:100%; background:linear-gradient(180deg,rgba(40,160,64,0.25),rgba(40,160,64,0.06)); border-radius:4px 4px 0 0; min-height:2px; transition:height 0.5s cubic-bezier(0.34,1.56,0.64,1); position:relative; }
+    .month-bar.current { background:linear-gradient(180deg,rgba(255,209,102,0.65),rgba(193,127,36,0.2)); box-shadow:0 -2px 12px rgba(255,209,102,0.2); }
+    .month-bar-count { display:none; }
+    .month-bar-label { font-size:7px; color:var(--ink3); letter-spacing:0.3px; margin-top:2px; }
     /* type pie */
     .type-pie-wrap { display:flex; align-items:center; gap:16px; }
     .type-pie-legend { display:flex; flex-direction:column; gap:6px; flex:1; }
@@ -567,8 +581,8 @@
     .type-pie-name { font-size:11px; color:var(--ink2); flex:1; }
     .type-pie-pct { font-size:10px; color:var(--ink3); }
     /* completion bar */
-    .completion-bar-wrap { background:rgba(0,0,0,0.3); border-radius:8px; height:8px; overflow:hidden; margin-top:8px; }
-    .completion-bar-fill { height:100%; background:linear-gradient(90deg,var(--forest),var(--amber)); border-radius:8px; transition:width 0.6s ease; }
+    .completion-bar-wrap { background:rgba(0,0,0,0.25); border-radius:99px; height:12px; overflow:hidden; margin-top:10px; }
+    .completion-bar-fill { height:100%; background:linear-gradient(90deg,var(--forest2),var(--forest3),var(--amber2)); border-radius:99px; transition:width 0.8s cubic-bezier(0.34,1.2,0.64,1); box-shadow:0 0 12px rgba(255,209,102,0.2); }
     /* achievements */
     .achievements-grid { display:flex; flex-direction:column; gap:8px; }
     .achievement-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,255,255,0.05); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:12px; transition:all 0.2s; }
@@ -582,11 +596,40 @@
     .achievement-badge.unlocked { color:var(--amber2); }
     .achievement-badge.locked { color:var(--ink3); }
     /* rarest find */
-    .rarest-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,209,102,0.12); border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; }
+    .rarest-card { background:rgba(14,22,14,0.85); border:1px solid rgba(255,209,102,0.12); border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px; }
     .rarest-icon { font-size:32px; }
     .rarest-name { font-size:15px; color:var(--ink); font-weight:500; }
     .rarest-sub { font-size:10px; color:var(--ink3); margin-top:2px; }
 
+
+    /* ═══════════════════════════════════════════════════════════════
+       MICRO-INTERACTION KEYFRAMES
+    ═══════════════════════════════════════════════════════════════ */
+    @keyframes rippleOut {
+      0%   { transform:scale(0); opacity:1; }
+      100% { transform:scale(3.5); opacity:0; }
+    }
+    @keyframes iucnShimmer {
+      0%   { opacity:0; transform:scale(0.85); }
+      60%  { opacity:1; transform:scale(1.08); }
+      100% { opacity:1; transform:scale(1); }
+    }
+    @keyframes starSparkle {
+      0%   { transform:scale(0.5); opacity:0; }
+      60%  { transform:scale(1.15); opacity:1; }
+      100% { transform:scale(1); opacity:1; }
+    }
+    @keyframes syncPulse {
+      0%   { transform:scale(1); box-shadow:0 0 0 0 rgba(40,160,64,0.6); }
+      50%  { transform:scale(1.4); box-shadow:0 0 0 6px rgba(40,160,64,0); }
+      100% { transform:scale(1); box-shadow:0 0 0 0 rgba(40,160,64,0); }
+    }
+    @keyframes countBounce {
+      0%   { transform:scale(1); }
+      40%  { transform:scale(1.5) rotate(-5deg); }
+      70%  { transform:scale(0.9) rotate(3deg); }
+      100% { transform:scale(1); }
+    }
     /* ═══════════════════════════════════════════════════════════════
        AMBIENT NATURE ANIMATIONS
     ═══════════════════════════════════════════════════════════════ */
@@ -626,6 +669,7 @@
     }
     .pulse-radar { animation: radarPulse 2s ease-in-out infinite; }
     #dtab-nearby { animation: radarPulse 2.2s ease-in-out infinite; }
+    #tab-discover.has-badge svg { animation: radarPulse 2s ease-in-out infinite; }
 
     /* Glow on streak fire */
     @keyframes fireGlow {
@@ -729,6 +773,17 @@
       </div>
     </div>
 
+    <div class="view" id="view-stats" style="display:none;flex-direction:column;">
+      <div class="map-tabs" style="flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--p);">
+        <button class="map-tab active" id="stab-stats" onclick="switchStatsTab('stats')">Stats</button>
+        <button class="map-tab" id="stab-migrate" onclick="switchStatsTab('migrate')">Migration</button>
+      </div>
+      <div style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;">
+        <div class="stats-view" id="stats-view-inner"></div>
+        <div class="stats-view" id="migrate-view-inner" style="display:none;"></div>
+      </div>
+    </div>
+
     <div class="view" id="view-catalogue" style="display:none;flex-direction:column;">
       <div class="map-tabs" style="flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--p);">
         <button class="map-tab active" id="jtab-journal" onclick="switchJournalTab('journal')">Journal</button>
@@ -742,14 +797,12 @@
           </div>
           <button onclick="toggleJournalSearch()" style="background:none;border:none;color:var(--ink3);font-size:18px;padding:4px 8px;cursor:pointer;">✕</button>
         </div>
-        <div id="cat-search-toggle" style="display:flex;justify-content:flex-end;padding:2px 16px 2px;position:sticky;top:41px;z-index:9;background:var(--p);">
-          <button onclick="toggleJournalSearch()" style="background:none;border:none;cursor:pointer;color:var(--ink3);display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            Search
+
+        <div class="cat-tabs-wrap" style="display:flex;align-items:center;gap:0;">
+          <div class="cat-tabs" id="type-filters" style="flex:1;"></div>
+          <button onclick="toggleJournalSearch()" style="background:none;border:none;cursor:pointer;color:var(--ink3);padding:6px 12px;flex-shrink:0;" aria-label="Search">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
-        </div>
-        <div class="cat-tabs-wrap">
-          <div class="cat-tabs" id="type-filters"></div>
         </div>
         <div class="cat-list" id="cat-list"></div>
       </div>
@@ -1014,7 +1067,7 @@
       <div class="undiscovered-sub" id="undiscovered-hint"></div>
     </div>
     <div class="modal-footer" style="justify-content:center;gap:10px;flex-wrap:wrap;">
-      <button class="btn-save" onclick="closeModal('undiscovered-modal');openAddForBird(currentUndiscoveredName,currentUndiscoveredSpecies,currentUndiscoveredType)">I spotted this! 🎉</button>
+      <button class="btn-save" onclick="closeModal('undiscovered-modal');openAddForBird(currentUndiscoveredName,currentUndiscoveredSpecies,currentUndiscoveredType)">I spotted this!</button>
       <button class="btn-cancel" onclick="closeModal('undiscovered-modal');openAdd()">Different bird</button>
     </div>
   </div>
@@ -1215,9 +1268,9 @@ async function loadAllData() {
     else { birds = await getFromCache('birds') || []; }
   } else { birds = await getFromCache('birds') || []; }
   updateStats(); renderPokedex(); renderCatalogue();
-  setTimeout(checkRarityOnLoad, 3000);
-  setTimeout(updateDiscoverBadge, 4000);
+  setTimeout(updateDiscoverBadge, 5000);
   populateSidebar();
+  if (typeof ACHIEVEMENTS !== 'undefined') checkNewAchievements(birds);
   updateSyncStatus('synced');
 }
 
@@ -1246,14 +1299,14 @@ function updateStats() {
   if (storageEl) {
     const approxBytes = new Blob([JSON.stringify(birds)]).size;
     const usedKB = Math.round(approxBytes / 1024);
-    storageEl.innerHTML = `<span style="color:var(--ink3)">💾 ${usedKB}KB · ${birds.length} bird${birds.length!==1?'s':''} · Supabase sync</span>`;
+    storageEl.innerHTML = `<span style="color:var(--ink3)">${usedKB}KB · ${birds.length} bird${birds.length!==1?'s':''} · Supabase sync</span>`;
   }
 }
 
 function updateSyncStatus(status) {
   const el = document.getElementById('sync-status');
   if (!el) return;
-  if (status === 'synced') { el.style.background = 'var(--forest3)'; el.title = 'Synced'; }
+  if (status === 'synced') { el.style.background = 'var(--forest3)'; el.title = 'Synced'; pulseSyncDot(); }
   else if (status === 'online') { el.style.background = 'var(--forest3)'; el.title = 'Syncing...'; }
   else { el.style.background = 'var(--amber)'; el.title = 'Offline'; }
 }
@@ -1272,7 +1325,7 @@ function switchTab(tab) {
   const activeView = document.getElementById('view-' + tab);
   if (!activeView) return;
   activeView.classList.add('active');
-  activeView.style.display = (tab === 'map' || tab === 'discover' || tab === 'catalogue') ? 'flex' : 'block';
+  activeView.style.display = (tab === 'map' || tab === 'discover' || tab === 'catalogue' || tab === 'stats') ? 'flex' : 'block';
   const tabBtn = document.getElementById('tab-' + tab);
   if (tabBtn) tabBtn.classList.add('active');
   if (tab === 'map') setTimeout(initMap, 60);
@@ -1288,7 +1341,7 @@ function iucnBadge(bird) {
   var c = bird && bird.profile && bird.profile.conservation;
   var map = { CR:'Critically Endangered', EN:'Endangered', VU:'Vulnerable', NT:'Near Threatened' };
   if (!c || !map[c]) return '';
-  return '<span class="iucn-badge iucn-'+c.toLowerCase()+'">'+c+' · '+map[c]+'</span>';
+  return '<span class="iucn-badge iucn-'+c.toLowerCase()+'">' + map[c] + '</span>';
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1296,24 +1349,24 @@ function iucnBadge(bird) {
 // ═══════════════════════════════════════════════════════════════════
 // FIX 3: added Swift, Cuckoo, Nightjar, Crow, Flycatcher categories
 const CATEGORY_CONFIG = [
-  { label: '🐦 Waders & Waterbirds', types: ['Wader', 'Waterbird'] },
-  { label: '🦅 Raptors', types: ['Raptor'] },
-  { label: '🐦 Songbirds', types: ['Songbird'] },
-  { label: '🦉 Owls', types: ['Owl'] },
-  { label: '🕊️ Pigeons & Doves', types: ['Pigeon'] },
-  { label: '🦜 Parrots & Parakeets', types: ['Parrot'] },
+  { label: 'Waders & Waterbirds', types: ['Wader', 'Waterbird'] },
+  { label: 'Raptors', types: ['Raptor'] },
+  { label: 'Songbirds', types: ['Songbird'] },
+  { label: 'Owls', types: ['Owl'] },
+  { label: 'Pigeons & Doves', types: ['Pigeon'] },
+  { label: 'Parrots & Parakeets', types: ['Parrot'] },
   { label: '🪵 Woodpeckers & Barbets', types: ['Woodpecker'] },
-  { label: '🐓 Game Birds', types: ['Game'] },
-  { label: '🌊 Seabirds', types: ['Seabird'] },
-  { label: '🦜 Bee-eaters', types: ['Bee-eater'] },
-  { label: '🐦 Kingfishers', types: ['Kingfisher'] },
-  { label: '🐦 Rollers & Hoopoes', types: ['Roller'] },
-  { label: '🦅 Swifts & Swallows', types: ['Swift'] },
-  { label: '🐦 Cuckoos', types: ['Cuckoo'] },
-  { label: '🌙 Nightjars & Frogmouths', types: ['Nightjar'] },
-  { label: '🐦 Crows, Drongos & Minivets', types: ['Crow'] },
-  { label: '🐦 Flycatchers & Warblers', types: ['Flycatcher'] },
-  { label: '❓ Unknown', types: ['Unknown'] },
+  { label: 'Game Birds', types: ['Game'] },
+  { label: 'Seabirds', types: ['Seabird'] },
+  { label: 'Bee-eaters', types: ['Bee-eater'] },
+  { label: 'Kingfishers', types: ['Kingfisher'] },
+  { label: 'Rollers & Hoopoes', types: ['Roller'] },
+  { label: 'Swifts & Swallows', types: ['Swift'] },
+  { label: 'Cuckoos', types: ['Cuckoo'] },
+  { label: 'Nightjars & Frogmouths', types: ['Nightjar'] },
+  { label: 'Crows & Drongos', types: ['Crow'] },
+  { label: 'Flycatchers', types: ['Flycatcher'] },
+  { label: 'Unknown', types: ['Unknown'] },
 ];
 
 function renderPokedex() {
@@ -1377,9 +1430,6 @@ function renderPokedex() {
           <div class="pdex-body">
             <div class="pdex-name">${userBird.name}</div>
             <div class="pdex-species">${userBird.species || ''}</div>
-            <div class="pdex-tags">
-              <span class="tag tag-${typeClass(userBird.type)}">${userBird.type || '—'}</span>
-            </div>
             ${iucnBadge(userBird) ? `<div style="margin-top:4px;">${iucnBadge(userBird)}</div>` : ''}
           </div>
         </div>`;
@@ -1388,7 +1438,26 @@ function renderPokedex() {
           <div class="pdex-img" style="background:var(--card2);">
             <div class="pdex-num">#${String(i + 1).padStart(3, '0')}</div>
             <div style="width:60px;height:60px;color:rgba(107,154,107,0.25);display:flex;align-items:center;justify-content:center;">${SILHOUETTES[item.type || cat.types[0]] || SILHOUETTES.Unknown}</div>
-            <div class="undiscovered-overlay"><span>???</span></div>
+            <div class="undiscovered-overlay">
+              <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.18;">
+                <!-- Body -->
+                <ellipse cx="26" cy="30" rx="10" ry="7" fill="currentColor"/>
+                <!-- Neck -->
+                <path d="M26 23 C24 20 23 17 24 14" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                <!-- Head -->
+                <circle cx="24.5" cy="12" r="5" fill="currentColor"/>
+                <!-- Beak -->
+                <path d="M20 11.5 L13 10.5 L20 13Z" fill="currentColor"/>
+                <!-- Tail -->
+                <path d="M35 30 C40 27 44 28 46 26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <path d="M35 32 C40 31 44 33 47 32" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <!-- Wing hint -->
+                <path d="M17 28 C20 24 28 23 35 26" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                <!-- Legs -->
+                <path d="M22 37 L20 46 M22 37 L19 42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M30 37 L32 46 M30 37 L33 42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
           </div>
           <div class="pdex-body">
             <div class="pdex-name" style="color:var(--ink3);">${item.name}</div>
@@ -1477,7 +1546,7 @@ function renderCatalogue() {
     }
   });
   const uncategorized = filtered.filter(b => !usedTypes.has(b.type));
-  if (uncategorized.length) groups.push({ label: '❓ Other', types: ['Other'], birds: uncategorized });
+  if (uncategorized.length) groups.push({ label: 'Other', types: ['Other'], birds: uncategorized });
 
   const tabsEl = document.getElementById('type-filters');
   let tabHtml = `<button class="cat-tab active" onclick="scrollToCatSection('all',this)">All <span class="cat-tab-count">${filtered.length}</span></button>`;
@@ -1503,7 +1572,6 @@ function renderCatalogue() {
           <div class="cat-row-name">${b.name || 'Unknown'}</div>
           <div class="cat-row-sub">${b.species || 'Species unrecorded'}</div>
           <div class="cat-row-tags">
-            <span class="tag tag-${sizeClass(b.size)}">${b.size || ''}</span>
             ${b.lat && b.lng ? `<span class="tag tag-geo">GPS</span>` : ''}
             ${iucnBadge(b)}
           </div>
@@ -1514,6 +1582,7 @@ function renderCatalogue() {
   });
   document.getElementById('cat-list').innerHTML = listHtml;
   setupCatScrollSpy();
+  setTimeout(shimmerIUCNBadges, 100);
 }
 
 function scrollToCatSection(id, tabEl) {
@@ -1761,23 +1830,23 @@ function openDetail(id) {
         <div class="meta-item"><div class="meta-label">Location</div><div class="meta-val">${b.location || '—'}</div></div>
         ${b.lat && b.lng ? `<div class="meta-item" style="grid-column:span 2;"><div class="meta-label">GPS</div><div class="meta-val" style="font-size:11px;font-family:monospace;">${parseFloat(b.lat).toFixed(5)}, ${parseFloat(b.lng).toFixed(5)} <a href="https://www.openstreetmap.org/?mlat=${b.lat}&mlon=${b.lng}&zoom=15" target="_blank" style="color:var(--forest);font-size:10px;font-family:'Josefin Sans',sans-serif;margin-left:6px;">Open map</a></div></div>` : ''}
       </div>
-      ${b.notes ? `<div><div class="section-lbl">🔭 Field notes</div><div class="notes-box">${b.notes}</div></div>` : ''}
+      ${b.notes ? `<div><div class="section-lbl"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Field notes</div><div class="notes-box">${b.notes}</div></div>` : ''}
       ${b.profile ? `
       <div>
-        <div class="section-lbl">📋 Bird profile</div>
+        <div class="section-lbl"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg> Profile</div>
         <div class="profile-grid">
-          ${b.profile.range ? `<div class="profile-card full"><span class="profile-card-icon">🗺️</span><div class="profile-card-label">Range & distribution</div><div class="profile-card-val">${b.profile.range}</div></div>` : ''}
-          ${b.profile.habitat ? `<div class="profile-card full"><span class="profile-card-icon">🌿</span><div class="profile-card-label">Preferred habitat</div><div class="profile-card-val">${b.profile.habitat}</div></div>` : ''}
-          ${b.profile.breeding ? `<div class="profile-card"><span class="profile-card-icon">🥚</span><div class="profile-card-label">Breeding season</div><div class="profile-card-val">${b.profile.breeding}</div></div>` : ''}
-          ${b.profile.diet ? `<div class="profile-card"><span class="profile-card-icon">🍽️</span><div class="profile-card-label">Diet</div><div class="profile-card-val">${b.profile.diet}</div></div>` : ''}
-          ${b.profile.call ? `<div class="profile-card full"><span class="profile-card-icon">🔊</span><div class="profile-card-label">Call / song</div><div class="profile-card-val">${b.profile.call}</div></div>` : ''}
-          ${b.profile.fieldId ? `<div class="profile-card full"><span class="profile-card-icon">🔍</span><div class="profile-card-label">Field identification tips</div><div class="profile-card-val">${b.profile.fieldId}</div></div>` : ''}
-          ${b.profile.conservation ? `<div class="profile-card"><span class="profile-card-icon">🛡️</span><div class="profile-card-label">Conservation status</div><div class="profile-card-val conservation-${(b.profile.conservation || '').toLowerCase().replace(/[^a-z]/g, '')}">${CONSERVATION_LABELS[b.profile.conservation] || b.profile.conservation}</div></div>` : ''}
-          ${b.profile.wingspan ? `<div class="profile-card"><span class="profile-card-icon">📏</span><div class="profile-card-label">Wingspan</div><div class="profile-card-val">${b.profile.wingspan}</div></div>` : ''}
+          ${b.profile.range ? `<div class="profile-card full"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><div class="profile-card-label">Range & distribution</div><div class="profile-card-val">${b.profile.range}</div></div>` : ''}
+          ${b.profile.habitat ? `<div class="profile-card full"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 7 17 2 22 2c0 5-3 10-10 10zM12 12C12 7 7 2 2 2c0 5 3 10 10 10z"/></svg></span><div class="profile-card-label">Preferred habitat</div><div class="profile-card-val">${b.profile.habitat}</div></div>` : ''}
+          ${b.profile.breeding ? `<div class="profile-card"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="7" ry="9"/></svg></span><div class="profile-card-label">Breeding season</div><div class="profile-card-val">${b.profile.breeding}</div></div>` : ''}
+          ${b.profile.diet ? `<div class="profile-card"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h3.5M16 22v-7"/></svg></span><div class="profile-card-label">Diet</div><div class="profile-card-val">${b.profile.diet}</div></div>` : ''}
+          ${b.profile.call ? `<div class="profile-card full"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg></span><div class="profile-card-label">Call / song</div><div class="profile-card-val">${b.profile.call}</div></div>` : ''}
+          ${b.profile.fieldId ? `<div class="profile-card full"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span><div class="profile-card-label">Field identification tips</div><div class="profile-card-val">${b.profile.fieldId}</div></div>` : ''}
+          ${b.profile.conservation ? `<div class="profile-card"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div class="profile-card-label">Conservation status</div><div class="profile-card-val conservation-${(b.profile.conservation || '').toLowerCase().replace(/[^a-z]/g, '')}">${CONSERVATION_LABELS[b.profile.conservation] || b.profile.conservation}</div></div>` : ''}
+          ${b.profile.wingspan ? `<div class="profile-card"><span class="profile-card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4"/></svg></span><div class="profile-card-label">Wingspan</div><div class="profile-card-val">${b.profile.wingspan}</div></div>` : ''}
         </div>
       </div>` : ''}
       <div>
-        <div class="section-lbl">✨ Fascinating facts</div>
+        <div class="section-lbl"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Facts</div>
         ${b.facts ? `<div class="facts-box">${b.facts}</div>` : `<button class="facts-btn" id="facts-btn-${id}" onclick="loadFacts('${id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Load bird profile + facts</button>`}
         <div id="facts-area-${id}" style="margin-top:8px;"></div>
       </div>
@@ -2008,7 +2077,11 @@ async function saveBird() {
   const saved = data && data[0] ? normalizeBird(data[0]) : normalizeBird(birdRow);
   birds.unshift(saved);
   saveToCache('birds', birds);
+  var prevCount = birds.length - 1;
   updateStats(); renderPokedex(); renderCatalogue();
+  animateCountTick(prevCount, birds.length);
+  checkNewAchievements(birds);
+  launchConfetti(saveBtn);
   saveBtn.textContent = '✓ Saved!'; saveBtn.style.background = 'var(--forest2)';
   setTimeout(() => {
     closeModal('add-modal');
@@ -2581,7 +2654,7 @@ function switchStatsTab(tab) {
   document.getElementById('migrate-view-inner').style.display = tab === 'migrate' ? 'block' : 'none';
   document.getElementById('stab-stats').classList.toggle('active', tab === 'stats');
   document.getElementById('stab-migrate').classList.toggle('active', tab === 'migrate');
-  if (tab === 'migrate') renderMigration();
+  if (tab === 'migrate') renderMigration('migrate-view-inner');
 }
 
 async function shareSightingCard(id) {
@@ -2690,9 +2763,9 @@ async function shareSightingCard(id) {
   ctx.font = '28px DM Sans, sans-serif';
   ctx.fillStyle = '#a8cca8';
   var metaParts = [];
-  if (b.date) metaParts.push('📅 ' + new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}));
-  if (b.location) metaParts.push('📍 ' + b.location);
-  if (b.type) metaParts.push('🐦 ' + b.type);
+  if (b.date) metaParts.push( new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}));
+  if (b.location) metaParts.push( b.location);
+  if (b.type) metaParts.push( b.type);
   ctx.fillText(metaParts.join('   ·   '), 60, metaY);
 
   // Grey Heron branding bottom
@@ -2881,8 +2954,8 @@ var BLR_MIGRATION = {
 var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var currentMigrateMonth = new Date().getMonth();
 
-function renderMigration() {
-  var el = document.getElementById('migrate-view-inner');
+function renderMigration(targetId) {
+  var el = document.getElementById(targetId || 'migrate-view-inner');
   if (!el) return;
   var m = currentMigrateMonth;
   var data = BLR_MIGRATION[m];
@@ -2930,20 +3003,18 @@ function renderMigration() {
 }
 
 function renderMigrationInto(targetId) {
-  var saved = currentMigrateMonth;
-  var origEl = document.getElementById('migrate-view-inner');
-  var targetEl = document.getElementById(targetId);
-  if (!targetEl) return;
-  // temporarily swap target
-  targetEl.id = 'migrate-view-inner';
-  renderMigration();
-  targetEl.id = targetId;
-  if (origEl) origEl.id = 'migrate-view-inner';
+  renderMigration(targetId);
 }
 
 function changeMigrateMonth(dir) {
   currentMigrateMonth = (currentMigrateMonth + dir + 12) % 12;
-  renderMigration();
+  // Re-render whichever migration container is visible
+  var statsEl = document.getElementById('migrate-view-inner');
+  var discoverEl = document.getElementById('discover-migrate-inner');
+  if (statsEl && statsEl.style.display !== 'none') renderMigration('migrate-view-inner');
+  if (discoverEl && discoverEl.style.display !== 'none') renderMigration('discover-migrate-inner');
+  // fallback
+  if ((!statsEl || statsEl.style.display === 'none') && (!discoverEl || discoverEl.style.display === 'none')) renderMigration();
 }
 
 
@@ -3060,11 +3131,16 @@ async function renderDiscover(targetId) {
       var rmapsUrl = obs.lat && obs.lng ? 'https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng : null;
       html += '<div class="discover-rarity-banner" style="display:flex;align-items:center;gap:10px;">';
       html += '<div style="flex:1;">';
-      html += '<div class="discover-rarity-title" style="margin-bottom:2px;">⚡ ' + dist.toFixed(1) + 'km · ' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div class="discover-rarity-title" style="margin-bottom:2px;">⚡ ' + dist.toFixed(1) + 'km · ' + ((obs.locName||'Unknown').split(',')[0]) + ' · ' + daysAgo(obs.obsDt) + '</div>';
       html += '<div class="discover-rarity-name">' + obs.comName + (isNew ? ' <span style="color:var(--amber2);font-size:10px;">★ New</span>' : '') + '</div>';
       html += '<div style="font-size:10px;color:var(--ink3);font-style:italic;">' + (obs.sciName||'') + '</div>';
       html += '</div>';
-      if (rmapsUrl) html += '<a href="' + rmapsUrl + '" target="_blank" style="flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:50%;color:#4285f4;font-size:16px;text-decoration:none;">📍</a>';
+      html += '<div style="display:flex;gap:5px;margin-top:8px;">';
+      var rarEbirdUrl = 'https://ebird.org/species/' + (obs.speciesCode || encodeURIComponent((obs.comName||'').toLowerCase().replace(/\s+/g,'-')));
+
+      html += '<a href="' + rarEbirdUrl + '" target="_blank" style="padding:4px 10px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;">eBird</a>';
+      if (rmapsUrl) html += '<a href="' + rmapsUrl + '" target="_blank" style="padding:4px 10px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.15);border-radius:6px;color:#4285f4;font-size:10px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:3px;"><svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
+      html += '</div>';
       html += '</div>';
     });
   }
@@ -3082,14 +3158,17 @@ async function renderDiscover(targetId) {
     newSpecies.slice(0, 15).forEach(function(obs) {
       var dist = distKm(userLat, userLng, obs.lat, obs.lng);
       var nmapsUrl = obs.lat && obs.lng ? 'https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng : null;
+      var ebirdSpeciesUrl = 'https://ebird.org/species/' + (obs.speciesCode || encodeURIComponent(obs.comName.toLowerCase().replace(/\s+/g,'-')));
       html += '<div class="discover-card new-species">';
-      html += '<div class="discover-card-icon">' + habitatEmoji(null) + '</div>';
+      html += '<div class="discover-card-icon">' + habitatEmoji(obs.category||null) + '</div>';
       html += '<div class="discover-card-info">';
       html += '<div class="discover-card-name">' + obs.comName + '</div>';
-      html += '<div class="discover-card-meta"><i>' + (obs.sciName||'') + '</i><br>' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
-      html += '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;">';
-      html += '<div class="discover-card-badge new" style="flex:1;">★ Add to your list</div>';
-      if (nmapsUrl) html += '<a href="' + nmapsUrl + '" target="_blank" style="padding:3px 8px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:6px;color:#4285f4;font-size:10px;font-weight:600;text-decoration:none;white-space:nowrap;">📍 Maps</a>';
+      html += '<div class="discover-card-meta"><i>' + (obs.sciName||'') + '</i><br>' + ((obs.locName||'Unknown').split(',')[0]) + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:5px;margin-top:7px;flex-wrap:wrap;">';
+      html += '<div class="discover-card-badge new" style="flex:1;min-width:80px;">★ New for you</div>';
+
+      html += '<a href="' + ebirdSpeciesUrl + '" target="_blank" style="padding:3px 9px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;white-space:nowrap;">eBird</a>';
+      if (nmapsUrl) html += '<a href="' + nmapsUrl + '" target="_blank" style="padding:3px 9px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.15);border-radius:6px;color:#4285f4;font-size:10px;font-weight:500;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;"><svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
       html += '</div>';
       html += '</div>';
       html += '<div class="discover-dist">' + dist.toFixed(1) + 'km</div>';
@@ -3106,10 +3185,10 @@ async function renderDiscover(targetId) {
     haveSpecies.slice(0, 8).forEach(function(obs) {
       var dist = distKm(userLat, userLng, obs.lat, obs.lng);
       html += '<div class="discover-card" style="opacity:0.6;">';
-      html += '<div class="discover-card-icon">' + habitatEmoji(null) + '</div>';
+      html += '<div class="discover-card-icon">' + habitatEmoji(obs.category||null) + '</div>';
       html += '<div class="discover-card-info">';
       html += '<div class="discover-card-name">' + obs.comName + '</div>';
-      html += '<div class="discover-card-meta">' + (obs.locName||'Unknown') + ' · ' + daysAgo(obs.obsDt) + '</div>';
+      html += '<div class="discover-card-meta">' + ((obs.locName||'Unknown').split(',')[0]) + ' · ' + daysAgo(obs.obsDt) + '</div>';
       html += '<div class="discover-card-badge have">✓ Logged</div>';
       html += '</div>';
       html += '<div class="discover-dist">' + dist.toFixed(1) + 'km</div>';
@@ -3118,6 +3197,7 @@ async function renderDiscover(targetId) {
   }
 
   el.innerHTML = html;
+  setTimeout(sparkleNewSpecies, 150);
 
   // Rarity flash already shown on load — skip in discover tab
 }
@@ -3204,8 +3284,8 @@ async function renderHotspots(targetId) {
     if (h.latestObsDt) html += ' · Last birded ' + daysAgo(h.latestObsDt);
     html += '</div>';
     html += '<div style="display:flex;gap:6px;margin-top:8px;">';
-    html += '<a href="' + mapsUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:8px;color:#4285f4;font-size:11px;font-weight:600;text-decoration:none;">📍 Maps</a>';
-    html += '<a href="' + ebirdUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:8px;color:var(--forest3);font-size:11px;font-weight:600;text-decoration:none;">🐦 eBird</a>';
+    html += '<a href="' + mapsUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:8px;color:#4285f4;font-size:11px;font-weight:600;text-decoration:none;"><svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
+    html += '<a href="' + ebirdUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:8px;color:var(--forest3);font-size:11px;font-weight:600;text-decoration:none;">eBird</a>';
     html += '</div>';
     html += '<button class="hotspot-expand-btn" id="hsp-btn-' + h.locId + '" onclick="toggleHotspotSpecies(\'' + h.locId + '\')">▸ Show recent sightings</button>';
     html += '<div class="hotspot-species-list" id="hsp-list-' + h.locId + '"></div>';
@@ -3263,6 +3343,7 @@ function closeSidebar() {
 // ═══════════════════════════════════════════════════════════════════
 var currentDiscoverTab = 'nearby';
 
+var discoverOpenedOnce = false;
 function switchDiscoverTab(tab) {
   currentDiscoverTab = tab;
   ['nearby','hotspots','migrate'].forEach(function(t) {
@@ -3271,7 +3352,14 @@ function switchDiscoverTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  if (tab === 'nearby') renderDiscoverNearby();
+  if (tab === 'nearby') {
+    // Fire rarity alert once per session when discover first opened
+    if (!discoverOpenedOnce) {
+      discoverOpenedOnce = true;
+      setTimeout(checkRarityOnLoad, 1000);
+    }
+    renderDiscoverNearby();
+  }
   if (tab === 'hotspots') renderDiscoverHotspots();
   if (tab === 'migrate') renderDiscoverMigration();
 }
@@ -3367,6 +3455,8 @@ async function updateDiscoverBadge() {
     if (badge && newCount > 0) {
       badge.textContent = newCount > 99 ? '99+' : newCount;
       badge.style.display = 'block';
+      var discoverTab = document.getElementById('tab-discover');
+      if (discoverTab) discoverTab.classList.add('has-badge');
     }
   } catch(e) {}
 }
@@ -3422,6 +3512,191 @@ function toggleJournalSearch() {
     if (input) { input.value = ''; renderCatalogue(); }
   }
 }
+
+
+// ═══════════════════════════════════════════════════════════════════
+// MICRO-INTERACTIONS
+// ═══════════════════════════════════════════════════════════════════
+
+// ── 1. Bird confetti burst on save ───────────────────────────────
+function launchConfetti(originEl) {
+  var rect = originEl ? originEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2, width:0, height:0 };
+  var cx = rect.left + rect.width/2;
+  var cy = rect.top + rect.height/2;
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+  document.body.appendChild(container);
+
+  var birdPath = 'M0 0 C-3-4-8-5-10-2 C-8-1-4-1.5 0 0 C3-4 8-5 10-2 C8-1 4-1.5 0 0Z';
+  var colors = ['#ffd166','#28c080','#a8cca8','#ffc947','#4fc88a','#e8a020'];
+  var count = 18;
+
+  for (var i=0; i<count; i++) {
+    (function(i) {
+      var el = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      var scale = 0.6 + Math.random() * 1.2;
+      el.setAttribute('width', 20*scale); el.setAttribute('height', 20*scale);
+      el.setAttribute('viewBox','-12 -8 24 16');
+      el.style.cssText = 'position:fixed;pointer-events:none;left:'+cx+'px;top:'+cy+'px;opacity:1;';
+      var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', birdPath);
+      path.setAttribute('fill', colors[i % colors.length]);
+      el.appendChild(path);
+      container.appendChild(el);
+
+      var angle = (i / count) * Math.PI * 2 + (Math.random()-0.5)*0.5;
+      var dist = 80 + Math.random() * 140;
+      var tx = Math.cos(angle) * dist;
+      var ty = Math.sin(angle) * dist - 60;
+      var rot = (Math.random()-0.5) * 720;
+      var duration = 600 + Math.random() * 400;
+      var delay = Math.random() * 120;
+
+      setTimeout(function() {
+        el.style.transition = 'transform '+duration+'ms cubic-bezier(0.25,0.46,0.45,0.94), opacity '+duration+'ms ease';
+        el.style.transform = 'translate('+tx+'px,'+ty+'px) rotate('+rot+'deg) scale(0.3)';
+        el.style.opacity = '0';
+      }, delay);
+
+      setTimeout(function() { el.remove(); }, delay + duration + 50);
+    })(i);
+  }
+  setTimeout(function() { container.remove(); }, 900);
+}
+
+// ── 2. Bird count tick animation ─────────────────────────────────
+function animateCountTick(fromVal, toVal) {
+  var el = document.getElementById('stat-total');
+  if (!el || fromVal === toVal) return;
+  el.style.transition = 'transform 0.15s ease, color 0.3s';
+  el.style.transform = 'scale(1.4)';
+  el.style.color = 'var(--amber2)';
+  el.textContent = toVal;
+  setTimeout(function() {
+    el.style.transform = 'scale(1)';
+    setTimeout(function() { el.style.color = ''; el.style.transition = ''; }, 300);
+  }, 150);
+}
+
+// ── 3. Achievement unlock flash ──────────────────────────────────
+var lastAchievementState = null;
+function checkNewAchievements(birdList) {
+  var achieved = ACHIEVEMENTS.map(function(a){ return { id:a.id, icon:a.icon, name:a.name, unlocked:a.check(birdList) }; });
+  if (!lastAchievementState) { lastAchievementState = achieved; return; }
+  achieved.forEach(function(a) {
+    var prev = lastAchievementState.find(function(p){ return p.id === a.id; });
+    if (prev && !prev.unlocked && a.unlocked) flashAchievement(a);
+  });
+  lastAchievementState = achieved;
+}
+
+function flashAchievement(achievement) {
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+  el.innerHTML = '<div style="background:linear-gradient(135deg,rgba(14,22,14,0.98),rgba(7,13,7,0.99));border:1px solid rgba(255,209,102,0.3);border-radius:20px;padding:28px 36px;text-align:center;transform:translateY(40px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 40px rgba(255,209,102,0.1);">' +
+    '<div style="font-size:48px;margin-bottom:10px;">'+achievement.icon+'</div>' +
+    '<div style="font-size:9px;letter-spacing:2px;color:var(--amber);text-transform:uppercase;margin-bottom:6px;">Achievement Unlocked</div>' +
+    '<div style="font-family:\'Playfair Display\',serif;font-size:20px;color:var(--ink);font-weight:700;">'+achievement.name+'</div>' +
+    '</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      el.firstChild.style.transform = 'translateY(0)';
+      el.firstChild.style.opacity = '1';
+    });
+  });
+  setTimeout(function() {
+    el.firstChild.style.transform = 'translateY(-20px)';
+    el.firstChild.style.opacity = '0';
+    setTimeout(function() { el.remove(); }, 400);
+  }, 2400);
+}
+
+// ── 4. Tab switch slide-up animation ─────────────────────────────
+var originalSwitchTab = switchTab;
+switchTab = function(tab) {
+  originalSwitchTab(tab);
+  var activeView = document.getElementById('view-' + tab);
+  if (!activeView) return;
+  activeView.style.opacity = '0';
+  activeView.style.transform = 'translateY(10px)';
+  activeView.style.transition = 'none';
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      activeView.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94)';
+      activeView.style.opacity = '1';
+      activeView.style.transform = 'translateY(0)';
+    });
+  });
+};
+
+// ── 5. Tap ripple on pokédex cards ───────────────────────────────
+document.addEventListener('click', function(e) {
+  var card = e.target.closest('.pdex-card');
+  if (!card || card.classList.contains('undiscovered')) return;
+  var rect = card.getBoundingClientRect();
+  var ripple = document.createElement('div');
+  var x = e.clientX - rect.left, y = e.clientY - rect.top;
+  ripple.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,209,102,0.15);pointer-events:none;transform:scale(0);animation:rippleOut 0.5s ease forwards;left:'+(x-30)+'px;top:'+(y-30)+'px;width:60px;height:60px;';
+  card.style.position = 'relative';
+  card.appendChild(ripple);
+  setTimeout(function(){ ripple.remove(); }, 500);
+}, true);
+
+// ── 6. IUCN badge shimmer on journal render ───────────────────────
+function shimmerIUCNBadges() {
+  var badges = document.querySelectorAll('.iucn-badge');
+  badges.forEach(function(b, i) {
+    b.style.animation = 'none';
+    setTimeout(function() {
+      b.style.animation = 'iucnShimmer 0.6s ease forwards';
+    }, i * 80);
+  });
+}
+
+// ── 7. New species ★ sparkle in Discover ─────────────────────────
+function sparkleNewSpecies() {
+  var badges = document.querySelectorAll('.discover-card-badge.new');
+  badges.forEach(function(b, i) {
+    setTimeout(function() {
+      b.style.animation = 'none';
+      requestAnimationFrame(function() {
+        b.style.animation = 'starSparkle 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';
+      });
+    }, i * 40);
+  });
+}
+
+// ── 8. Sync dot pulse on completion ──────────────────────────────
+function pulseSyncDot() {
+  var dot = document.getElementById('sync-status');
+  if (!dot) return;
+  dot.style.animation = 'none';
+  requestAnimationFrame(function() {
+    dot.style.animation = 'syncPulse 0.8s ease forwards';
+  });
+}
+
+// ── 9. Search bar slide-open animation ───────────────────────────
+var originalToggleSearch = toggleJournalSearch;
+toggleJournalSearch = function() {
+  var bar = document.getElementById('cat-search-bar');
+  var isOpening = bar.style.display === 'none' || !bar.style.display;
+  originalToggleSearch();
+  if (isOpening) {
+    bar = document.getElementById('cat-search-bar');
+    bar.style.opacity = '0';
+    bar.style.transform = 'translateY(-6px)';
+    bar.style.transition = 'none';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        bar.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        bar.style.opacity = '1';
+        bar.style.transform = 'translateY(0)';
+      });
+    });
+  }
+};
 
 </script>
 </body>
