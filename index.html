@@ -1133,19 +1133,25 @@ let MASTER = [];
 // AUTHENTICATION — FIX 1: loading screen prevents flash
 // ═══════════════════════════════════════════════════════════════════
 async function initAuth() {
-  // Ensure loading screen is visible and app/login are hidden
   document.getElementById('loading-screen').style.display = 'flex';
   document.getElementById('loading-screen').style.opacity = '1';
   document.getElementById('login-container').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   try {
     const { data: { user } } = await sb.auth.getUser();
-    // Fade out loading screen smoothly
     const ls = document.getElementById('loading-screen');
     ls.style.opacity = '0';
     setTimeout(() => { ls.style.display = 'none'; }, 300);
     if (user) { currentUser = user; showApp(); loadAllData(); }
-    else { showLogin(); }
+    else {
+      // Auto sign in with demo account
+      const { data, error } = await sb.auth.signInWithPassword({ email: 'test@test.com', password: 'test1234' });
+      const ls2 = document.getElementById('loading-screen');
+      ls2.style.opacity = '0';
+      setTimeout(() => { ls2.style.display = 'none'; }, 300);
+      if (!error && data.user) { currentUser = data.user; showApp(); loadAllData(); }
+      else { showLogin(); }
+    }
   } catch(e) {
     document.getElementById('loading-screen').style.opacity = '0';
     setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
@@ -1185,6 +1191,11 @@ function showLoginError(msg, isError = true) {
 
 // FIX 1: showLogin hides loading screen cleanly
 function showLogin() {
+  // Auto sign in with demo credentials
+  document.getElementById('login-email').value = 'test@test.com';
+  document.getElementById('login-password').value = 'test1234';
+  setTimeout(handleSignIn, 100);
+  return;
   const ls = document.getElementById('loading-screen');
   if (ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 300); }
   document.getElementById('login-container').style.display = 'flex';
