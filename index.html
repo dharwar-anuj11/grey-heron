@@ -774,13 +774,9 @@
     </div>
 
     <div class="view" id="view-stats" style="display:none;flex-direction:column;">
-      <div class="map-tabs" style="flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--p);">
-        <button class="map-tab active" id="stab-stats" onclick="switchStatsTab('stats')">Stats</button>
-        <button class="map-tab" id="stab-migrate" onclick="switchStatsTab('migrate')">Migration</button>
-      </div>
+
       <div style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;">
         <div class="stats-view" id="stats-view-inner"></div>
-        <div class="stats-view" id="migrate-view-inner" style="display:none;"></div>
       </div>
     </div>
 
@@ -2650,11 +2646,8 @@ function renderStats() {
 // SHAREABLE SIGHTING CARD
 // ═══════════════════════════════════════════════════════════════════
 function switchStatsTab(tab) {
-  document.getElementById('stats-view-inner').style.display = tab === 'stats' ? 'block' : 'none';
-  document.getElementById('migrate-view-inner').style.display = tab === 'migrate' ? 'block' : 'none';
-  document.getElementById('stab-stats').classList.toggle('active', tab === 'stats');
-  document.getElementById('stab-migrate').classList.toggle('active', tab === 'migrate');
-  if (tab === 'migrate') renderMigration('migrate-view-inner');
+  document.getElementById('stats-view-inner').style.display = 'block';
+  document.getElementById('stab-stats').classList.add('active');
 }
 
 async function shareSightingCard(id) {
@@ -3008,13 +3001,7 @@ function renderMigrationInto(targetId) {
 
 function changeMigrateMonth(dir) {
   currentMigrateMonth = (currentMigrateMonth + dir + 12) % 12;
-  // Re-render whichever migration container is visible
-  var statsEl = document.getElementById('migrate-view-inner');
-  var discoverEl = document.getElementById('discover-migrate-inner');
-  if (statsEl && statsEl.style.display !== 'none') renderMigration('migrate-view-inner');
-  if (discoverEl && discoverEl.style.display !== 'none') renderMigration('discover-migrate-inner');
-  // fallback
-  if ((!statsEl || statsEl.style.display === 'none') && (!discoverEl || discoverEl.style.display === 'none')) renderMigration();
+  renderMigration('discover-migrate-inner');
 }
 
 
@@ -3138,7 +3125,7 @@ async function renderDiscover(targetId) {
       html += '<div style="display:flex;gap:5px;margin-top:8px;">';
       var rarEbirdUrl = 'https://ebird.org/species/' + (obs.speciesCode || encodeURIComponent((obs.comName||'').toLowerCase().replace(/\s+/g,'-')));
 
-      html += '<a href="' + rarEbirdUrl + '" target="_blank" style="padding:4px 10px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;">eBird</a>';
+      html += '<a href="' + rarEbirdUrl + '" target="_blank" style="padding:4px 10px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;">Know more</a>';
       if (rmapsUrl) html += '<a href="' + rmapsUrl + '" target="_blank" style="padding:4px 10px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.15);border-radius:6px;color:#4285f4;font-size:10px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:3px;"><svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
       html += '</div>';
       html += '</div>';
@@ -3167,7 +3154,7 @@ async function renderDiscover(targetId) {
       html += '<div style="display:flex;align-items:center;gap:5px;margin-top:7px;flex-wrap:wrap;">';
       html += '<div class="discover-card-badge new" style="flex:1;min-width:80px;">★ New for you</div>';
 
-      html += '<a href="' + ebirdSpeciesUrl + '" target="_blank" style="padding:3px 9px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;white-space:nowrap;">eBird</a>';
+      html += '<a href="' + ebirdSpeciesUrl + '" target="_blank" style="padding:3px 9px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:6px;color:var(--forest3);font-size:10px;font-weight:500;text-decoration:none;white-space:nowrap;">Know more</a>';
       if (nmapsUrl) html += '<a href="' + nmapsUrl + '" target="_blank" style="padding:3px 9px;background:rgba(66,133,244,0.08);border:1px solid rgba(66,133,244,0.15);border-radius:6px;color:#4285f4;font-size:10px;font-weight:500;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;"><svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
       html += '</div>';
       html += '</div>';
@@ -3285,7 +3272,7 @@ async function renderHotspots(targetId) {
     html += '</div>';
     html += '<div style="display:flex;gap:6px;margin-top:8px;">';
     html += '<a href="' + mapsUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.2);border-radius:8px;color:#4285f4;font-size:11px;font-weight:600;text-decoration:none;"><svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> Maps</a>';
-    html += '<a href="' + ebirdUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:8px;color:var(--forest3);font-size:11px;font-weight:600;text-decoration:none;">eBird</a>';
+    html += '<a href="' + ebirdUrl + '" target="_blank" style="flex:1;text-align:center;padding:6px;background:rgba(40,160,64,0.08);border:1px solid rgba(40,160,64,0.15);border-radius:8px;color:var(--forest3);font-size:11px;font-weight:600;text-decoration:none;">Know more</a>';
     html += '</div>';
     html += '<button class="hotspot-expand-btn" id="hsp-btn-' + h.locId + '" onclick="toggleHotspotSpecies(\'' + h.locId + '\')">▸ Show recent sightings</button>';
     html += '<div class="hotspot-species-list" id="hsp-list-' + h.locId + '"></div>';
