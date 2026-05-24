@@ -959,15 +959,11 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 <body>
 <!-- LOADING SCREEN -->
 <div id="loading-screen" style="display:flex;align-items:center;justify-content:center;flex-direction:column;width:100%;height:100dvh;background:var(--ink);position:fixed;inset:0;z-index:9999;transition:opacity 0.6s ease;overflow:hidden;">
-  <!-- Contour rings expanding outward -->
-  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-    <svg viewBox="0 0 400 400" style="width:100%;height:100%;position:absolute;opacity:0.35;">
-      <circle cx="200" cy="200" r="30" fill="none" stroke="var(--brass)" stroke-width="0.6" style="animation:ring-expand 4s ease-out infinite;animation-delay:0s;opacity:0"/>
-      <circle cx="200" cy="200" r="30" fill="none" stroke="var(--paper-dim)" stroke-width="0.3" style="animation:ring-expand 4s ease-out infinite;animation-delay:0.8s;opacity:0"/>
-      <circle cx="200" cy="200" r="30" fill="none" stroke="var(--brass)" stroke-width="0.5" style="animation:ring-expand 4s ease-out infinite;animation-delay:1.6s;opacity:0"/>
-      <circle cx="200" cy="200" r="30" fill="none" stroke="var(--paper-dim)" stroke-width="0.3" style="animation:ring-expand 4s ease-out infinite;animation-delay:2.4s;opacity:0"/>
-      <circle cx="200" cy="200" r="30" fill="none" stroke="var(--brass)" stroke-width="0.4" style="animation:ring-expand 4s ease-out infinite;animation-delay:3.2s;opacity:0"/>
-    </svg>
+  <!-- Ripple rings — subtle, slow -->
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0.25;">
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;border:0.5px solid var(--brass);animation:ring-expand-div 6s ease-out infinite;animation-delay:0s;"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;border:0.5px solid var(--brass);animation:ring-expand-div 6s ease-out infinite;animation-delay:2s;"></div>
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;border:0.5px solid var(--brass);animation:ring-expand-div 6s ease-out infinite;animation-delay:4s;"></div>
   </div>
   <!-- Heron with breathing animation -->
   <div style="position:relative;z-index:1;animation:heron-breathe 3s ease-in-out infinite;">
@@ -995,7 +991,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
   </div>
   <div id="loading-status" style="position:relative;z-index:1;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim);opacity:0;transition:opacity 0.3s;animation:splash-text-in 1s 0.8s both;animation-fill-mode:forwards;">Connecting…</div>
   <style>
-    @keyframes ring-expand { 0%{r:30;opacity:0.6} 100%{r:200;opacity:0} }
+    @keyframes ring-expand-div { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(8);opacity:0} }
     @keyframes heron-breathe { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.03)} }
     @keyframes splash-text-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     @keyframes loading-bar { from{width:0%} to{width:100%} }
@@ -2422,24 +2418,34 @@ function openDetail(id) {
 
   document.getElementById('detail-content').innerHTML = `
     <!-- Image plate -->
-    <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="margin:0;position:relative;cursor:zoom-in;min-height:220px;background:linear-gradient(165deg,${b.type?({'Raptor':'#3A3128','Waterbird':'#2A3A42','Wader':'#2A3830','Owl':'#2E2C1C','Kingfisher':'#1E2C3A','Songbird':'#2A3428'}[b.type]||'#252D26'):'#252D26'} 0%,var(--ink) 100%);display:flex;align-items:center;justify-content:center;">
-      <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.08;">
-        ${[18,32,48,66,86,108].map((r,i) => `<ellipse cx="150" cy="110" rx="${r}" ry="${Math.round(r*0.78)}" fill="none" stroke="${i%2===0?'var(--brass)':'var(--paper-dim)'}" stroke-width="${i%2===0?'0.5':'0.35'}"/>`).join('')}
-      </svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;left:12px;"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;right:12px;transform:scaleX(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;left:12px;transform:scaleY(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;right:12px;transform:scale(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
-      ${b.photo
-        ? `<img src="${b.photo}" alt="${b.name}" style="width:100%;max-height:260px;object-fit:contain;display:block;position:relative;z-index:1;" onclick="event.stopPropagation();openLightbox('${b.photo.replace(/'/g,"\'")}','${(b.name||'').replace(/'/g,"\'")}');"/>`
-        : `<div style="width:110px;height:110px;color:#0a0d0a;opacity:0.35;position:relative;z-index:1;">${SILHOUETTES[b.type]||SILHOUETTES.Unknown}</div>`
-      }
-      <!-- Bottom strip: plate number + type tag -->
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(0deg,rgba(14,20,16,0.7) 0%,transparent 100%);z-index:2;">
-        <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);opacity:0.8;">FOLIO · ${plateNum}</span>
-        ${b.type ? `<span style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:var(--paper-dim);opacity:0.6;">${b.type}</span>` : ''}
+    <div style="margin:16px 0 0;position:relative;">
+      <!-- Tape corners — inside frame -->
+        <div style="position:absolute;top:6px;left:6px;width:28px;height:12px;background:rgba(143,168,136,0.35);border-radius:2px;transform:rotate(-2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+        <div style="position:absolute;top:6px;right:6px;width:28px;height:12px;background:rgba(143,168,136,0.35);border-radius:2px;transform:rotate(2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+        <div style="position:absolute;bottom:32px;left:6px;width:28px;height:12px;background:rgba(143,168,136,0.25);border-radius:2px;transform:rotate(2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+        <div style="position:absolute;bottom:32px;right:6px;width:28px;height:12px;background:rgba(143,168,136,0.25);border-radius:2px;transform:rotate(-2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+      <!-- Photo frame -->
+      <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="position:relative;cursor:zoom-in;height:280px;overflow:hidden;border:0.5px solid var(--line-2);border-radius:2px;background:linear-gradient(165deg,${b.type?({"Raptor":"#3A3128","Waterbird":"#2A3A42","Wader":"#2A3830","Owl":"#2E2C1C","Kingfisher":"#1E2C3A","Songbird":"#2A3428"}[b.type]||"#252D26"):"#252D26"} 0%,var(--ink) 100%);">
+        <!-- Topo contour lines background -->
+        <svg viewBox="0 0 360 280" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.07;">
+          ${[20,38,58,80,104,130,158,188].map((r,i) => `<ellipse cx="180" cy="140" rx="${r}" ry="${Math.round(r*0.75)}" fill="none" stroke="var(--paper)" stroke-width="0.6"/>`).join("")}
+        </svg>
+        ${b.photo
+          ? `<img src="${b.photo}" alt="${b.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:1;" onclick="event.stopPropagation();openLightbox('${b.photo.replace(/'/g,"\'")}','${(b.name||"").replace(/'/g,"\'")}'  );"/>`
+          : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;"><div style="width:100px;height:100px;color:#0a0d0a;opacity:0.3;">${SILHOUETTES[b.type]||SILHOUETTES.Unknown}</div></div>`
+        }
+        <!-- Scan lines overlay -->
+        <div style="position:absolute;inset:0;pointer-events:none;z-index:2;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,0.06) 0 1px,transparent 1px 3px);"></div>
+        <!-- Verified badge -->
+        ${b.photo ? `<div style="position:absolute;top:10px;right:10px;z-index:3;font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);background:rgba(14,20,16,0.75);border:0.5px solid rgba(201,163,94,0.25);border-radius:3px;padding:3px 7px;backdrop-filter:blur(4px);">VERIFIED · AI</div>` : ""}
+        <!-- Bottom: filename + folio -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(0deg,rgba(14,20,16,0.65) 0%,transparent 100%);z-index:3;">
+          <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.16em;color:var(--brass-hi);opacity:0.7;">FOLIO · ${plateNum}</span>
+          <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.16em;color:var(--paper-dim);opacity:0.6;">${b.type||""}</span>
+        </div>
       </div>
     </div>
+
 
     <div class="detail-body">
 
@@ -2501,12 +2507,10 @@ function openDetail(id) {
         <div id="xc-wave-${id}" style="display:flex;align-items:center;gap:2px;height:44px;padding:0 2px;cursor:pointer;" onclick="toggleXcPlay('${id}')">
           ${sonoHeights.map((h,wi) => `<div class="xc-bar" data-h="${h}" style="flex:1;min-width:2px;background:linear-gradient(180deg,var(--brass-hi),var(--brass));border-radius:1.5px;height:${h}px;opacity:0.7;transition:height 0.1s ease,opacity 0.1s;"></div>`).join('')}
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-          <span id="xc-time-${id}" style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">0:00</span>
-          <div id="xc-progress-wrap-${id}" style="flex:1;height:2px;background:rgba(201,163,94,0.1);border-radius:1px;margin:0 10px;cursor:pointer;" onclick="xcSeek(event,'${id}')">
+        <div style="margin-top:6px;">
+          <div id="xc-progress-wrap-${id}" style="height:2px;background:rgba(201,163,94,0.1);border-radius:1px;cursor:pointer;" onclick="xcSeek(event,'${id}')">
             <div id="xc-progress-${id}" style="height:100%;width:0%;background:var(--brass-hi);border-radius:1px;transition:width 0.25s linear;"></div>
           </div>
-          <span id="xc-dur-${id}" style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">--:--</span>
         </div>
         <audio id="xc-audio-${id}" preload="none" onended="xcEnded('${id}')" ontimeupdate="xcTimeUpdate('${id}')" onloadedmetadata="xcMeta('${id}')"></audio>
       </div>
@@ -2640,7 +2644,7 @@ async function loadXcAudio(birdId, scientificName) {
 
     // Animate waveform bars while loading
     var durEl = document.getElementById('xc-dur-' + birdId);
-    if (durEl) durEl.textContent = rec.length ? (rec.length.includes(':') ? rec.length : formatTime(parseInt(rec.length))) : '--:--';
+    if (durEl) durEl.textContent = rec.length ? rec.length : '--:--';
 
   } catch(e) {
     if (sourceEl) sourceEl.textContent = 'Could not load recording';
@@ -2664,14 +2668,26 @@ function toggleXcPlay(birdId) {
   });
 
   if (audioEl.paused) {
-    audioEl.play().then(function() {
-      xcSetPlayIcon(birdId, true);
-      xcStartWaveAnim(birdId);
-      if (playBtn) { playBtn.style.transform = 'scale(0.95)'; setTimeout(function(){ playBtn.style.transform=''; }, 150); }
-    }).catch(function(e) {
+    // Ensure src is set before playing
+    if (!audioEl.src || audioEl.src === window.location.href) {
       var sourceEl = document.getElementById('xc-source-' + birdId);
-      if (sourceEl) sourceEl.textContent = 'Playback blocked — tap again';
-    });
+      if (sourceEl) sourceEl.textContent = 'Recording not loaded yet';
+      return;
+    }
+    var playPromise = audioEl.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function() {
+        xcSetPlayIcon(birdId, true);
+        xcStartWaveAnim(birdId);
+        if (playBtn) { playBtn.style.transform = 'scale(0.95)'; setTimeout(function(){ playBtn.style.transform=''; }, 150); }
+      }).catch(function(e) {
+        // Autoplay blocked — user must interact again, button is already visible
+        xcSetPlayIcon(birdId, false);
+        xcStopWaveAnim(birdId);
+        var sourceEl = document.getElementById('xc-source-' + birdId);
+        if (sourceEl) sourceEl.textContent = 'Tap play to listen';
+      });
+    }
   } else {
     audioEl.pause();
     xcSetPlayIcon(birdId, false);
@@ -2732,15 +2748,21 @@ function xcTimeUpdate(birdId) {
   var prog = document.getElementById('xc-progress-' + birdId);
   var timeEl = document.getElementById('xc-time-' + birdId);
   if (!audioEl) return;
-  var pct = audioEl.duration ? (audioEl.currentTime / audioEl.duration * 100) : 0;
+  var dur = audioEl.duration;
+  var cur = audioEl.currentTime;
+  if (!isFinite(dur) || !dur) return;
+  var pct = (cur / dur) * 100;
   if (prog) prog.style.width = pct + '%';
-  if (timeEl) timeEl.textContent = formatTime(audioEl.currentTime);
+  if (timeEl) timeEl.textContent = formatTime(cur);
 }
 
 function xcMeta(birdId) {
   var audioEl = document.getElementById('xc-audio-' + birdId);
   var durEl = document.getElementById('xc-dur-' + birdId);
-  if (audioEl && durEl) durEl.textContent = formatTime(audioEl.duration);
+  if (audioEl && durEl) {
+    var d = audioEl.duration;
+    durEl.textContent = isFinite(d) && d > 0 ? formatTime(d) : '--:--';
+  }
 }
 
 function xcSeek(event, birdId) {
