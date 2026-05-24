@@ -217,7 +217,7 @@ html,body {
 .topbar-right { display:flex; align-items:center; gap:14px; }
 .sync-status { display:flex; align-items:center; }
 .topbar-stat { text-align:right; }
-.topbar-stat b { font-family:var(--serif); font-size:22px; font-weight:500; color:var(--brass-hi); display:block; line-height:1.1; }
+.topbar-stat b { font-family:var(--serif); font-size:24px; font-weight:500; color:var(--brass-hi); display:block; line-height:1.1; letter-spacing:-0.5px; }
 .topbar-stat span { font-family:var(--mono); font-size:7px; letter-spacing:0.2em; text-transform:uppercase; color:var(--paper-dim); }
 .topbar-add {
   background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, var(--brass-lo));
@@ -282,25 +282,37 @@ html,body {
   backdrop-filter: blur(10px);
   border-bottom: 0.5px solid var(--line);
 }
-.pdex-tabs { display:flex; gap:0; overflow-x:auto; scrollbar-width:none; padding:4px 18px 0; }
+.pdex-tabs { display:flex; gap:0; overflow-x:auto; scrollbar-width:none; padding:6px 18px 0; }
 .pdex-tabs::-webkit-scrollbar { display:none; }
 .pdex-tab {
-  padding:12px 14px 12px 0; border:none; background:none; cursor:pointer;
+  padding:12px 16px 13px 0; border:none; background:none; cursor:pointer;
   white-space:nowrap; flex-shrink:0; transition:color 0.2s, opacity 0.2s;
   position:relative; display:flex; align-items:baseline; gap:7px;
-  color: var(--paper-dim); opacity:0.55;
+  color: var(--paper-dim); opacity:0.5;
+  overflow:hidden;
 }
-.pdex-tab:hover { opacity:0.75; }
+.pdex-tab:hover { opacity:0.78; }
 .pdex-tab.active { color:var(--paper); opacity:1; }
-.pdex-tab-label { font-family:var(--serif); font-size:15px; font-weight:500; }
-.pdex-tab-frac  { font-family:var(--mono); font-size:10px; color:var(--brass); }
+/* Bottom underline */
 .pdex-tab-underline {
-  position:absolute; left:0; right:14px; bottom:-1px; height:1.5px;
+  position:absolute; left:0; right:14px; bottom:0; height:1.5px;
   background: linear-gradient(90deg, var(--brass-hi), var(--brass) 70%, transparent);
   display:none;
 }
 .pdex-tab.active .pdex-tab-underline { display:block; }
-.pdex-tab.has-birds { opacity:0.75; }
+/* Ink pool glow — same mechanic as bottom nav */
+.pdex-tab .tab-ink-pool {
+  position:absolute; bottom:-8px; left:50%; width:0; height:0;
+  background:radial-gradient(ellipse at center, rgba(201,163,94,0.18) 0%, transparent 70%);
+  border-radius:50%; transform:translateX(-50%);
+  transition:width 0.4s cubic-bezier(0.34,1.1,0.64,1), height 0.4s cubic-bezier(0.34,1.1,0.64,1), opacity 0.3s;
+  pointer-events:none; opacity:0;
+}
+.pdex-tab.active .tab-ink-pool { width:80px; height:44px; opacity:1; }
+.pdex-tab.active .pdex-tab-label { color:var(--paper); }
+.pdex-tab-label { font-family:var(--serif); font-size:17px; font-weight:500; }
+.pdex-tab-frac  { font-family:var(--mono); font-size:10px; color:var(--brass); }
+.pdex-tab.has-birds { opacity:0.72; }
 
 /* ── SECTION HEADER — manuscript style ──────────── */
 .section-ornament {
@@ -321,23 +333,17 @@ html,body {
 }
 /* progress bar under section header */
 .section-progress-wrap {
-  height:4px; background:rgba(201,163,94,0.06); border-radius:2px;
-  overflow:hidden; margin:0 2px 12px; position:relative;
+  height:2px; background:rgba(201,163,94,0.08); border-radius:1px;
+  margin:0 2px 14px; position:relative;
 }
 .section-progress-fill {
-  height:100%; border-radius:2px;
-  background: linear-gradient(90deg, var(--brass-lo), var(--brass-hi));
-  box-shadow: 0 0 8px rgba(201,163,94,0.4);
-  position:relative; overflow:hidden;
+  height:100%; border-radius:1px;
+  background: linear-gradient(90deg, var(--brass-lo) 0%, var(--brass-hi) 100%);
+  transition: width 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.section-progress-fill::after {
-  content:''; position:absolute; inset:0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
-  animation: shimmer-bar 2.6s ease-in-out infinite;
-}
-@keyframes shimmer-bar { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
 .section-progress-tick {
-  position:absolute; top:-2px; bottom:-2px; width:0.5px; background:var(--ink); z-index:1;
+  position:absolute; top:0; bottom:0; width:1px;
+  background:rgba(14,20,16,0.6); z-index:1;
 }
 /* section footer ornament */
 .section-footer {
@@ -362,23 +368,35 @@ html,body {
   display:flex; align-items:center; justify-content:center;
 }
 .pdex-unseen-grid { padding:10px 2px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
-.pokedex-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; align-items:start; }
-.pokedex-section { padding:0 12px 8px; position:relative; scroll-margin-top:52px; overflow-x:clip; }
+.pokedex-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; align-items:start; }
+.pokedex-section { padding:0 12px 8px; position:relative; scroll-margin-top:60px; }
 
 /* ── CODEX PLATE CARD ───────────────────────────── */
 .pdex-card {
-  background: var(--ink-1); border:0.5px solid var(--line-2); border-radius:8px;
+  background: var(--ink-1); border:0.5px solid var(--line-2); border-radius:10px;
   overflow:hidden; cursor:pointer;
-  transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-  box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 0 0 rgba(201,163,94,0); position:relative;
+  transition:transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.25s, border-color 0.25s;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.55); position:relative;
 }
-.pdex-card:hover { transform:translateY(-3px) scale(1.01); box-shadow:0 10px 32px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(201,163,94,0.15); border-color:rgba(201,163,94,0.2); }
-.pdex-card:active { transform:scale(0.97); transition:transform 0.1s; }
-.pdex-card.undiscovered { opacity:0.42; }
-.pdex-card.undiscovered:hover { transform:none; opacity:0.55; }
+/* Shimmer sweep on hover */
+.pdex-card::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:10;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+  background-size:200% 100%; background-position:200% 0;
+  transition: background-position 0.5s ease; border-radius:10px;
+}
+.pdex-card:hover::after { background-position:-20% 0; }
+.pdex-card:hover {
+  transform:translateY(-4px) scale(1.015);
+  box-shadow:0 14px 36px rgba(0,0,0,0.65), 0 0 0 0.5px rgba(201,163,94,0.22);
+  border-color:rgba(201,163,94,0.22);
+}
+.pdex-card:active { transform:scale(0.97); transition:transform 0.08s; }
+.pdex-card.undiscovered { opacity:0.38; filter:grayscale(0.3); }
+.pdex-card.undiscovered:hover { transform:none; opacity:0.52; }
 
 .pdex-img {
-  width:100%; height:96px;
+  width:100%; height:108px;
   background: linear-gradient(160deg, var(--ink-2), var(--ink));
   display:flex; align-items:center; justify-content:center;
   position:relative; overflow:hidden;
@@ -386,41 +404,41 @@ html,body {
 /* inner hairline engraving border */
 .pdex-img::before {
   content:''; position:absolute; inset:5px; z-index:1; pointer-events:none;
-  border:0.5px solid var(--brass); opacity:0.15; border-radius:2px;
+  border:0.5px solid var(--brass); opacity:0.13; border-radius:3px;
 }
 /* scan line texture */
-.pdex-img::after {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
-  opacity:0.4;
+.pdex-img .scanlines {
+  position:absolute; inset:0; pointer-events:none; z-index:2;
+  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.14) 0 1px, transparent 1px 3px);
+  opacity:0.35;
 }
-.pdex-img img { width:100%; height:96px; object-fit:cover; transition:transform 0.3s; }
-.pdex-card:hover .pdex-img img { transform:scale(1.04); }
+.pdex-img img { width:100%; height:108px; object-fit:cover; transition:transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94); }
+.pdex-card:hover .pdex-img img { transform:scale(1.06); }
+/* Vignette on image bottom */
+.pdex-img .img-vignette {
+  position:absolute; bottom:0; left:0; right:0; height:50%; z-index:3;
+  background:linear-gradient(0deg,rgba(14,20,16,0.75) 0%,transparent 100%);
+  pointer-events:none;
+}
 .pdex-num {
-  position:absolute; top:5px; left:5px; z-index:2;
-  background:rgba(14,20,16,0.82); backdrop-filter:blur(6px);
-  border-radius:2px; padding:1px 5px; border:0.5px solid var(--line-2);
+  position:absolute; top:6px; left:6px; z-index:4;
+  background:rgba(14,20,16,0.82); backdrop-filter:blur(8px);
+  border-radius:3px; padding:2px 6px; border:0.5px solid rgba(201,163,94,0.2);
   font-family:var(--mono); font-size:7px; color:var(--brass); letter-spacing:0.08em;
 }
-/* "FROM LIFE" caption bottom-right */
-.pdex-plate-caption {
-  position:absolute; bottom:5px; right:6px; z-index:2;
-  font-family:var(--mono); font-size:6.5px; color:var(--paper-dim);
-  letter-spacing:0.18em; text-transform:uppercase; opacity:0.5;
-}
-.pdex-body { padding:7px 8px 9px; min-height:52px; display:flex; flex-direction:column; }
-.pdex-name { font-family:var(--serif); font-size:12px; font-weight:500; color:var(--paper); line-height:1.2; margin-bottom:1px; }
+.pdex-body { padding:8px 9px 10px; min-height:52px; display:flex; flex-direction:column; }
+.pdex-name { font-family:var(--serif); font-size:13px; font-weight:500; color:var(--paper); line-height:1.2; margin-bottom:1px; }
 .pdex-species { font-size:9px; color:var(--sage-dim); font-style:italic; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:var(--body); }
 .pdex-tags { display:flex; gap:3px; flex-wrap:wrap; }
 
-/* collected check mark */
+/* collected check mark — with pulse ring */
 .pdex-collected-mark {
-  position:absolute; top:5px; right:5px; z-index:2;
-  width:15px; height:15px; border-radius:50%;
+  position:absolute; top:6px; right:6px; z-index:4;
+  width:17px; height:17px; border-radius:50%;
   background: radial-gradient(circle at 35% 30%, var(--brass-hi), var(--brass) 60%, var(--brass-lo));
   border:0.5px solid var(--brass-lo);
   display:flex; align-items:center; justify-content:center;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 8px rgba(201,163,94,0.25);
 }
 
 /* ── TAGS ────────────────────────────────────────── */
@@ -451,7 +469,6 @@ html,body {
 .tag-verylarge{background:rgba(201,163,94,0.06);color:var(--brass-hi);border-color:rgba(201,163,94,0.12);}
 .tag-geo{background:rgba(143,168,136,0.08);color:var(--sage);border-color:rgba(143,168,136,0.15);}
 
-.undiscovered-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:var(--paper-dim); z-index:1; }
 
 /* ── JOURNAL / CATALOGUE VIEW ───────────────────── */
 .search-wrap { position:relative; flex:1; }
@@ -463,50 +480,10 @@ html,body {
 .search-input:focus { border-color:var(--brass); box-shadow:0 0 0 3px rgba(201,163,94,0.08); background:rgba(0,0,0,0.4); }
 .search-input::placeholder { color:var(--sage-dim); font-style:italic; opacity:0.6; }
 
-.cat-tabs-wrap { background:var(--ink); padding:0 0 6px; border-bottom:0.5px solid var(--line); }
-.cat-tabs { display:flex; gap:0; overflow-x:auto; scrollbar-width:none; padding:0 16px; }
-.cat-tabs::-webkit-scrollbar { display:none; }
-.cat-tab {
-  padding:8px 12px 8px 0; border:none; background:none; cursor:pointer;
-  white-space:nowrap; flex-shrink:0; transition:color 0.2s, opacity 0.2s;
-  position:relative; display:flex; align-items:baseline; gap:5px;
-  color:var(--paper-dim); opacity:0.55;
-}
-.cat-tab:hover { opacity:0.75; }
-.cat-tab.active { color:var(--paper); opacity:1; }
-.cat-tab .cat-tab-label { font-family:var(--serif); font-size:14px; font-weight:500; }
-.cat-tab .cat-tab-count { font-family:var(--mono); font-size:9px; color:var(--brass); }
-.cat-tab .cat-tab-line {
-  position:absolute; left:0; right:12px; bottom:-1px; height:1.5px;
-  background:linear-gradient(90deg,var(--brass-hi),var(--brass) 70%,transparent);
-  display:none;
-}
-.cat-tab.active .cat-tab-line { display:block; }
 
-.cat-list { padding:0 14px 80px; overflow-y:auto; flex:1; }
 #view-codex { display:none; flex-direction:column; }
 #view-codex.active { display:flex; }
-.cat-section-header {
-  font-family:var(--serif); font-size:15px; font-weight:500; font-style:italic;
-  color:var(--brass-hi); padding:16px 0 10px; display:flex; align-items:center; gap:8px;
-  position:sticky; top:0; z-index:7;
-  background:linear-gradient(180deg,var(--ink) 80%,rgba(14,20,16,0));
-}
-.cat-section-header::after { content:''; flex:1; height:0.5px; background:linear-gradient(90deg,rgba(201,163,94,0.2),transparent); }
 .cat-section-count { font-family:var(--mono); font-size:8px; letter-spacing:0.1em; color:var(--sage-dim); font-weight:400; }
-.cat-row {
-  display:flex; align-items:center; gap:12px;
-  background:var(--ink-1); border:0.5px solid var(--line); border-radius:8px;
-  padding:10px 12px; margin-bottom:5px; cursor:pointer; transition:all 0.2s;
-}
-.cat-row:hover { border-color:var(--line-2); transform:translateX(3px); background:var(--ink-2); }
-.cat-row-thumb { width:46px; height:46px; border-radius:6px; background:var(--ink-2); overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; border:0.5px solid var(--line); }
-.cat-row-thumb img { width:46px; height:46px; object-fit:cover; }
-.cat-row-info { flex:1; min-width:0; }
-.cat-row-name { font-family:var(--serif); font-size:15px; font-weight:500; color:var(--paper); line-height:1.15; }
-.cat-row-sub { font-size:10px; color:var(--sage-dim); font-style:italic; margin:1px 0 4px; font-family:var(--body); }
-.cat-row-tags { display:flex; gap:4px; flex-wrap:wrap; }
-.cat-row-date { font-family:var(--mono); font-size:9px; color:var(--sage-dim); flex-shrink:0; text-align:right; letter-spacing:0.06em; }
 
 @keyframes login-rise { from{opacity:0;transform:translateY(24px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
 
@@ -859,7 +836,6 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 .sidebar-item svg { width:17px; height:17px; flex-shrink:0; color:var(--sage-dim); }
 
 /* MIGRATION */
-.migrate-view { padding:16px 14px 24px; }
 .migrate-month-header { font-family:var(--serif); font-size:22px; font-style:italic; color:var(--paper); margin-bottom:4px; }
 .migrate-subtitle { font-family:var(--sans); font-size:11px; color:var(--sage-dim); margin-bottom:16px; }
 .migrate-month-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
@@ -908,6 +884,48 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 
 /* MICRO-ANIMATIONS */
 @keyframes rippleOut { 0%{transform:scale(0);opacity:1;} 100%{transform:scale(3.5);opacity:0;} }
+
+/* Section header reveal */
+@keyframes section-slide-in {
+  from { opacity:0; transform:translateX(-12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.pokedex-section.in-view .section-title { animation:section-slide-in 0.45s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+.pokedex-section.in-view .section-order-label { animation:section-slide-in 0.4s 0.05s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+
+/* Tab active glow */
+.pdex-tab.active .pdex-tab-label {
+  text-shadow: 0 0 18px rgba(232,220,196,0.25);
+}
+
+/* Topbar stat pulse when count changes */
+@keyframes stat-bump {
+  0%   { transform:scale(1); color:var(--brass-hi); }
+  40%  { transform:scale(1.35); color:#fff; }
+  70%  { transform:scale(0.95); }
+  100% { transform:scale(1); color:var(--brass-hi); }
+}
+.stat-bumping { animation: stat-bump 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* Detail modal hero image parallax-ish zoom */
+.detail-hero-zoom { transition:transform 0.6s ease; }
+.detail-hero-zoom:hover { transform:scale(1.02); }
+
+/* Wax badge entrance */
+@keyframes wax-pop {
+  0%  { opacity:0; transform:scale(0.7) rotate(-4deg); }
+  65% { transform:scale(1.06) rotate(1deg); }
+  100%{ opacity:1; transform:scale(1) rotate(0deg); }
+}
+.wax-badge { animation:wax-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* Section ornament line draw */
+@keyframes line-draw { from{transform:scaleX(0);transform-origin:left;} to{transform:scaleX(1);} }
+.pokedex-section.in-view .section-ornament-line { animation:line-draw 0.5s ease both; }
+
+/* Card image load fade-in */
+.pdex-img img { opacity:0; transition:opacity 0.35s ease, transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94); }
+.pdex-img img.loaded { opacity:1; }
 @keyframes fireGlow { 0%,100%{text-shadow:0 0 6px rgba(201,163,94,0.15),0 0 12px rgba(201,163,94,0.08);} 50%{text-shadow:0 0 14px rgba(227,191,122,0.3),0 0 28px rgba(201,163,94,0.18);} }
 @keyframes syncPulse { 0%{transform:scale(1);box-shadow:0 0 0 0 rgba(143,168,136,0.6);} 50%{transform:scale(1.4);box-shadow:0 0 0 6px rgba(143,168,136,0);} 100%{transform:scale(1);box-shadow:0 0 0 0 rgba(143,168,136,0);} }
 @keyframes iucnShimmer { 0%{opacity:0;transform:scale(0.85);} 60%{opacity:1;transform:scale(1.08);} 100%{opacity:1;transform:scale(1);} }
@@ -1405,28 +1423,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
           <div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;text-align:center;max-width:240px;">Choose a photo — we'll identify the bird and press it into your codex.</div>
         </div>
       </div>
-      <!-- Recent library thumbnails (decorative + trigger) -->
-      <div style="margin-top:16px;">
-        <div style="font-family:var(--mono);font-size:8.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;">Recent from your library</div>
-        <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px;" class="no-scrollbar">
-          <label style="width:76px;height:76px;flex-shrink:0;border-radius:8px;background:linear-gradient(165deg,#3F4636 0%,#15191A 100%);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;">
-            <input type="file" accept="image/*" onchange="handlePhoto(event);" style="display:none;"/>
-            <svg viewBox="0 0 60 55" fill="#0a0d0a" width="28" height="28" opacity="0.5"><ellipse cx="28" cy="30" rx="13" ry="9"/><circle cx="38" cy="20" r="7"/><path d="M38 20L50 16L48 23Z"/></svg>
-          </label>
-          <label style="width:76px;height:76px;flex-shrink:0;border-radius:8px;background:linear-gradient(165deg,#4A5A3F 0%,#15191A 100%);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            <input type="file" accept="image/*" onchange="handlePhoto(event);" style="display:none;"/>
-            <svg viewBox="0 0 60 60" fill="#0a0d0a" width="28" height="28" opacity="0.5"><path d="M34 6C32 9 28 10 24 8C20 14 22 20 26 22L24 30L22 44C20 48 22 54 26 52L28 44L30 36L32 44L34 52C38 54 40 48 38 44L36 30L34 22C38 20 40 14 36 8Z"/><circle cx="36" cy="10" r="5"/></svg>
-          </label>
-          <label style="width:76px;height:76px;flex-shrink:0;border-radius:8px;background:linear-gradient(165deg,#534639 0%,#15191A 100%);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            <input type="file" accept="image/*" onchange="handlePhoto(event);" style="display:none;"/>
-            <svg viewBox="0 0 60 50" fill="#0a0d0a" width="28" height="28" opacity="0.5"><path d="M30 8C26 10 18 7 10 14C6 18 8 24 14 22C18 20 22 22 24 26L26 34L24 44L28 43L30 36L32 43L36 44L34 34L36 26C38 22 42 20 46 22C52 24 54 18 50 14C42 7 34 10 30 8Z"/></svg>
-          </label>
-          <label style="width:76px;height:76px;flex-shrink:0;border-radius:8px;background:linear-gradient(165deg,#39474F 0%,#15191A 100%);border:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-            <input type="file" accept="image/*" onchange="handlePhoto(event);" style="display:none;"/>
-            <svg viewBox="0 0 60 55" fill="#0a0d0a" width="28" height="28" opacity="0.5"><ellipse cx="28" cy="30" rx="13" ry="9"/><circle cx="38" cy="20" r="7"/></svg>
-          </label>
-        </div>
-      </div>
+
     </div>
 
     <!-- STEP 1: Identifying -->
@@ -1450,11 +1447,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
         <!-- Scan progress fill (tinted band behind the line) -->
         <div id="scan-fill" style="position:absolute;left:0;right:0;top:0;height:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(227,191,122,0.04) 0%,rgba(227,191,122,0.01) 100%);opacity:0;transition:opacity 0.3s;"></div>
 
-        <!-- Corner brackets overlaid on scan -->
-        <svg style="position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;" preserveAspectRatio="none">
-          <path d="M16 16 L16 30 M16 16 L30 16" stroke="rgba(227,191,122,0.5)" stroke-width="1.5" fill="none"/>
-          <path d="M84% 16 L84% 30" stroke="rgba(227,191,122,0.5)" stroke-width="1.5" fill="none"/>
-        </svg>
+        <!-- Corner brackets are handled by the absolute-positioned divs below -->
         <div style="position:absolute;top:12px;left:12px;z-index:5;pointer-events:none;">
           <svg width="20" height="20" viewBox="0 0 20 20"><path d="M0 0 L0 8 M0 0 L8 0" stroke="rgba(227,191,122,0.55)" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
         </div>
@@ -1483,10 +1476,6 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
         </div>
       </div>
       <div id="exif-bar" class="exif-bar" style="margin-top:10px;"></div>
-      <div class="form-2col" id="geo-row" style="display:none;margin-top:10px;">
-        <div class="form-group"><label>Latitude</label><input type="text" id="f-lat" placeholder="12.9716"/></div>
-        <div class="form-group"><label>Longitude</label><input type="text" id="f-lng" placeholder="77.5946"/></div>
-      </div>
     </div>
 
     <!-- STEP 2: Confirm / Fill details -->
@@ -1682,7 +1671,8 @@ var currentMigrateMonth = new Date().getMonth();
 var currentPhotoBase64 = null;
 var locationResolved = false;
 var locationPromise = null;
-var ebirdCache = {};
+var userLat = null, userLng = null;
+var ebirdCache = {}; // v2 - clears stale dist=100 cache
 // ═══════════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════════
@@ -1860,10 +1850,7 @@ function normalizeBird(s) {
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
-// ═══════════════════════════════════════════════════════════════════
-function habitatEmoji(h){ const m={Songbird:'🐦',Raptor:'🦅',Waterbird:'🦆',Wader:'🐦',Owl:'🦉',Parrot:'🦜',Pigeon:'🕊️',Woodpecker:'🐦',Seabird:'🌊',Game:'🐓','Bee-eater':'🐦',Kingfisher:'🐦',Roller:'🐦',Swift:'🐦',Cuckoo:'🐦',Nightjar:'🌙',Crow:'🐦',Flycatcher:'🐦',Unknown:'🐦'}; return m[h]||'🐦'; }
-function typeClass(t){ const m={Raptor:'raptor',Waterbird:'waterbird',Songbird:'songbird',Wader:'wader',Seabird:'seabird',Pigeon:'pigeon',Woodpecker:'woodpecker',Owl:'owl',Parrot:'parrot',Game:'game','Bee-eater':'bee-eater',Kingfisher:'kingfisher',Roller:'roller',Swift:'swift',Cuckoo:'cuckoo',Nightjar:'nightjar',Crow:'crow',Flycatcher:'flycatcher'}; return m[t]||'unknown'; }
-function sizeClass(s){ const m={'Small':'small','Medium':'medium','Large':'large','Very Large':'verylarge'}; return m[s]||'small'; }
+// ═══════════════════════════════════════════════════════════════════; return m[h]||'🐦'; }; return m[t]||'unknown'; }; return m[s]||'small'; }
 
 function updateStats() {
   document.getElementById('stat-total').textContent = birds.length;
@@ -1900,7 +1887,17 @@ function showToast(msg, type='success') {
 
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
-  // Remove modal-open if no modals remain open
+  // Stop any playing XC audio when detail modal closes
+  if (id === 'detail-modal') {
+    document.querySelectorAll('audio[id^="xc-audio-"]').forEach(function(a) {
+      if (!a.paused) {
+        a.pause();
+        var bid = a.id.replace('xc-audio-', '');
+        xcSetPlayIcon(bid, false);
+        xcStopWaveAnim(bid);
+      }
+    });
+  }
   var anyOpen = document.querySelectorAll('.modal-bg.open').length > 0;
   if (!anyOpen) document.body.classList.remove('modal-open');
   if (id === 'add-modal') {
@@ -1995,7 +1992,7 @@ function renderPokedex() {
     let tabHtml = '';
     categories.forEach((cat, i) => {
       const shortLabel = cat.label.replace(/^[^\w]*\s/, '');
-      tabHtml += `<button class="pdex-tab${i === 0 ? ' active' : ''}${cat.capturedCount > 0 ? ' has-birds' : ''}" onclick="scrollToPdexSection('pdex-sec-${i}',this)"><span class="pdex-tab-label">${shortLabel}</span><span class="pdex-tab-frac">${cat.capturedCount}/${cat.allInType.length}</span><div class="pdex-tab-underline"></div></button>`;
+      tabHtml += `<button class="pdex-tab${i === 0 ? ' active' : ''}${cat.capturedCount > 0 ? ' has-birds' : ''}" onclick="scrollToPdexSection('pdex-sec-${i}',this)"><span class="pdex-tab-label">${shortLabel}</span><span class="pdex-tab-frac">${cat.capturedCount}/${cat.allInType.length}</span><div class="pdex-tab-underline"></div><div class="tab-ink-pool"></div></button>`;
       _pdexTabCategories[i] = cat.types;
     });
     tabsEl.innerHTML = tabHtml;
@@ -2163,6 +2160,24 @@ function renderPokedex() {
   </div>`;
 
   document.getElementById('pdex-grid-area').innerHTML = html;
+
+  // Add image load fade-in
+  document.querySelectorAll('.pdex-img img').forEach(function(img) {
+    if (img.complete) { img.classList.add('loaded'); }
+    else { img.onload = function() { img.classList.add('loaded'); }; }
+  });
+
+  // Section entrance animations via IntersectionObserver
+  if (window._sectionObserver) window._sectionObserver.disconnect();
+  window._sectionObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) e.target.classList.add('in-view');
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+  document.querySelectorAll('.pokedex-section').forEach(function(s) {
+    window._sectionObserver.observe(s);
+  });
+
   setupPdexScrollSpy();
 }
 
@@ -2185,43 +2200,65 @@ function togglePdexUnseen(id, btn) {
 }
 
 function scrollToPdexSection(id, tabEl) {
+  // Mark active tab immediately
   document.querySelectorAll('.pdex-tab').forEach(t => t.classList.remove('active'));
   tabEl.classList.add('active');
-  tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
   const section = document.getElementById(id);
   if (!section) return;
-  // .content is the real scroller — codex-content does not scroll
+  // Pause scroll spy to avoid fighting
   const scroller = document.getElementById('content');
-  if (!scroller) return;
-  requestAnimationFrame(function() {
-    const tabsWrap = document.querySelector('.pdex-tabs-wrap');
-    const tabsH = tabsWrap ? tabsWrap.offsetHeight : 56;
-    const scrollerRect = scroller.getBoundingClientRect();
-    const sectionRect = section.getBoundingClientRect();
-    const target = scroller.scrollTop + (sectionRect.top - scrollerRect.top) - tabsH - 4;
-    scroller.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
-  });
+  if (scroller && window._pdexScrollHandler) {
+    scroller.removeEventListener('scroll', window._pdexScrollHandler);
+  }
+  // Measure the sticky header height and set scroll-margin-top so
+  // scrollIntoView lands exactly below it — no manual rect math needed
+  const tabsWrap = document.querySelector('.pdex-tabs-wrap');
+  const tabsH = tabsWrap ? tabsWrap.offsetHeight : 56;
+  section.style.scrollMarginTop = (tabsH + 4) + 'px';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Keep tab strip in sync after scroll settles
+  setTimeout(function() {
+    tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    setupPdexScrollSpy();
+  }, 500);
 }
 
 function setupPdexScrollSpy() {
-  // .content is the real scroller
   const scroller = document.getElementById('content');
   if (!scroller) return;
-  const sections = document.querySelectorAll('.pokedex-section[id^="pdex-sec-"]');
-  if (!sections.length) return;
-  if (window._pdexObserver) window._pdexObserver.disconnect();
-  window._pdexObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const idx = entry.target.id.replace('pdex-sec-', '');
-        const tabs = document.querySelectorAll('.pdex-tab');
-        tabs.forEach((t, i) => t.classList.toggle('active', i === parseInt(idx)));
-        const activeTab = tabs[parseInt(idx)];
-        if (activeTab) activeTab.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  // Clean up previous listener
+  if (window._pdexScrollHandler) scroller.removeEventListener('scroll', window._pdexScrollHandler);
+  if (window._pdexObserver) { window._pdexObserver.disconnect(); window._pdexObserver = null; }
+
+  window._pdexScrollHandler = function() {
+    const sections = document.querySelectorAll('.pokedex-section[id^="pdex-sec-"]');
+    if (!sections.length) return;
+    const tabsWrap = document.querySelector('.pdex-tabs-wrap');
+    const tabsH = tabsWrap ? tabsWrap.offsetHeight : 56;
+    const scrollerTop = scroller.getBoundingClientRect().top;
+    // Find the section whose top is closest to just below the sticky header
+    const threshold = scrollerTop + tabsH + 8;
+    let activeIdx = 0;
+    sections.forEach(function(sec, i) {
+      const top = sec.getBoundingClientRect().top;
+      // Section is considered active if its top has passed the threshold
+      if (top <= threshold + 20) activeIdx = i;
+    });
+    // Update tabs without triggering scroll (use _pdexTabSetActive)
+    const tabs = document.querySelectorAll('.pdex-tab');
+    tabs.forEach(function(t, i) {
+      const wasActive = t.classList.contains('active');
+      t.classList.toggle('active', i === activeIdx);
+      // Scroll tab into view only if it just became active
+      if (!wasActive && i === activeIdx) {
+        t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
       }
     });
-  }, { root: scroller, rootMargin: '-60px 0px -65% 0px', threshold: 0 });
-  sections.forEach(s => window._pdexObserver.observe(s));
+  };
+
+  scroller.addEventListener('scroll', window._pdexScrollHandler, { passive: true });
+  // Run once immediately to set initial state
+  window._pdexScrollHandler();
 }
 
 let currentUndiscoveredName = '', currentUndiscoveredSpecies = '', currentUndiscoveredType = '';
@@ -2248,41 +2285,6 @@ function openAddForBird(name, species, type) {
   }, 50);
 }
 // ═══════════════════════════════════════════════════════════════════
-// CATALOGUE
-// ═══════════════════════════════════════════════════════════════════
-function scrollToCatSection(id, tabEl) {
-  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-  tabEl.classList.add('active');
-  tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-  if (id === 'all') { var cc = document.getElementById('codex-content'); if (cc) cc.scrollTop = 0; return; }
-  const section = document.getElementById(id);
-  if (section) {
-    const content = document.querySelector('.content');
-    const offset = section.offsetTop - 100;
-    content.scrollTo({ top: offset, behavior: 'smooth' });
-  }
-}
-
-function setupCatScrollSpy() {
-  const content = document.querySelector('.content');
-  if (!content) return;
-  const sections = document.querySelectorAll('.cat-section-header');
-  if (!sections.length) return;
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const idx = entry.target.id.replace('cat-sec-', '');
-        const tabs = document.querySelectorAll('.cat-tab');
-        tabs.forEach((t, i) => t.classList.toggle('active', i === parseInt(idx) + 1));
-      }
-    });
-  }, { root: content, rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-  sections.forEach(s => observer.observe(s));
-}
-
-function setTypeFilter() {}
-
-// ═══════════════════════════════════════════════════════════════════
 // MAP
 // ═══════════════════════════════════════════════════════════════════
 // ── Leaflet map instance ──────────────────────────────────────────
@@ -2294,7 +2296,6 @@ function initMap() {
   if (!el) return;
 
   var geoBirds = birds.filter(function(b){ return b.lat && b.lng; });
-  if (infoBar) infoBar.textContent = geoBirds.length + ' of ' + birds.length + ' sightings geotagged';
 
   // If already initialised, just refresh markers
   if (_leafletMap) {
@@ -2308,10 +2309,11 @@ function initMap() {
   el.style.minHeight = (window.innerHeight - 140) + 'px';
 
   // Centre on user or Bengaluru
-  var lat = userLat || 12.9716, lng = userLng || 77.5946;
+  var lat = userLat, lng = userLng;
+    if (!lat || !lng) { return; } // no location yet
 
   _leafletMap = L.map('map-el', {
-    center: [lat, lng], zoom: 12,
+    center: [lat, lng], zoom: 13,
     zoomControl: false,
     attributionControl: true,
   });
@@ -2419,189 +2421,142 @@ function openDetail(id) {
   ).join('');
 
   document.getElementById('detail-content').innerHTML = `
-    <!-- FOLIO header -->
-    <div style="padding:8px 18px 0;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-family:var(--mono);font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim);">FOLIO · NO. ${plateNum}</span>
-    </div>
-
-    <!-- Image plate with contour bg, corner brackets, PLATE/FROM LIFE labels -->
-    <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="margin:8px 16px 0;border-radius:10px;overflow:hidden;border:0.5px solid var(--line-2);position:relative;cursor:zoom-in;min-height:220px;background:linear-gradient(165deg,${b.type?({'Raptor':'#3A3128','Waterbird':'#2A3A42','Wader':'#2A3830','Owl':'#2E2C1C','Kingfisher':'#1E2C3A','Songbird':'#2A3428'}[b.type]||'#252D26'):'#252D26'} 0%,var(--ink) 100%);display:flex;align-items:center;justify-content:center;">
-      <!-- Contour rings -->
-      <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.09;">
+    <!-- Image plate -->
+    <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="margin:0;position:relative;cursor:zoom-in;min-height:220px;background:linear-gradient(165deg,${b.type?({'Raptor':'#3A3128','Waterbird':'#2A3A42','Wader':'#2A3830','Owl':'#2E2C1C','Kingfisher':'#1E2C3A','Songbird':'#2A3428'}[b.type]||'#252D26'):'#252D26'} 0%,var(--ink) 100%);display:flex;align-items:center;justify-content:center;">
+      <svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.08;">
         ${[18,32,48,66,86,108].map((r,i) => `<ellipse cx="150" cy="110" rx="${r}" ry="${Math.round(r*0.78)}" fill="none" stroke="${i%2===0?'var(--brass)':'var(--paper-dim)'}" stroke-width="${i%2===0?'0.5':'0.35'}"/>`).join('')}
       </svg>
-      <!-- Inner hairline -->
-      <div style="position:absolute;inset:8px;border:0.5px solid var(--brass);opacity:0.18;pointer-events:none;border-radius:4px;"></div>
-      <!-- Corner brackets -->
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;left:12px;"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.6"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;right:12px;transform:scaleX(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.6"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;left:12px;transform:scaleY(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.6"/></svg>
-      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;right:12px;transform:scale(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.6"/></svg>
-      <!-- Photo or silhouette -->
+      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;left:12px;"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;top:12px;right:12px;transform:scaleX(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;left:12px;transform:scaleY(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" style="position:absolute;bottom:28px;right:12px;transform:scale(-1)"><path d="M0 0L0 8M0 0L8 0" stroke="var(--brass-hi)" stroke-width="1.1" opacity="0.5"/></svg>
       ${b.photo
-        ? `<img src="${b.photo}" alt="${b.name}" style="width:100%;max-height:260px;object-fit:contain;display:block;position:relative;z-index:1;" onclick="event.stopPropagation();openLightbox('${b.photo.replace(/'/g,"\\'")}','${(b.name||'').replace(/'/g,"\\'")}');"/>`
+        ? `<img src="${b.photo}" alt="${b.name}" style="width:100%;max-height:260px;object-fit:contain;display:block;position:relative;z-index:1;" onclick="event.stopPropagation();openLightbox('${b.photo.replace(/'/g,"\'")}','${(b.name||'').replace(/'/g,"\'")}');"/>`
         : `<div style="width:110px;height:110px;color:#0a0d0a;opacity:0.35;position:relative;z-index:1;">${SILHOUETTES[b.type]||SILHOUETTES.Unknown}</div>`
       }
-      <!-- Bottom labels -->
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:6px 12px;display:flex;justify-content:space-between;background:linear-gradient(0deg,rgba(14,20,16,0.6) 0%,transparent 100%);z-index:2;">
-        <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);opacity:0.8;">PLATE · No. ${plateNum}</span>
-        <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:var(--paper-dim);opacity:0.55;">FROM LIFE</span>
+      <!-- Bottom strip: plate number + type tag -->
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(0deg,rgba(14,20,16,0.7) 0%,transparent 100%);z-index:2;">
+        <span style="font-family:var(--mono);font-size:7px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);opacity:0.8;">FOLIO · ${plateNum}</span>
+        ${b.type ? `<span style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:var(--paper-dim);opacity:0.6;">${b.type}</span>` : ''}
       </div>
     </div>
 
     <div class="detail-body">
-      <!-- Name -->
+
+      <!-- ① NAME + SCIENTIFIC + IUCN — identity block -->
       <div>
         <div style="font-family:var(--serif);font-size:30px;font-weight:500;color:var(--paper);letter-spacing:-0.3px;line-height:1.05;">${nameFirst} <em style="color:var(--brass-hi);font-style:italic;font-weight:400;">${nameLast}</em></div>
         <div style="font-family:var(--body);font-style:italic;font-size:15px;color:var(--sage);margin-top:3px;">${b.species || ''}</div>
-        ${iucnBadge(b) ? `<div style="margin-top:8px;">${iucnBadge(b)}</div>` : ''}
-      </div>
-
-      <!-- Taxonomy strip — 6 cells matching design -->
-      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Order</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);">${orderMap[b.type]||'Aves'}</div></div>
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Family</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);">${b.species?b.species.split(' ')[0]:'—'}</div></div>
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Length</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);">—</div></div>
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Wingspan</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);">${p.wingspan||'—'}</div></div>
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Status</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);">${p.conservation||'LC'}</div></div>
-          <div><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Voice</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.call?p.call.split('.')[0].split(',')[0].trim().slice(0,18):'—'}</div></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
+          ${iucnBadge(b) ? iucnBadge(b) : ''}
+          ${b.type ? `<span style="font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage-dim);padding:3px 7px;border:0.5px solid var(--line-2);border-radius:3px;">${b.type}</span>` : ''}
+          ${orderMap[b.type] ? `<span style="font-family:var(--mono);font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage-dim);padding:3px 7px;border:0.5px solid var(--line-2);border-radius:3px;">${orderMap[b.type]}</span>` : ''}
         </div>
-        ${b.lat && b.lng ? `<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--line);"><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:3px;">Coordinates</div><div style="font-family:var(--mono);font-size:10px;color:var(--sage);">${parseFloat(b.lat).toFixed(5)}, ${parseFloat(b.lng).toFixed(5)} <a href="https://www.openstreetmap.org/?mlat=${b.lat}&mlon=${b.lng}&zoom=15" target="_blank" style="color:var(--brass);margin-left:6px;">Open map ↗</a></div></div>` : ''}
       </div>
 
-      <!-- Spectrogram / Call section -->
-      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+      <!-- ⑥ NEAREST SIGHTING — eBird live -->
+      <div id="nearest-sighting-${id}" style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;opacity:0.7;">Nearest Sighting · eBird Live</div>
+        <div id="nearest-content-${id}" style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);">Searching nearby…</div>
+      </div>
+
+      <!-- ⑦ LOCAL ACTIVITY — eBird live -->
+      <div id="barchart-${id}" style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;opacity:0.7;">Local Activity · eBird Live</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="barchart-inner-${id}">
+          <div style="background:var(--ink-2);border-radius:6px;padding:9px 10px;border:0.5px solid var(--line-2);display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;">Last seen</div>
+            <div style="font-family:var(--serif);font-size:18px;color:var(--paper);font-weight:500;line-height:1.1;">—</div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">loading…</div>
+          </div>
+          <div style="background:var(--ink-2);border-radius:6px;padding:9px 10px;border:0.5px solid var(--line-2);display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;">Sightings</div>
+            <div style="font-family:var(--serif);font-size:18px;color:var(--paper);font-weight:500;line-height:1.1;">—</div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">past 30 days</div>
+          </div>
+          <div style="background:var(--ink-2);border-radius:6px;padding:9px 10px;border:0.5px solid var(--line-2);display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;">Peak time</div>
+            <div style="font-family:var(--serif);font-size:18px;color:var(--paper);font-weight:500;line-height:1.1;">—</div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">of day</div>
+          </div>
+          <div style="background:var(--ink-2);border-radius:6px;padding:9px 10px;border:0.5px solid var(--line-2);display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;">Max count</div>
+            <div style="font-family:var(--serif);font-size:18px;color:var(--paper);font-weight:500;line-height:1.1;">—</div>
+            <div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">in one sighting</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ④ CALL RECORDING — Xeno-canto live -->
+      <div id="xc-player-${id}" style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <div>
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);">Call · Spectrogram</div>
-            <div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:2px;">Recorded · Macaulay Library</div>
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);">Call Recording</div>
+            <div id="xc-source-${id}" style="font-family:var(--body);font-style:italic;font-size:11px;color:var(--paper-dim);margin-top:2px;">Loading from Xeno-canto…</div>
           </div>
-          <div style="width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 60%,var(--brass-lo));border:0.5px solid var(--brass-lo);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3);cursor:pointer;">
-            <svg width="11" height="13" viewBox="0 0 11 13"><path d="M0 0 L11 6.5 L0 13 Z" fill="#1A1410"/></svg>
+          <button id="xc-play-btn-${id}" onclick="toggleXcPlay('${id}')" style="width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 60%,var(--brass-lo));border:0.5px solid var(--brass-lo);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),0 2px 8px rgba(201,163,94,0.2);cursor:pointer;flex-shrink:0;transition:transform 0.15s,box-shadow 0.15s;">
+            <svg id="xc-play-icon-${id}" width="11" height="13" viewBox="0 0 11 13"><path d="M0 0 L11 6.5 L0 13 Z" fill="#1A1410"/></svg>
+          </button>
+        </div>
+        <div id="xc-wave-${id}" style="display:flex;align-items:center;gap:2px;height:44px;padding:0 2px;cursor:pointer;" onclick="toggleXcPlay('${id}')">
+          ${sonoHeights.map((h,wi) => `<div class="xc-bar" data-h="${h}" style="flex:1;min-width:2px;background:linear-gradient(180deg,var(--brass-hi),var(--brass));border-radius:1.5px;height:${h}px;opacity:0.7;transition:height 0.1s ease,opacity 0.1s;"></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <span id="xc-time-${id}" style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">0:00</span>
+          <div id="xc-progress-wrap-${id}" style="flex:1;height:2px;background:rgba(201,163,94,0.1);border-radius:1px;margin:0 10px;cursor:pointer;" onclick="xcSeek(event,'${id}')">
+            <div id="xc-progress-${id}" style="height:100%;width:0%;background:var(--brass-hi);border-radius:1px;transition:width 0.25s linear;"></div>
           </div>
+          <span id="xc-dur-${id}" style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">--:--</span>
         </div>
-        <!-- Bars -->
-        <div style="display:flex;align-items:flex-end;gap:1.5px;height:44px;padding:0 2px;">${sonoBars}</div>
-        <div style="display:flex;justify-content:space-between;margin-top:5px;">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">0.0s</span>
-          <span style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">2.4s</span>
-          <span style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);">4.8s</span>
-        </div>
+        <audio id="xc-audio-${id}" preload="none" onended="xcEnded('${id}')" ontimeupdate="xcTimeUpdate('${id}')" onloadedmetadata="xcMeta('${id}')"></audio>
       </div>
 
-      <!-- Field marks — numbered list -->
+      <!-- ⑤ YOUR SIGHTING — user-recorded data -->
+      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;opacity:0.7;">Your Sightings · ${birdSightings.length} recorded</div>
+        ${birdSightings.length > 0
+          ? birdSightings.map(s => `
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:6px;margin-bottom:5px;">
+              <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--brass);letter-spacing:0.1em;flex-shrink:0;">${s.date ? new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}).toUpperCase() : '—'}</span>
+              <span style="font-family:var(--body);font-size:13px;color:var(--paper-dim);font-style:italic;flex:1;">${s.location||'Location unrecorded'}</span>
+              ${s.lat && s.lng ? `<a href="https://www.openstreetmap.org/?mlat=${s.lat}&mlon=${s.lng}&zoom=15" target="_blank" style="font-family:var(--mono);font-size:8px;color:var(--sage);text-decoration:none;">GPS ↗</a>` : ''}
+            </div>`).join('')
+          : `<div style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);padding:4px 0;">No sightings recorded yet.</div>`
+        }
+        ${b.notes ? `<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--line);"><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:6px;">Field Notes</div><div class="notes-box">${b.notes}</div></div>` : ''}
+      </div>
+
+      <!-- ② TAXONOMY — species profile data (Gemini/preloaded) -->
+      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;opacity:0.7;">Species Profile · Gemini AI</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${p.wingspan ? `<div style="display:flex;gap:12px;"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);flex-shrink:0;min-width:72px;padding-top:2px;">Wingspan</span><span style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--paper);line-height:1.4;">${p.wingspan}</span></div>` : ''}
+          ${p.habitat ? `<div style="display:flex;gap:12px;"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);flex-shrink:0;min-width:72px;padding-top:2px;">Habitat</span><span style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--paper);line-height:1.4;">${p.habitat.split('.')[0].trim()}</span></div>` : ''}
+          ${p.diet ? `<div style="display:flex;gap:12px;"><span style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);flex-shrink:0;min-width:72px;padding-top:2px;">Diet</span><span style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--paper);line-height:1.4;">${p.diet.split('.')[0].trim()}</span></div>` : ''}
+        </div>
+        ${p.range ? `<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--line);"><div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:4px;">Range</div><div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);line-height:1.5;">${p.range}</div></div>` : ''}
+      </div>
+
+      <!-- ③ FIELD MARKS — species identification (Gemini/preloaded) -->
       ${fieldMarks.length > 0 ? `
-      <div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;">Field Marks</div>
+      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
+        <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;opacity:0.7;">Field Marks · Gemini AI</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           ${fieldMarks.map((mark,i) => `<div style="display:flex;gap:12px;align-items:flex-start;">
             <span style="font-family:var(--mono);font-size:9px;color:var(--brass);letter-spacing:0.12em;flex-shrink:0;margin-top:2px;">${String(i+1).padStart(2,'0')}</span>
             <span style="font-family:var(--body);font-style:italic;font-size:14px;color:var(--paper);line-height:1.4;">${mark}</span>
           </div>`).join('')}
         </div>
-      </div>` : ''}
-
-      <!-- Notes box if present -->
-      ${b.notes ? `<div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;">Field Notes</div>
-        <div class="notes-box">${b.notes}</div>
-      </div>` : ''}
-
-      <!-- Range map -->
-      <div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:12px 14px;">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;">Range · Indian Subcontinent</div>
-        <div style="position:relative;height:120px;overflow:hidden;border-radius:4px;">
-          <svg viewBox="0 0 200 120" style="width:100%;height:100%;" id="range-map-svg-${id}">
-            <!-- Subcontinent outline — abstract but recognisable -->
-            <path d="M50 5 Q55 8 60 14 L75 20 Q80 22 85 28 L100 38 Q105 45 108 55 L112 75 Q108 90 100 105 Q95 115 88 110 L80 95 Q70 80 65 65 Q58 55 50 45 Q40 35 38 20 Q42 8 50 5 Z"
-              fill="rgba(143,168,136,0.06)" stroke="var(--sage)" stroke-width="0.5" opacity="0.6"/>
-            <!-- Sri Lanka -->
-            <ellipse cx="98" cy="112" rx="5" ry="7" fill="none" stroke="var(--sage)" stroke-width="0.4" opacity="0.4"/>
-            ${(function(){
-              // Dynamic range fill based on bird type
-              var rangeByType = {
-                Raptor: 'M48 12 Q72 18 88 32 Q102 50 106 70 Q102 92 90 105 Q75 95 62 75 Q50 55 46 30 Z',
-                Waterbird: 'M55 22 Q70 26 82 35 Q95 50 100 70 Q95 90 85 100 Q75 95 68 80 Q60 65 55 45 Z',
-                Wader: 'M52 28 Q66 32 80 44 Q92 58 96 78 Q90 95 80 102 Q70 95 62 80 Q55 60 52 40 Z',
-                Songbird: 'M56 30 Q68 35 78 46 Q88 60 90 76 Q85 90 76 97 Q66 90 60 76 Q55 58 56 38 Z',
-                Owl: 'M50 20 Q65 25 78 38 Q90 54 92 72 Q86 88 76 96 Q64 88 57 72 Q52 54 50 34 Z',
-                Kingfisher: 'M58 26 Q71 30 82 42 Q93 56 96 74 Q90 90 80 100 Q70 92 63 76 Q57 58 58 36 Z',
-              };
-              var path = rangeByType[b.type] || rangeByType.Songbird;
-              return '<path d="' + path + '" fill="var(--brass)" opacity="0.25"/>' +
-                '<path d="' + path + '" fill="none" stroke="var(--brass-hi)" stroke-width="0.5" stroke-dasharray="2 1.5"/>';
-            })()}
-            <!-- Migration arrows for migratory types -->
-            ${(['Raptor','Waterbird','Wader'].includes(b.type) ?
-              '<path d="M90 105 Q100 80 110 50 Q115 30 105 15" fill="none" stroke="var(--brass-hi)" stroke-width="0.5" stroke-dasharray="1.5 1.5" opacity="0.6" marker-end="url(#arr)"/>' +
-              '<defs><marker id="arr" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0 0 L4 2 L0 4 Z" fill="rgba(201,163,94,0.6)"/></marker></defs>'
-              : '')}
-            <!-- Your sighting location dot -->
-            ${b.lat && b.lng ? (function(){
-              // Project lat/lng to SVG coordinates (rough subcontinent mapping)
-              // Subcontinent roughly: lat 8-37°N, lng 68-97°E → SVG 0-200, 0-120
-              var svgX = ((parseFloat(b.lng) - 68) / 29) * 90 + 42;
-              var svgY = 120 - ((parseFloat(b.lat) - 8) / 29) * 115;
-              svgX = Math.max(45, Math.min(115, svgX));
-              svgY = Math.max(10, Math.min(108, svgY));
-              return '<circle cx="' + svgX.toFixed(1) + '" cy="' + svgY.toFixed(1) + '" r="3.5" fill="var(--wax-hi)"/>' +
-                '<circle cx="' + svgX.toFixed(1) + '" cy="' + svgY.toFixed(1) + '" r="6" fill="none" stroke="var(--wax-hi)" stroke-width="0.5" opacity="0.6"/>' +
-                '<circle cx="' + svgX.toFixed(1) + '" cy="' + svgY.toFixed(1) + '" r="1.2" fill="var(--paper)"/>';
-            })() : '<circle cx="78" cy="68" r="3" fill="var(--wax-hi)"/><circle cx="78" cy="68" r="5.5" fill="none" stroke="var(--wax-hi)" stroke-width="0.5" opacity="0.6"/>'}
-          </svg>
-          <div style="position:absolute;bottom:5px;right:8px;display:flex;align-items:center;gap:4px;">
-            <div style="width:8px;height:8px;border-radius:2px;background:var(--brass);opacity:0.5;"></div>
-            <span style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--paper-dim);">
-              ${['Raptor','Waterbird','Wader'].includes(b.type) ? 'Winter visitor' : 'Resident'}
-            </span>
-          </div>
-        </div>
-        ${p.range ? `<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:8px;line-height:1.5;">${p.range}</div>` : ''}
-      </div>
-
-      <!-- Natural history facts -->
-      ${p.habitat || p.diet || p.breeding ? `
-      <div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;">Natural History</div>
-        <div class="profile-grid">
-          ${p.habitat ? `<div class="profile-card full"><div class="profile-card-label">Preferred Habitat</div><div class="profile-card-val">${p.habitat}</div></div>` : ''}
-          ${p.breeding ? `<div class="profile-card"><div class="profile-card-label">Breeding</div><div class="profile-card-val">${p.breeding}</div></div>` : ''}
-          ${p.diet ? `<div class="profile-card"><div class="profile-card-label">Diet</div><div class="profile-card-val">${p.diet}</div></div>` : ''}
-        </div>
-      </div>` : ''}
-
-      <!-- Facts bullet list -->
-      ${b.facts ? `
-      <div>
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px;">Notes</div>
-        <div class="facts-box">${b.facts}</div>
       </div>` : `
       <button class="facts-btn" id="facts-btn-${id}" onclick="loadFacts('${id}')">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-        Load bird profile &amp; facts
+        Load species profile from Gemini
       </button>`}
       <div id="facts-area-${id}" style="margin-top:8px;"></div>
 
-      <!-- Your sightings -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);">Your Sightings</div>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--brass-hi);">${birdSightings.length}</span>
-        </div>
-        ${birdSightings.length > 0
-          ? birdSightings.map(s => `
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--ink-1);border:0.5px solid var(--line);border-radius:6px;margin-bottom:5px;">
-              <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--brass);letter-spacing:0.1em;flex-shrink:0;">${s.date ? new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}).toUpperCase() : '—'}</span>
-              <span style="font-family:var(--body);font-size:13px;color:var(--paper-dim);font-style:italic;flex:1;">${s.location||'Location unrecorded'}</span>
-              ${s.lat && s.lng ? `<span style="font-family:var(--mono);font-size:8px;color:var(--sage);">GPS</span>` : ''}
-            </div>`).join('')
-          : `<div style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);padding:10px 0;">No sightings recorded yet.</div>`
-        }
-      </div>
-
       <div style="height:8px;"></div>
     </div>`;
+
 
   document.getElementById('detail-delete-btn').onclick = () => deleteBird(id);
   document.getElementById('detail-edit-btn').onclick = () => openEdit(id);
@@ -2609,7 +2564,361 @@ function openDetail(id) {
   document.getElementById('detail-record-btn').onclick = () => { closeModal('detail-modal'); openAddForBird(b.name, b.species, b.type); };
   document.getElementById('detail-modal').classList.add('open');
   document.body.classList.add('modal-open');
+
+  // Load live data after modal is open
+  const sciName = b.species || '';
+  setTimeout(function() {
+    loadXcAudio(id, sciName);
+    loadNearestSighting(id, sciName);
+    loadEbirdBarChart(id, sciName);
+  }, 100);
 }
+// ═══════════════════════════════════════════════════════════════════
+// XENO-CANTO AUDIO PLAYER
+// ═══════════════════════════════════════════════════════════════════
+var _xcAudioState = {}; // tracks playing state per bird id
+
+async function loadXcAudio(birdId, scientificName) {
+  if (!scientificName) return;
+  // Clean name for query — use scientific name for best match
+  var parts = scientificName.trim().split(' ');
+  var genus = parts[0] || '';
+  var species = parts[1] || '';
+  if (!genus) return;
+
+  var query = encodeURIComponent('gen:' + genus + (species ? ' sp:' + species : '') + ' cnt:India q:A');
+  // API v3
+  var url = 'https://xeno-canto.org/api/3/recordings?query=' + query + '&key=f23568e54688083e34e5081c57143f7f0ee3d579';
+
+  var sourceEl = document.getElementById('xc-source-' + birdId);
+  var audioEl = document.getElementById('xc-audio-' + birdId);
+  var playBtn = document.getElementById('xc-play-btn-' + birdId);
+  if (!audioEl) return;
+
+  try {
+    var res = await fetch(url);
+    var data = await res.json();
+    var recs = data.recordings || [];
+
+    // Fall back to any country if India has none
+    if (!recs.length) {
+      var url2 = 'https://xeno-canto.org/api/3/recordings?query=' + encodeURIComponent('gen:' + genus + (species ? ' sp:' + species : '') + ' q:A') + '&key=f23568e54688083e34e5081c57143f7f0ee3d579';
+      var res2 = await fetch(url2);
+      var data2 = await res2.json();
+      recs = data2.recordings || [];
+    }
+
+    if (!recs.length) {
+      if (sourceEl) sourceEl.textContent = 'No recordings found';
+      if (playBtn) playBtn.style.opacity = '0.3';
+      return;
+    }
+
+    // Pick best quality recording, prefer shorter ones (< 60s)
+    recs.sort(function(a,b) {
+      var qa = {'A':5,'B':4,'C':3,'D':2,'E':1}[a.q]||0;
+      var qb = {'A':5,'B':4,'C':3,'D':2,'E':1}[b.q]||0;
+      if (qb !== qa) return qb - qa;
+      return parseInt(a.length||999) - parseInt(b.length||999);
+    });
+    var rec = recs[0];
+
+    // Use the file URL directly from API response
+    // rec.file is the direct stream URL, rec['file-name'] is the filename
+    // rec.file is either '//xeno-canto.org/...' or 'https://xeno-canto.org/...'
+    var mp3Url = rec.file
+      ? (rec.file.startsWith('http') ? rec.file : 'https:' + rec.file)
+      : ('https://xeno-canto.org/' + rec.id + '/download');
+
+    audioEl.src = mp3Url;
+    _xcAudioState[birdId] = { playing: false, rec: rec };
+
+    if (sourceEl) {
+      sourceEl.innerHTML = 'XC' + rec.id + ' · ' + (rec.loc || rec.cnt || '') + 
+        ' · <a href="https://xeno-canto.org/' + rec.id + '" target="_blank" style="color:var(--sage);">Xeno-canto ↗</a>';
+    }
+
+    // Animate waveform bars while loading
+    var durEl = document.getElementById('xc-dur-' + birdId);
+    if (durEl) durEl.textContent = rec.length ? (rec.length.includes(':') ? rec.length : formatTime(parseInt(rec.length))) : '--:--';
+
+  } catch(e) {
+    if (sourceEl) sourceEl.textContent = 'Could not load recording';
+  }
+}
+
+function toggleXcPlay(birdId) {
+  var audioEl = document.getElementById('xc-audio-' + birdId);
+  var playIcon = document.getElementById('xc-play-icon-' + birdId);
+  var playBtn = document.getElementById('xc-play-btn-' + birdId);
+  if (!audioEl) return;
+
+  // Stop any other playing audio
+  document.querySelectorAll('audio[id^="xc-audio-"]').forEach(function(a) {
+    if (a.id !== 'xc-audio-' + birdId && !a.paused) {
+      var otherId = a.id.replace('xc-audio-', '');
+      a.pause();
+      xcSetPlayIcon(otherId, false);
+      xcStopWaveAnim(otherId);
+    }
+  });
+
+  if (audioEl.paused) {
+    audioEl.play().then(function() {
+      xcSetPlayIcon(birdId, true);
+      xcStartWaveAnim(birdId);
+      if (playBtn) { playBtn.style.transform = 'scale(0.95)'; setTimeout(function(){ playBtn.style.transform=''; }, 150); }
+    }).catch(function(e) {
+      var sourceEl = document.getElementById('xc-source-' + birdId);
+      if (sourceEl) sourceEl.textContent = 'Playback blocked — tap again';
+    });
+  } else {
+    audioEl.pause();
+    xcSetPlayIcon(birdId, false);
+    xcStopWaveAnim(birdId);
+  }
+}
+
+function xcSetPlayIcon(birdId, playing) {
+  var icon = document.getElementById('xc-play-icon-' + birdId);
+  if (!icon) return;
+  if (playing) {
+    // Pause icon — two bars
+    icon.innerHTML = '<rect x="1" y="1" width="3.5" height="11" rx="1" fill="#1A1410"/><rect x="6.5" y="1" width="3.5" height="11" rx="1" fill="#1A1410"/>';
+    icon.setAttribute('viewBox', '0 0 11 13');
+  } else {
+    icon.innerHTML = '<path d="M0 0 L11 6.5 L0 13 Z" fill="#1A1410"/>';
+    icon.setAttribute('viewBox', '0 0 11 13');
+  }
+}
+
+function xcStartWaveAnim(birdId) {
+  var wave = document.getElementById('xc-wave-' + birdId);
+  if (!wave) return;
+  var bars = wave.querySelectorAll('.xc-bar');
+  if (window._xcAnimInterval) clearInterval(window._xcAnimInterval);
+  window._xcAnimInterval = setInterval(function() {
+    bars.forEach(function(bar) {
+      var baseH = parseInt(bar.dataset.h || 20);
+      var jitter = (Math.random() - 0.5) * 16;
+      var newH = Math.max(4, Math.min(44, baseH + jitter));
+      bar.style.height = newH + 'px';
+      bar.style.opacity = (0.6 + Math.random() * 0.4).toFixed(2);
+    });
+  }, 80);
+}
+
+function xcStopWaveAnim(birdId) {
+  if (window._xcAnimInterval) { clearInterval(window._xcAnimInterval); window._xcAnimInterval = null; }
+  var wave = document.getElementById('xc-wave-' + birdId);
+  if (!wave) return;
+  wave.querySelectorAll('.xc-bar').forEach(function(bar) {
+    bar.style.height = (bar.dataset.h || 20) + 'px';
+    bar.style.opacity = '0.7';
+  });
+}
+
+function xcEnded(birdId) {
+  xcSetPlayIcon(birdId, false);
+  xcStopWaveAnim(birdId);
+  var prog = document.getElementById('xc-progress-' + birdId);
+  var timeEl = document.getElementById('xc-time-' + birdId);
+  if (prog) prog.style.width = '0%';
+  if (timeEl) timeEl.textContent = '0:00';
+}
+
+function xcTimeUpdate(birdId) {
+  var audioEl = document.getElementById('xc-audio-' + birdId);
+  var prog = document.getElementById('xc-progress-' + birdId);
+  var timeEl = document.getElementById('xc-time-' + birdId);
+  if (!audioEl) return;
+  var pct = audioEl.duration ? (audioEl.currentTime / audioEl.duration * 100) : 0;
+  if (prog) prog.style.width = pct + '%';
+  if (timeEl) timeEl.textContent = formatTime(audioEl.currentTime);
+}
+
+function xcMeta(birdId) {
+  var audioEl = document.getElementById('xc-audio-' + birdId);
+  var durEl = document.getElementById('xc-dur-' + birdId);
+  if (audioEl && durEl) durEl.textContent = formatTime(audioEl.duration);
+}
+
+function xcSeek(event, birdId) {
+  var audioEl = document.getElementById('xc-audio-' + birdId);
+  var wrap = document.getElementById('xc-progress-wrap-' + birdId);
+  if (!audioEl || !wrap || !audioEl.duration) return;
+  var rect = wrap.getBoundingClientRect();
+  var pct = (event.clientX - rect.left) / rect.width;
+  audioEl.currentTime = pct * audioEl.duration;
+}
+
+function formatTime(secs) {
+  if (!secs || isNaN(secs)) return '0:00';
+  var m = Math.floor(secs / 60);
+  var s = Math.floor(secs % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EBIRD NEAREST SIGHTING
+// ═══════════════════════════════════════════════════════════════════
+async function loadNearestSighting(birdId, scientificName) {
+  var el = document.getElementById('nearest-content-' + birdId);
+  if (!el || !scientificName) return;
+  try {
+    await getLocation();
+    var lat = userLat, lng = userLng;
+    if (!lat || !lng) {
+      el.innerHTML = '<span style="color:var(--sage-dim);font-style:italic;">Enable location to see nearby sightings</span>';
+      return;
+    }
+    var res = await fetch(EBIRD_BASE + '/data/obs/geo/recent?lat=' + lat + '&lng=' + lng + '&dist=50&back=30&maxResults=500&includeProvisional=true', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!res.ok) throw new Error('eBird ' + res.status);
+    var obs = await res.json();
+    var nameParts = scientificName.trim().split(' ');
+    var genus = nameParts[0].toLowerCase();
+    var sp = (nameParts[1] || '').toLowerCase();
+    var match = obs.find(function(o) {
+      var sci = (o.sciName || '').toLowerCase();
+      return sci.startsWith(genus + ' ' + sp);
+    });
+    if (!match) {
+      el.innerHTML = '<span style="color:var(--sage-dim);font-style:italic;">No recent sightings within 50km</span>';
+      return;
+    }
+    var dist = distKm(lat, lng, match.lat, match.lng);
+    var daysAgoStr = daysAgo(match.obsDt);
+    var loc = (match.locName || '').split(',')[0];
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--moss),var(--sage-dim));display:flex;align-items:center;justify-content:center;border:0.5px solid var(--line-2);">
+          <svg width="14" height="16" viewBox="0 0 14 16"><path d="M7 0a5 5 0 015 5c0 4-5 11-5 11S2 9 2 5a5 5 0 015-5z" fill="none" stroke="var(--paper)" stroke-width="1.2"/><circle cx="7" cy="5" r="1.8" fill="var(--paper)"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-family:var(--serif);font-size:15px;color:var(--paper);font-weight:500;">${dist.toFixed(1)} km away</div>
+          <div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:2px;">${loc} · ${daysAgoStr}</div>
+          ${match.howMany ? `<div style="font-family:var(--mono);font-size:9px;color:var(--brass);margin-top:3px;letter-spacing:0.1em;">${match.howMany} ${parseInt(match.howMany) === 1 ? 'individual' : 'individuals'}</div>` : ''}
+        </div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${match.lat},${match.lng}" target="_blank" style="flex-shrink:0;padding:7px 10px;font-family:var(--mono);font-size:8.5px;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.3);border-radius:5px;text-decoration:none;letter-spacing:0.12em;">GO ↗</a>
+      </div>`;
+  } catch(e) {
+    console.error('Nearest sighting error:', e);
+    el.innerHTML = '<span style="color:var(--sage-dim);font-style:italic;">Could not load: ' + e.message + '</span>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EBIRD MONTHLY ABUNDANCE BAR CHART
+// ═══════════════════════════════════════════════════════════════════
+async function loadEbirdBarChart(birdId, scientificName) {
+  var cardEl = document.getElementById('barchart-' + birdId);
+  if (!cardEl || !scientificName) return;
+  var nameParts = scientificName.trim().toLowerCase().split(' ');
+  var genus = nameParts[0], sp = nameParts[1] || '';
+
+  function setCell(cardEl, col, val, sub) {
+    var cells = cardEl.querySelectorAll('[id^="barchart-inner-"] > div, #barchart-inner-' + birdId + ' > div');
+    // use direct DOM query
+    var inner = document.getElementById('barchart-inner-' + birdId);
+    if (!inner) return;
+    var cell = inner.children[col];
+    if (!cell) return;
+    var valEl = cell.children[1];
+    var subEl = cell.children[2];
+    if (valEl) { valEl.textContent = val; valEl.style.color = val === '—' ? 'var(--sage-dim)' : 'var(--paper)'; }
+    if (subEl && sub) subEl.textContent = sub;
+  }
+
+  try {
+    await getLocation();
+    var lat = userLat, lng = userLng;
+    if (!lat || !lng) {
+      var inner = document.getElementById('barchart-inner-' + birdId);
+      if (inner) inner.innerHTML = '<div style="grid-column:1/-1;font-family:var(--body);font-style:italic;font-size:12px;color:var(--sage-dim);padding:4px 0;">Enable location to see local activity</div>';
+      return;
+    }
+    var r = await fetch(EBIRD_BASE + '/data/obs/geo/recent?lat=' + lat + '&lng=' + lng + '&dist=50&back=30&maxResults=500&includeProvisional=true', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
+    if (!r.ok) throw new Error('eBird ' + r.status);
+    var allObs = await r.json();
+
+    // Filter to species
+    var speciesObs = allObs.filter(function(o) {
+      return (o.sciName || '').toLowerCase().startsWith(genus + (sp ? ' ' + sp : ''));
+    });
+
+    if (!speciesObs.length) {
+      setCell(cardEl, 0, '—', 'not seen nearby');
+      setCell(cardEl, 1, '0', 'past 30 days · 50km');
+      setCell(cardEl, 2, '—', 'no data');
+      setCell(cardEl, 3, '—', 'no data');
+      var src = cardEl.querySelector('[style*="via eBird"]');
+      return;
+    }
+
+    // Sort by date descending
+    speciesObs.sort(function(a, b) {
+      return new Date(b.obsDt.replace(' ','T')) - new Date(a.obsDt.replace(' ','T'));
+    });
+
+    // ── Stat 0: Last seen ──
+    var latest = speciesObs[0];
+    var latestDate = new Date(latest.obsDt.replace(' ','T'));
+    var dAgo = Math.floor((Date.now() - latestDate.getTime()) / 86400000);
+    var lastSeenVal = dAgo === 0 ? 'Today' : dAgo === 1 ? 'Yesterday' : dAgo + 'd ago';
+    var lastSeenLoc = (latest.locName || '').split(',')[0];
+    setCell(cardEl, 0, lastSeenVal, lastSeenLoc || 'nearby');
+
+    // ── Stat 1: Sighting count ──
+    setCell(cardEl, 1, String(speciesObs.length), 'past 30 days · 50km');
+
+    // ── Stat 2: Peak time of day ──
+    var hourCounts = new Array(24).fill(0);
+    speciesObs.forEach(function(o) {
+      if (o.obsDt) {
+        // obsDt format: "2025-05-20 07:30" or "2025-05-20"
+        var parts = o.obsDt.split(' ');
+        if (parts[1]) {
+          var hr = parseInt(parts[1].split(':')[0]);
+          if (!isNaN(hr)) hourCounts[hr]++;
+        }
+      }
+    });
+    var peakHour = hourCounts.indexOf(Math.max.apply(null, hourCounts));
+    var hasTimes = hourCounts.some(function(c){ return c > 0; });
+    if (hasTimes && Math.max.apply(null, hourCounts) > 0) {
+      var period = peakHour < 12 ? 'AM' : 'PM';
+      var displayHr = peakHour === 0 ? 12 : peakHour > 12 ? peakHour - 12 : peakHour;
+      var timeLabel = peakHour < 6 ? 'dawn' : peakHour < 10 ? 'morning' : peakHour < 14 ? 'midday' : peakHour < 18 ? 'afternoon' : peakHour < 21 ? 'evening' : 'night';
+      setCell(cardEl, 2, displayHr + ' ' + period, timeLabel);
+    } else {
+      setCell(cardEl, 2, '—', 'no time data');
+    }
+
+    // ── Stat 3: Max count in one sighting ──
+    var maxCount = 0;
+    speciesObs.forEach(function(o) {
+      var n = parseInt(o.howMany) || 0;
+      if (n > maxCount) maxCount = n;
+    });
+    if (maxCount > 0) {
+      setCell(cardEl, 3, String(maxCount), maxCount === 1 ? 'individual' : 'individuals');
+    } else {
+      setCell(cardEl, 3, speciesObs.length > 0 ? 'Seen' : '—', 'count not recorded');
+    }
+
+    // Highlight card border if seen recently (within 7 days)
+    if (dAgo <= 7) {
+      cardEl.style.borderColor = 'rgba(143,168,136,0.3)';
+    }
+
+  } catch(e) {
+    console.error('Activity error:', e);
+    console.error('Activity error:', e);
+    var inner = document.getElementById('barchart-inner-' + birdId);
+    if (inner) inner.innerHTML = '<div style="grid-column:1/-1;font-family:var(--body);font-style:italic;font-size:12px;color:var(--sage-dim);padding:4px 0;">Error: ' + e.message + '</div>';
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // FACTS / GEMINI
 // ═══════════════════════════════════════════════════════════════════
@@ -2686,28 +2995,6 @@ Respond ONLY in this exact JSON format with no markdown, no backticks, no extra 
 // MERGED CODEX — PLATES + SIGHTINGS VIEW
 // ═══════════════════════════════════════════════════════════════════
 
-function setCodexView(view) {
-  _codexView = view;
-  var platesBtn = document.getElementById('codex-btn-plates');
-  var sightingsBtn = document.getElementById('codex-btn-sightings');
-  if (platesBtn) {
-    platesBtn.style.background = view === 'plates' ? 'var(--ink-1)' : 'transparent';
-    platesBtn.querySelector('svg').style.stroke = view === 'plates' ? 'var(--brass-hi)' : 'var(--paper-dim)';
-  }
-  if (sightingsBtn) {
-    sightingsBtn.style.background = view === 'sightings' ? 'var(--ink-1)' : 'transparent';
-    sightingsBtn.querySelector('svg').style.stroke = view === 'sightings' ? 'var(--brass-hi)' : 'var(--paper-dim)';
-  }
-  var plates = document.getElementById('pdex-grid-area');
-  var sightings = document.getElementById('sightings-list-area');
-  if (plates) plates.style.display = view === 'plates' ? 'block' : 'none';
-  if (sightings) sightings.style.display = view === 'sightings' ? 'block' : 'none';
-  if (view === 'plates') renderPokedex();
-  else renderSightingsList();
-  // Scroll to top
-  var content = document.getElementById('codex-content');
-  if (content) content.scrollTop = 0;
-}
 
 function renderCodexActive() {
   renderPokedex();
@@ -4103,14 +4390,15 @@ var BLR_MIGRATION = {
 
 var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-function renderMigration(targetId) {
+async function renderMigration(targetId) {
   var el = document.getElementById(targetId || 'discover-migrate-inner');
   if (!el) return;
   var currentMonth = new Date().getMonth();
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var spottedNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase(); }));
+  var m = currentMigrateMonth !== undefined ? currentMigrateMonth : currentMonth;
 
-  // Species with monthly presence peaks (0–1)
+  // Species with monthly presence peaks (0-1)
   var species = [
     { name:'Greater Flamingo',    peaks:[0.85,0.95,0.80,0.50,0.20,0.10,0.10,0.10,0.20,0.40,0.70,0.90], color:'var(--wax-hi)' },
     { name:'Bar-headed Goose',    peaks:[0.90,0.80,0.50,0.20,0.05,0.00,0.00,0.00,0.10,0.40,0.70,0.85], color:'var(--brass-hi)' },
@@ -4118,29 +4406,45 @@ function renderMigration(targetId) {
     { name:'Pied Avocet',         peaks:[0.60,0.80,0.70,0.40,0.10,0.00,0.00,0.00,0.10,0.30,0.50,0.60], color:'#9DB7BD' },
   ];
 
-  // This month's arrivals derived from BLR_MIGRATION if available, else defaults
-  var m = currentMigrateMonth !== undefined ? currentMigrateMonth : currentMonth;
-  var arrivals = [];
-  if (typeof BLR_MIGRATION !== 'undefined' && BLR_MIGRATION[m] && BLR_MIGRATION[m].visitors) {
-    arrivals = BLR_MIGRATION[m].visitors.slice(0, 4).map(function(v) {
-      return { name: v.name, latin: v.species, note: v.tip, window: months[m] };
-    });
-  } else {
-    arrivals = [
-      { name:'Indian Pitta',               latin:'Pitta brachyura',        note:'Returning to breeding range',  window:'May 20 — Jun 30' },
-      { name:'Pied Cuckoo',                latin:'Clamator jacobinus',      note:'Arrives with the monsoon',     window:'Jun 5 — Jul 15' },
-      { name:'Asian Paradise Flycatcher',  latin:'Terpsiphone paradisi',    note:'Passage migrant through area', window:'May 1 — Jun 10' },
-      { name:'Common Sandpiper',           latin:'Actitis hypoleucos',      note:'Winter visitor departing',     window:'Mar 15 — May 30' },
-    ];
-  }
+  // Fetch live eBird data
+  var liveNotable = [], liveRecent = [];
+  try {
+    await getLocation();
+    var lat = userLat, lng = userLng;
+    if (!lat || !lng) { return; } // no location yet
+    var _res = await Promise.all([
+      fetch(EBIRD_BASE+'/data/obs/geo/recent/notable?lat='+lat+'&lng='+lng+'&dist=50&back=14&maxResults=50&detail=full',{headers:{'X-eBirdApiToken':EBIRD_KEY}}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];}),
+      fetch(EBIRD_BASE+'/data/obs/geo/recent?lat='+lat+'&lng='+lng+'&dist=50&back=30&maxResults=200&includeProvisional=true',{headers:{'X-eBirdApiToken':EBIRD_KEY}}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];})
+    ]);
+    liveNotable = _res[0]||[];
+    var _seen=new Set();
+    liveRecent=(_res[1]||[]).filter(function(o){if(_seen.has(o.sciName))return false;_seen.add(o.sciName);return true;});
+  } catch(e) {}
 
+  // Merge static BLR_MIGRATION with live eBird data
+  var staticVisitors = (BLR_MIGRATION&&BLR_MIGRATION[m]&&BLR_MIGRATION[m].visitors)?BLR_MIGRATION[m].visitors:[];
+  var arrivals = staticVisitors.slice(0,6).map(function(v){
+    var lm=liveRecent.find(function(o){return (o.comName||'').toLowerCase().includes(v.name.toLowerCase().split(' ')[0]);});
+    return {name:v.name,latin:v.species,note:v.tip,window:months[m],likelihood:v.likelihood,liveCount:lm?(lm.howMany||null):null,liveDist:lm?distKm(userLat,userLng,lm.lat,lm.lng):null,liveDaysAgo:lm?daysAgo(lm.obsDt):null};
+  });
+  // Append live rarities not in static list
+  var liveExtras=liveNotable.filter(function(o){return !arrivals.some(function(a){return a.name.toLowerCase().includes((o.comName||''). toLowerCase().split(' ')[0]);});}).slice(0,3).map(function(obs){
+    var d=distKm(userLat,userLng,obs.lat,obs.lng);
+    return {name:obs.comName,latin:obs.sciName,note:'Rare sighting nearby',window:'⚡ Live',liveCount:obs.howMany||null,liveDist:d,liveDaysAgo:daysAgo(obs.obsDt),isLive:true};
+  });
   var html = '';
 
   // ── Header ──
+  var liveCount = liveRecent.length;
+  var notableCount = liveNotable.length;
   html += '<div style="padding:16px 18px 14px;">';
   html += '<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:4px;">What\'s passing through</div>';
   html += '<div style="font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.05;">The <em style="color:var(--brass-hi);font-style:italic;">Migration</em> Almanac</div>';
-  html += '<div style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--paper-dim);margin-top:6px;line-height:1.4;">Peak activity windows for winter visitors and passage migrants near Bengaluru.</div>';
+  html += '<div style="display:flex;gap:10px;margin-top:10px;">';
+  html += '<div style="flex:1;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:8px;padding:8px 10px;"><div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px;">Live nearby</div><div style="font-family:var(--serif);font-size:22px;color:var(--paper);font-weight:500;">' + liveCount + '</div><div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">species · 50km</div></div>';
+  html += '<div style="flex:1;background:var(--ink-1);border:0.5px solid ' + (notableCount > 0 ? 'rgba(216,91,77,0.3)' : 'var(--line-2)') + ';border-radius:8px;padding:8px 10px;"><div style="font-family:var(--mono);font-size:8px;color:' + (notableCount > 0 ? 'var(--wax-hi)' : 'var(--paper-dim)') + ';letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px;">Rarities</div><div style="font-family:var(--serif);font-size:22px;color:var(--paper);font-weight:500;">' + notableCount + '</div><div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">notable obs · 14 days</div></div>';
+  html += '<div style="flex:1;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:8px;padding:8px 10px;"><div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px;">Month</div><div style="font-family:var(--serif);font-size:22px;color:var(--brass-hi);font-weight:500;">' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m] + '</div><div style="font-family:var(--mono);font-size:8px;color:var(--sage-dim);">almanac view</div></div>';
+  html += '</div>';
   html += '</div>';
 
   // ── Year-wheel SVG ──
@@ -4205,21 +4509,90 @@ function renderMigration(targetId) {
   });
   html += '</div></div>';
 
-  // ── Arriving this week ──
+  // ── Live: Rarities spotted nearby ──
+  // ── Live: Spotted this week (not yet in your log) ──
+  var unseenRecent = liveRecent.filter(function(o) {
+    return !spottedNames.has((o.comName||'').toLowerCase().trim());
+  }).slice(0, 8);
+
+  if (unseenRecent.length > 0) {
+    html += '<div style="padding:0 18px 10px;display:flex;align-items:center;gap:10px;">';
+    html += '<svg width="14" height="10" viewBox="0 0 14 10"><circle cx="3" cy="5" r="2.5" fill="var(--sage)"/><line x1="7" y1="5" x2="14" y2="5" stroke="var(--sage)" stroke-width="0.8" stroke-dasharray="1.5 1.5"/></svg>';
+    html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);">Spotted Nearby · This Month</span>';
+    html += '<div style="flex:1;height:0.5px;background:var(--line);"></div></div>';
+    html += '<div style="padding:0 18px 16px;display:flex;flex-direction:column;gap:6px;">';
+    unseenRecent.forEach(function(o) {
+      var dist = userLat && o.lat ? distKm(userLat, userLng, parseFloat(o.lat), parseFloat(o.lng)) : null;
+      var da = daysAgo(o.obsDt);
+      html += '<div style="background:var(--ink-1);border:0.5px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;">';
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-family:var(--serif);font-size:15px;font-weight:500;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (o.comName||'Unknown') + '</div>';
+      html += '<div style="font-family:var(--body);font-style:italic;font-size:11px;color:var(--sage-dim);margin-top:1px;">' + (o.sciName||'') + '</div>';
+      html += '</div>';
+      html += '<div style="text-align:right;flex-shrink:0;">';
+      if (dist != null) html += '<div style="font-family:var(--mono);font-size:10px;color:var(--brass-hi);">' + dist.toFixed(1) + 'km</div>';
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);">' + da + '</div>';
+      html += '</div>';
+      var safeName = (o.comName||'').replace(/"/g,'&quot;'); var safeSci = (o.sciName||'').replace(/"/g,'&quot;');
+      html += '<button onclick="openAddForBird(this.dataset.name,this.dataset.sci)" data-name="' + safeName + '" data-sci="' + safeSci + '" style="flex-shrink:0;padding:6px 10px;font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:5px;background:transparent;cursor:pointer;white-space:nowrap;">+ LOG</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else if (liveRecent.length === 0) {
+    html += '<div style="padding:0 18px 16px;font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);">No eBird data loaded yet. Enable location to see live sightings.</div>';
+  }
+
+  if (liveExtras.length > 0) {
+    html += '<div style="padding:0 18px 10px;display:flex;align-items:center;gap:10px;">'
+    html += '<svg width="12" height="12" viewBox="0 0 14 14"><path d="M7 0L8.6 5.2H14L9.6 8.4L11.2 13.6L7 10.4L2.8 13.6L4.4 8.4L0 5.2H5.4Z" fill="var(--wax-hi)"/></svg>';
+    html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--wax-hi);">Rarities Nearby · Live</span>';
+    html += '<div style="flex:1;height:0.5px;background:var(--line);"></div></div>';
+    html += '<div style="padding:0 18px 16px;display:flex;flex-direction:column;gap:8px;">';
+    liveExtras.forEach(function(s) {
+      var spotted = spottedNames.has((s.name||''). toLowerCase());
+      html += '<div style="background:linear-gradient(135deg,rgba(178,58,47,0.08),rgba(14,20,16,0.95));border:0.5px solid rgba(216,91,77,0.25);border-radius:8px;padding:10px 12px;">';
+      html += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">';
+      html += '<div style="font-family:var(--serif);font-size:15px;font-weight:500;color:var(--paper);">'+s.name+(spotted?' <span style="font-family:var(--mono);font-size:8px;color:var(--sage);">✓ LOGGED</span>':'')+'</div>';
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--wax-hi);white-space:nowrap;">'+s.window+'</div>';
+      html += '</div>';
+      html += '<div style="font-family:var(--body);font-style:italic;font-size:11px;color:var(--sage-dim);margin-top:2px;">'+s.latin+'</div>';
+      var meta = [];
+      if (s.liveDist != null) meta.push(s.liveDist.toFixed(1)+'km away');
+      if (s.liveDaysAgo) meta.push(s.liveDaysAgo);
+      if (s.liveCount) meta.push(s.liveCount+' seen');
+      if (meta.length) html += '<div style="font-family:var(--mono);font-size:9px;color:var(--wax-hi);margin-top:4px;letter-spacing:0.1em;">'+meta.join(' · ')+'</div>';
+      html += '<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;">'+s.note+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // ── Expected this month ──
   html += '<div style="padding:0 18px 10px;display:flex;align-items:center;gap:10px;">';
   html += '<svg width="14" height="10" viewBox="0 0 14 10"><path d="M0 5 Q3 0 7 5 Q11 0 14 5" stroke="var(--sage)" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>';
-  html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);">Arriving this week</span>';
+  html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage);">Expected This Month</span>';
   html += '<div style="flex:1;height:0.5px;background:var(--line);"></div></div>';
   html += '<div style="padding:0 18px 80px;display:flex;flex-direction:column;gap:8px;">';
   arrivals.forEach(function(s) {
-    var spotted = spottedNames.has((s.name||'').toLowerCase());
-    html += '<div style="background:var(--ink-1);border:0.5px solid '+(spotted?'rgba(143,168,136,0.2)':'var(--line)')+';border-radius:8px;padding:10px 12px;opacity:'+(spotted?'0.7':'1')+'">';
+    var spotted = spottedNames.has((s.name||''). toLowerCase());
+    var hasLive = s.liveDist != null;
+    html += '<div style="background:var(--ink-1);border:0.5px solid '+(hasLive?'rgba(143,168,136,0.25)':'var(--line)')+';border-radius:8px;padding:10px 12px;">';
     html += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">';
-    html += '<div style="font-family:var(--serif);font-size:15px;font-weight:500;color:var(--paper);">'+s.name+(spotted?' <span style="font-family:var(--mono);font-size:8px;color:var(--sage);letter-spacing:0.12em;">✓ LOGGED</span>':'')+'</div>';
+    html += '<div style="font-family:var(--serif);font-size:15px;font-weight:500;color:var(--paper);">'+s.name+(spotted?' <span style="font-family:var(--mono);font-size:8px;color:var(--sage);">✓ LOGGED</span>':'')+'</div>';
     html += '<div style="font-family:var(--mono);font-size:9px;color:var(--brass-hi);white-space:nowrap;flex-shrink:0;">'+s.window+'</div>';
     html += '</div>';
     html += '<div style="font-family:var(--body);font-style:italic;font-size:11px;color:var(--sage);margin-top:2px;">'+s.latin+'</div>';
+    if (hasLive) {
+      var meta2=[]; if(s.liveDist!=null)meta2.push(s.liveDist.toFixed(1)+'km away'); if(s.liveDaysAgo)meta2.push(s.liveDaysAgo); if(s.liveCount)meta2.push(s.liveCount+' seen');
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--sage);margin-top:4px;letter-spacing:0.1em;">✦ '+meta2.join(' · ')+'</div>';
+    }
     html += '<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;">'+s.note+'</div>';
+    // Likelihood pips
+    if (s.likelihood) {
+      html += '<div style="display:flex;gap:3px;margin-top:5px;">';
+      for (var pi=0;pi<5;pi++) html += '<div style="width:7px;height:7px;border-radius:2px;background:'+(pi<s.likelihood?'var(--brass)':'rgba(201,163,94,0.1)')+';transition:background 0.3s '+pi*0.06+'s;"></div>';
+      html += '</div>';
+    }
     html += '</div>';
   });
   html += '</div>';
@@ -4235,7 +4608,6 @@ function changeMigrateMonth(dir) {
 // ═══════════════════════════════════════════════════════════════════
 var EBIRD_KEY = 'f2a1re6pkv40';
 var EBIRD_BASE = 'https://api.ebird.org/v2';
-var BLR_LAT = 12.9716, BLR_LNG = 77.5946;
 
 function distKm(lat1, lng1, lat2, lng2) {
   var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
@@ -4432,212 +4804,116 @@ async function renderHotspots(targetId) {
   if (!el) return;
   el.innerHTML = loadingBird;
   await getLocation();
-  var hotspots = await fetchHotspots(userLat, userLng, 30);
+  var hotspots = await fetchHotspots(userLat, userLng, 25);
   if (!hotspots.length) {
-    el.innerHTML = '<div style="padding:48px 20px;text-align:center;font-family:var(--body);font-style:italic;color:var(--sage-dim);font-size:14px;">No hotspots found nearby.<br>Check connection or expand radius.</div>';
+    el.innerHTML = '<div style="padding:48px 20px;text-align:center;font-family:var(--body);font-style:italic;color:var(--sage-dim);font-size:14px;">No hotspots found nearby.<br>Check connection or try again.</div>';
     return;
   }
   hotspots.sort(function(a,b){ return distKm(userLat, userLng, a.lat, a.lng) - distKm(userLat, userLng, b.lat, b.lng); });
 
-  // ── Custom SVG map ──
-  var topSpots = hotspots.slice(0, 8);
   var html = '';
 
-  // Outer wrapper — map + bottom sheet stacked, not overlapping
+  // ── Real Leaflet map ──
   html += '<div style="margin:16px 18px 0;border-radius:12px;overflow:hidden;border:0.5px solid var(--line-2);">';
-
-  // Map area
-  html += '<div style="position:relative;background:radial-gradient(ellipse at 45% 55%,#1C2820 0%,#0E1410 65%,#0A0F0C 100%);">';
-
-  // Top overlays
-  html += '<div style="position:absolute;top:12px;left:16px;z-index:5;pointer-events:none;">';
-  html += '<div style="font-family:var(--mono);font-size:10px;color:var(--brass);letter-spacing:0.16em;">PLATE IV</div>';
-  html += '<div style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);margin-top:2px;opacity:0.8;">' + (userLat ? parseFloat(userLat).toFixed(2)+'°N · '+parseFloat(userLng).toFixed(2)+'°E' : '12.97°N · 77.59°E') + '</div>';
-  html += '</div>';
-  html += '<div style="position:absolute;top:12px;right:16px;z-index:5;padding:5px 10px;background:rgba(14,20,16,0.85);border:0.5px solid var(--line-2);border-radius:5px;backdrop-filter:blur(8px);">';
-  html += '<span style="font-family:var(--mono);font-size:10px;color:var(--brass-hi);letter-spacing:0.12em;" id="map-radius-label">RADIUS 30km</span></div>';
-  // Zoom controls
-  html += '<div style="position:absolute;bottom:100px;right:14px;z-index:6;display:flex;flex-direction:column;gap:4px;">';
-  html += '<button onclick="hotspotZoom(1)" style="width:30px;height:30px;background:rgba(14,20,16,0.9);border:0.5px solid var(--line-2);border-radius:5px;cursor:pointer;color:var(--brass-hi);font-size:18px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">+</button>';
-  html += '<button onclick="hotspotZoom(-1)" style="width:30px;height:30px;background:rgba(14,20,16,0.9);border:0.5px solid var(--line-2);border-radius:5px;cursor:pointer;color:var(--brass-hi);font-size:18px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);">−</button>';
+  html += '<div id="hotspot-map-el" style="width:100%;height:300px;"></div>';
   html += '</div>';
 
-  // SVG — 300×260 viewBox so all sizes are in real pixel-equivalent units
-  html += '<svg viewBox="0 0 300 260" style="width:100%;height:280px;display:block;">';
-
-  // Dark grid lines (subtle)
-  for (var gi = 0; gi < 6; gi++) {
-    var gx = 50 + gi * 40;
-    html += '<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="260" stroke="rgba(232,220,196,0.04)" stroke-width="0.5"/>';
-  }
-  for (var gi2 = 0; gi2 < 5; gi2++) {
-    var gy = 52 + gi2 * 40;
-    html += '<line x1="0" y1="'+gy+'" x2="300" y2="'+gy+'" stroke="rgba(232,220,196,0.04)" stroke-width="0.5"/>';
-  }
-
-  // Contour rings — centred at user position (cx=150, cy=130)
-  var MCX = 150, MCY = 130;
-  var ringDefs = [
-    { r: 20, stroke: 'var(--brass)', sw: 0.6, op: 0.5 },
-    { r: 36, stroke: 'var(--paper-dim)', sw: 0.3, op: 0.3 },
-    { r: 54, stroke: 'var(--brass)', sw: 0.5, op: 0.45 },
-    { r: 72, stroke: 'var(--paper-dim)', sw: 0.3, op: 0.25 },
-    { r: 92, stroke: 'var(--brass)', sw: 0.4, op: 0.4 },
-    { r: 114, stroke: 'var(--paper-dim)', sw: 0.3, op: 0.2 },
-    { r: 138, stroke: 'var(--brass)', sw: 0.35, op: 0.3 },
-  ];
-  ringDefs.forEach(function(ring) {
-    // Slightly organic rings with noise
-    var pts = [];
-    for (var a = 0; a < 360; a += 8) {
-      var rad = a * Math.PI / 180;
-      var noise = Math.sin(a * 0.07 + ring.r * 0.05) * 3.5 + Math.cos(a * 0.11 + ring.r * 0.03) * 2.5;
-      pts.push([MCX + Math.cos(rad) * (ring.r + noise), MCY + Math.sin(rad) * (ring.r + noise) * 0.92]);
-    }
-    var d = pts.map(function(p, i){ return (i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ')+'Z';
-    html += '<path d="'+d+'" fill="none" stroke="'+ring.stroke+'" stroke-width="'+ring.sw+'" opacity="'+ring.op+'"/>';
-  });
-
-  // Water body (lake shape, darker blue-green fill)
-  html += '<path d="M60 180 Q80 168 100 174 Q125 182 148 170 Q170 158 188 168 Q205 178 190 195 Q175 208 150 205 Q120 202 90 210 Q68 215 58 198 Z" fill="#1A3040" opacity="0.7" stroke="#2A4860" stroke-width="0.8"/>';
-  html += '<path d="M60 180 Q80 168 100 174 Q125 182 148 170 Q170 158 188 168 Q205 178 190 195 Q175 208 150 205 Q120 202 90 210 Q68 215 58 198 Z" fill="none" stroke="#3A6880" stroke-width="0.5" opacity="0.8"/>';
-
-  // User position marker
-  html += '<circle cx="'+MCX+'" cy="'+MCY+'" r="16" fill="none" stroke="var(--sage)" stroke-width="0.4" stroke-dasharray="2 2" opacity="0.35"/>';
-  html += '<circle cx="'+MCX+'" cy="'+MCY+'" r="4" fill="var(--sage)" opacity="0.3"/>';
-  html += '<circle cx="'+MCX+'" cy="'+MCY+'" r="2.5" fill="var(--sage)"/>';
-  html += '<circle cx="'+MCX+'" cy="'+MCY+'" r="1" fill="var(--paper)"/>';
-
-  // Hotspot dots — positioned relative to user, with minimum separation
-  var placedDots = [];
-  topSpots.forEach(function(h, hi) {
-    var dlat = (h.lat - userLat) * 110;
-    var dlng = (h.lng - userLng) * 90;
-    var maxRange = 30;
-    var px = MCX + (dlng / maxRange) * 130;
-    var py = MCY - (dlat / maxRange) * 115;
-    px = Math.max(18, Math.min(282, px));
-    py = Math.max(24, Math.min(242, py));
-
-    // Minimum separation — push dots apart if too close
-    var minSep = 22;
-    var attempts = 0;
-    while (attempts < 20) {
-      var tooClose = false;
-      for (var pi = 0; pi < placedDots.length; pi++) {
-        var dx = px - placedDots[pi][0], dy = py - placedDots[pi][1];
-        if (Math.sqrt(dx*dx + dy*dy) < minSep) {
-          // Push outward from centre
-          var angle = Math.atan2(py - MCY, px - MCX);
-          px += Math.cos(angle) * 12;
-          py += Math.sin(angle) * 12;
-          px = Math.max(18, Math.min(282, px));
-          py = Math.max(24, Math.min(242, py));
-          tooClose = true; break;
-        }
-      }
-      if (!tooClose) break;
-      attempts++;
-    }
-    placedDots.push([px, py]);
-
-    var isFirst = hi === 0;
-    var dotR = isFirst ? 7 : 5;
-
-    // Wrap in group for zoom re-render
-    html += '<g class="hspot-dot-group">';
-
-    // Dashed connector line from user to nearest
-    if (isFirst) {
-      html += '<line x1="'+MCX+'" y1="'+MCY+'" x2="'+px.toFixed(1)+'" y2="'+py.toFixed(1)+'" stroke="var(--brass)" stroke-width="0.6" stroke-dasharray="3 2.5" opacity="0.4"/>';
-    }
-
-    // Glow for nearest
-    if (isFirst) {
-      html += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="14" fill="var(--brass-hi)" opacity="0.07"><animate attributeName="r" values="10;20;10" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.07;0.01;0.07" dur="3s" repeatCount="indefinite"/></circle>';
-      html += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="12" fill="none" stroke="var(--brass-hi)" stroke-width="0.6" opacity="0.35"/>';
-    }
-    html += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="'+dotR+'" fill="'+(isFirst?'var(--brass-hi)':'rgba(201,163,94,0.8)')+'" stroke="var(--ink)" stroke-width="1.8"/>';
-    html += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="'+(dotR*0.36).toFixed(1)+'" fill="var(--ink)" opacity="0.7"/>';
-
-    // Smart label placement — prefer right, flip if near right edge, go above if near bottom
-    var nameWords = h.locName.split(' ');
-    var shortName = nameWords.slice(0, 2).join(' ');
-    if (shortName.length > 14) shortName = shortName.slice(0, 12) + '…';
-    var dist = distKm(userLat, userLng, h.lat, h.lng);
-    var nearRight = px > 200;
-    var nearBottom = py > 220;
-    var lx = nearRight ? px - dotR - 3 : px + dotR + 3;
-    var anchor = nearRight ? 'end' : 'start';
-    var ly = nearBottom ? py - dotR - 6 : py - 3;
-    var ly2 = nearBottom ? py - dotR + 5 : py + 8;
-
-    html += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anchor+'" fill="'+(isFirst?'var(--paper)':'rgba(232,220,196,0.75)')+'" font-family="Cormorant Garamond,serif" font-style="italic" font-size="'+(isFirst?11:9)+'" font-weight="'+(isFirst?600:400)+'">'+shortName+'</text>';
-    html += '<text x="'+lx.toFixed(1)+'" y="'+ly2.toFixed(1)+'" text-anchor="'+anchor+'" fill="'+(isFirst?'var(--brass-hi)':'rgba(201,163,94,0.6)')+'" font-family="JetBrains Mono,monospace" font-size="7.5" letter-spacing="0.3">'+dist.toFixed(1)+'km</text>';
-    html += '</g>'; // close hspot-dot-group
-  });
-
-  html += '</svg>';
-  html += '</div>'; // close map area
-
-  // Store ALL hotspots for zoom re-render
-  var _storedAllHotspots = hotspots;
-
-  // Bottom sheet — normal flow (not absolute, not clipped)
-  if (topSpots.length) {
-    var top = topSpots[0];
-    var topDist = distKm(userLat, userLng, top.lat, top.lng);
-    var tn = top.locName.split(' ');
-    var tfirst = tn[0];
-    var trest = tn.slice(1, 4).join(' ') + (tn.length > 4 ? '…' : '');
-    html += '<div style="padding:12px 16px 14px;background:rgba(14,20,16,0.96);border-top:0.5px solid var(--line-2);">';
-    html += '<div style="font-family:var(--mono);font-size:8.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);margin-bottom:6px;">Hotspot</div>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;">';
-    html += '<div style="font-family:var(--serif);font-size:22px;font-weight:500;line-height:1.05;color:var(--paper);flex:1;min-width:0;">'+tfirst+' <em style="color:var(--brass-hi);font-style:italic;font-weight:400;">'+trest+'</em></div>';
-    html += '<div style="font-family:var(--mono);font-size:12px;color:var(--brass-hi);white-space:nowrap;flex-shrink:0;">'+topDist.toFixed(1)+'<span style="font-size:10px;color:var(--paper-dim);">KM</span></div>';
-    html += '</div>';
-    html += '<div style="display:flex;gap:14px;align-items:center;">';
-    html += '<div><div style="font-family:var(--mono);font-size:20px;color:var(--paper);font-weight:500;line-height:1;">'+(top.numSpeciesAllTime||'—')+'</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:var(--paper-dim);margin-top:3px;">Species</div></div>';
-    html += '<div style="width:0.5px;height:28px;background:var(--line);"></div>';
-    html += '<div><div style="font-family:var(--mono);font-size:20px;color:var(--sage);font-weight:500;line-height:1;">—</div><div style="font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;color:var(--paper-dim);margin-top:3px;">This week</div></div>';
-    html += '<div style="flex:1;"></div>';
-    html += '<a href="https://www.google.com/maps/dir/?api=1&destination='+top.lat+','+top.lng+'" target="_blank" style="padding:10px 16px;background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 60%,var(--brass-lo));border-radius:6px;font-family:var(--mono);font-size:9px;font-weight:700;color:#1A1410;letter-spacing:0.14em;text-decoration:none;box-shadow:0 3px 12px rgba(201,163,94,0.35);">NAVIGATE</a>';
-    html += '</div></div>';
-  }
-  html += '</div>'; // close outer wrapper
+  // ── Hotspot nearest card ──
+  var top = hotspots[0];
+  var topDist = distKm(userLat, userLng, top.lat, top.lng);
+  var tn = top.locName.split(' ');
+  html += '<div style="margin:12px 18px 0;padding:12px 14px;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:10px;display:flex;align-items:center;gap:14px;">';
+  html += '<div style="flex:1;min-width:0;">';
+  html += '<div style="font-family:var(--mono);font-size:8.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass-hi);margin-bottom:5px;">Nearest Hotspot</div>';
+  html += '<div style="font-family:var(--serif);font-size:19px;font-weight:500;line-height:1.1;color:var(--paper);">' + top.locName + '</div>';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:6px;">';
+  html += '<span style="font-family:var(--mono);font-size:11px;color:var(--brass-hi);">' + topDist.toFixed(1) + '<span style="color:var(--paper-dim);font-size:9px;"> km</span></span>';
+  if (top.numSpeciesAllTime) html += '<span style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);">' + top.numSpeciesAllTime + ' species ever</span>';
+  html += '</div></div>';
+  html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + top.lat + ',' + top.lng + '" target="_blank" style="padding:10px 14px;background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 60%,var(--brass-lo));border-radius:7px;font-family:var(--mono);font-size:9px;font-weight:700;color:#1A1410;letter-spacing:0.14em;text-decoration:none;flex-shrink:0;box-shadow:0 3px 12px rgba(201,163,94,0.3);">GO ↗</a>';
+  html += '</div>';
 
   // ── Hotspot list ──
-  html += '<div style="padding:16px 18px 10px;display:flex;align-items:center;gap:10px;">';
-  html += '<svg width="12" height="14" viewBox="0 0 12 14"><path d="M6 0a5 5 0 015 5c0 4-5 9-5 9S1 9 1 5a5 5 0 015-5z" fill="none" stroke="var(--brass-hi)" stroke-width="0.7"/><circle cx="6" cy="5" r="1.6" fill="var(--brass-hi)"/></svg>';
-  html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass-hi);">Birding Hotspots · '+hotspots.length+'</span>';
+  html += '<div style="padding:14px 18px 6px;display:flex;align-items:center;gap:10px;">';
+  html += '<svg width="12" height="14" viewBox="0 0 12 14"><path d="M6 0a5 5 0 015 5c0 4-5 9-5 9S1 9 1 5a5 5 0 015-5z" fill="none" stroke="var(--brass-hi)" stroke-width="0.8"/><circle cx="6" cy="5" r="1.6" fill="var(--brass-hi)"/></svg>';
+  html += '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass-hi);">Birding Hotspots · ' + hotspots.length + '</span>';
   html += '<div style="flex:1;height:0.5px;background:var(--line);"></div></div>';
   html += '<div style="padding:0 18px 80px;display:flex;flex-direction:column;gap:8px;">';
 
   hotspots.slice(0, 12).forEach(function(h) {
     var dist = distKm(userLat, userLng, h.lat, h.lng);
-    var hn = h.locName.split(' ');
-    var hfirst = hn[0], hrest = hn.slice(1, 4).join(' ') + (hn.length > 4 ? '…' : '');
     html += '<div style="background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:10px;padding:11px 14px;">';
     html += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">';
-    html += '<div style="font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.1;color:var(--paper);">'+hfirst+' <em style="color:var(--brass-hi);font-style:italic;font-weight:400;">'+hrest+'</em></div>';
-    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:12px;color:var(--brass-hi);font-weight:500;">'+dist.toFixed(1)+'<span style="color:var(--paper-dim);">km</span></div><div style="font-family:var(--mono);font-size:8px;color:var(--paper-dim);letter-spacing:0.16em;">AWAY</div></div>';
+    html += '<div style="font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.1;color:var(--paper);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + h.locName + '</div>';
+    html += '<div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:12px;color:var(--brass-hi);font-weight:500;">' + dist.toFixed(1) + '<span style="color:var(--paper-dim);font-size:10px;">km</span></div></div>';
     html += '</div>';
-    html += '<div style="margin-top:6px;display:flex;align-items:center;gap:8px;">';
-    if (h.numSpeciesAllTime) html += '<span style="font-family:var(--mono);font-size:10px;color:var(--paper);">'+h.numSpeciesAllTime+'<span style="color:var(--paper-dim);"> species</span></span><span style="width:2px;height:2px;border-radius:50%;background:var(--paper-dim);display:inline-block;"></span>';
-    html += '<span style="font-family:var(--mono);font-size:10px;color:var(--sage);">—<span style="color:var(--paper-dim);"> this week</span></span>';
+    html += '<div style="margin-top:5px;display:flex;align-items:center;gap:8px;">';
+    if (h.numSpeciesAllTime) html += '<span style="font-family:var(--mono);font-size:9px;color:var(--paper);">' + h.numSpeciesAllTime + '<span style="color:var(--paper-dim);"> species</span></span><span style="width:2px;height:2px;border-radius:50%;background:var(--paper-dim);display:inline-block;"></span>';
+    html += '<span style="font-family:var(--mono);font-size:9px;color:var(--sage);">eBird hotspot</span>';
     html += '</div>';
-    html += '<div style="margin-top:10px;display:flex;gap:6px;">';
-    html += '<a href="https://www.google.com/maps/dir/?api=1&destination='+h.lat+','+h.lng+'" target="_blank" style="flex:1;text-align:center;padding:7px 0;font-family:var(--mono);font-size:9px;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:5px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z" fill="none" stroke="currentColor" stroke-width="0.8"/><circle cx="4.5" cy="3.5" r="1.2" fill="currentColor"/></svg>Navigate</a>';
-    html += '<button onclick="toggleHotspotSpecies(\''+h.locId+'\')" style="flex:1;padding:7px 0;font-family:var(--mono);font-size:9px;color:var(--sage);border:0.5px solid rgba(143,168,136,0.3);border-radius:5px;background:transparent;cursor:pointer;" id="hsp-btn-'+h.locId+'">Recent Sightings</button>';
+    html += '<div style="margin-top:8px;display:flex;gap:6px;">';
+    html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng + '" target="_blank" style="flex:1;text-align:center;padding:7px 0;font-family:var(--mono);font-size:9px;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:5px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z" fill="none" stroke="currentColor" stroke-width="0.8"/><circle cx="4.5" cy="3.5" r="1.2" fill="currentColor"/></svg>Navigate</a>';
+    html += '<button onclick="toggleHotspotSpecies(\'' + h.locId + '\')" style="flex:1;padding:7px 0;font-family:var(--mono);font-size:9px;color:var(--sage);border:0.5px solid rgba(143,168,136,0.3);border-radius:5px;background:transparent;cursor:pointer;" id="hsp-btn-' + h.locId + '">Species</button>';
     html += '</div>';
-    html += '<div class="hotspot-species-list" id="hsp-list-'+h.locId+'"></div>';
+    html += '<div class="hotspot-species-list" id="hsp-list-' + h.locId + '"></div>';
     html += '</div>';
   });
   html += '</div>';
+
   el.innerHTML = html;
-  el._hotspots = _storedAllHotspots;
-  _hotspotZoomIdx = 2;
+  el._hotspots = hotspots;
+
+  // ── Init Leaflet map for hotspots ──
+  setTimeout(function() {
+    var mapEl = document.getElementById('hotspot-map-el');
+    if (!mapEl || window._hotspotLeaflet) {
+      if (window._hotspotLeaflet) {
+        window._hotspotLeaflet.invalidateSize();
+        _refreshHotspotMarkers(hotspots);
+      }
+      return;
+    }
+    var lat = userLat, lng = userLng;
+    if (!lat || !lng) { return; } // no location yet
+    window._hotspotLeaflet = L.map('hotspot-map-el', { center:[lat,lng], zoom:12, zoomControl:true, attributionControl:false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(window._hotspotLeaflet);
+
+    // User location
+    var userIcon = L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#8FA888;border:2px solid rgba(14,20,16,0.9);box-shadow:0 0 0 4px rgba(143,168,136,0.22);"></div>', iconSize:[14,14], iconAnchor:[7,7] });
+    L.marker([lat, lng], {icon:userIcon}).addTo(window._hotspotLeaflet).bindPopup('<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:#8FA888;">YOU ARE HERE</div>');
+
+    _refreshHotspotMarkers(hotspots);
+
+    var attrEl = document.querySelector('#hotspot-map-el + * .leaflet-control-attribution, #hotspot-map-el .leaflet-control-attribution');
+    if (attrEl) attrEl.style.cssText = 'background:rgba(14,20,16,0.75);color:rgba(232,220,196,0.4);font-size:7px;';
+  }, 80);
 }
+
+function _refreshHotspotMarkers(hotspots) {
+  if (!window._hotspotLeaflet) return;
+  if (window._hotspotLeafletMarkers) window._hotspotLeafletMarkers.forEach(function(m){ window._hotspotLeaflet.removeLayer(m); });
+  window._hotspotLeafletMarkers = [];
+
+  var hsIcon = L.divIcon({ className:'', html:'<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E3BF7A,#C9A35E 60%,#8B7240);border:2px solid rgba(14,20,16,0.8);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;"><svg width="8" height="10" viewBox="0 0 9 11" fill="#1A1410"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z"/></svg></div>', iconSize:[22,22], iconAnchor:[11,22], popupAnchor:[0,-24] });
+
+  hotspots.slice(0, 20).forEach(function(h) {
+    var dist = distKm(userLat, userLng, h.lat, h.lng);
+    var popup = L.popup({ className:'leaflet-popup-dark', maxWidth:200, closeButton:true }).setContent(
+      '<div style="font-family:Cormorant Garamond,serif;min-width:140px;">' +
+      '<div style="font-size:14px;font-weight:500;color:#ECDFC5;margin-bottom:3px;">' + h.locName + '</div>' +
+      '<div style="font-size:10px;color:#8FA888;margin-bottom:6px;">' + dist.toFixed(1) + 'km · ' + (h.numSpeciesAllTime||'?') + ' species</div>' +
+      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng + '" target="_blank" style="display:block;text-align:center;padding:5px;background:linear-gradient(135deg,#C9A35E,#8B7240);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:0.12em;color:#1A1410;text-decoration:none;">NAVIGATE ↗</a>' +
+      '</div>');
+    var m = L.marker([parseFloat(h.lat), parseFloat(h.lng)], {icon:hsIcon}).bindPopup(popup).addTo(window._hotspotLeaflet);
+    window._hotspotLeafletMarkers.push(m);
+  });
+
+  if (window._hotspotLeafletMarkers.length > 1) {
+    var group = new L.featureGroup(window._hotspotLeafletMarkers);
+    window._hotspotLeaflet.fitBounds(group.getBounds().pad(0.3));
+  }
+}
+
 async function checkRarityOnLoad() {
   if (rarityAlertShown) return;
   try {
@@ -4660,31 +4936,32 @@ async function checkRarityOnLoad() {
 // LOCATION CACHE
 // ═══════════════════════════════════════════════════════════════════
 function getLocation() {
+  // Already have coords — resolve immediately, no new permission prompt
+  if (userLat && userLng) return Promise.resolve();
   if (locationResolved) return Promise.resolve();
   if (locationPromise) return locationPromise;
   locationPromise = new Promise(function(resolve) {
     if (!navigator.geolocation) { locationResolved = true; resolve(); return; }
+    // Use maximumAge=Infinity to use any cached position — avoids re-prompting
+    // and gives instant result if permission was already granted
+    function onSuccess(pos) {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      locationResolved = true;
+      resolve();
+    }
+    function onError() { locationResolved = true; resolve(); }
     if (navigator.permissions) {
       navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
         if (result.state === 'denied') { locationResolved = true; resolve(); return; }
-        navigator.geolocation.getCurrentPosition(
-          function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
-          function() { locationResolved = true; resolve(); },
-          { timeout: 6000, maximumAge: 300000 }
-        );
+        // 'granted' — use cached position, no prompt
+        var maxAge = result.state === 'granted' ? Infinity : 60000;
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 8000, maximumAge: maxAge });
       }).catch(function() {
-        navigator.geolocation.getCurrentPosition(
-          function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
-          function() { locationResolved = true; resolve(); },
-          { timeout: 6000, maximumAge: 300000 }
-        );
+        navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 8000, maximumAge: 60000 });
       });
     } else {
-      navigator.geolocation.getCurrentPosition(
-        function(pos) { userLat = pos.coords.latitude; userLng = pos.coords.longitude; locationResolved = true; resolve(); },
-        function() { locationResolved = true; resolve(); },
-        { timeout: 6000, maximumAge: 300000 }
-      );
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 8000, maximumAge: 60000 });
     }
   });
   return locationPromise;
@@ -4805,6 +5082,8 @@ function renderDiscoverNearby() {
 function renderDiscoverHotspots() {
   var el = document.getElementById('discover-hotspots-inner');
   if (!el || el.dataset.loaded) return;
+  // Reset leaflet instance so map reinits in new container
+  if (window._hotspotLeaflet) { window._hotspotLeaflet.remove(); window._hotspotLeaflet = null; }
   renderHotspots('discover-hotspots-inner'); el.dataset.loaded = '1';
 }
 function renderDiscoverMigration() {
@@ -4856,7 +5135,6 @@ function updateSearchClearBtn() {
 }
 
 // Legacy stubs — no longer needed but kept safe
-function switchJournalTab() {}
 function toggleJournalSearch() { toggleCodexSearch(); }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4938,14 +5216,11 @@ function launchConfetti(originEl) {
 function animateCountTick(fromVal, toVal) {
   var el = document.getElementById('stat-total');
   if (!el || fromVal === toVal) return;
-  el.style.transition = 'transform 0.15s ease, color 0.3s';
-  el.style.transform = 'scale(1.5)';
-  el.style.color = 'var(--brass-hi)';
   el.textContent = toVal;
-  setTimeout(function() {
-    el.style.transform = 'scale(1)';
-    setTimeout(function() { el.style.color = ''; el.style.transition = ''; }, 300);
-  }, 150);
+  el.classList.remove('stat-bumping');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('stat-bumping');
+  setTimeout(function() { el.classList.remove('stat-bumping'); }, 550);
 }
 
 var lastAchievementState = null;
@@ -4987,6 +5262,16 @@ switchTab = function(tab) {
   originalSwitchTab(tab);
   var activeView = document.getElementById('view-' + tab);
   if (!activeView) return;
+  // Skip fade animation for map — Leaflet needs stable dimensions at init
+  if (tab === 'map') {
+    activeView.style.opacity = '1';
+    activeView.style.transform = 'none';
+    // Give the view a frame to paint, then force Leaflet to remeasure
+    setTimeout(function() {
+      if (_leafletMap) _leafletMap.invalidateSize();
+    }, 100);
+    return;
+  }
   activeView.style.opacity = '0'; activeView.style.transform = 'translateY(8px)'; activeView.style.transition = 'none';
   requestAnimationFrame(function() {
     requestAnimationFrame(function() {
