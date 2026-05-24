@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Grey Heron · Field Journal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="preload" as="style" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></noscript>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
 /* ═══════════════════════════════════════════════════════════════
@@ -169,8 +170,13 @@ html,body {
   display:none; flex-direction:column; height:100vh; height:100dvh; width:100%;
   background: var(--ink);
   background-image:
-    radial-gradient(circle at 10% 90%, rgba(62,81,66,0.08) 0%, transparent 35%),
-    radial-gradient(circle at 90% 10%, rgba(201,163,94,0.03) 0%, transparent 35%);
+    /* Horizon glow — bottom warm, top cool */
+    radial-gradient(ellipse at 50% 110%, rgba(201,163,94,0.06) 0%, transparent 55%),
+    /* Top-left cool mist */
+    radial-gradient(circle at 8% 12%, rgba(62,81,66,0.10) 0%, transparent 40%),
+    /* Mid atmosphere */
+    radial-gradient(circle at 85% 30%, rgba(143,168,136,0.04) 0%, transparent 35%),
+    radial-gradient(circle at 20% 75%, rgba(62,81,66,0.06) 0%, transparent 30%);
   position: relative;
 }
 
@@ -185,7 +191,7 @@ html,body {
 /* Scan-line texture */
 .app::after {
   content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 499;
-  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 3px);
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.01) 2px, rgba(0,0,0,0.01) 3px);
   pointer-events: none;
 }
 
@@ -236,6 +242,17 @@ html,body {
 .content::-webkit-scrollbar-track { background:transparent; }
 .content::-webkit-scrollbar-thumb { background:rgba(201,163,94,0.15); border-radius:2px; }
 
+
+/* Aurora line above bottom nav */
+.bottom-nav::before {
+  content:''; position:absolute; top:-1px; left:10%; right:10%; height:0.5px;
+  background:linear-gradient(90deg,
+    transparent 0%, rgba(201,163,94,0.0) 5%,
+    rgba(201,163,94,0.35) 30%, rgba(232,220,196,0.5) 50%,
+    rgba(201,163,94,0.35) 70%, rgba(201,163,94,0.0) 95%, transparent 100%);
+  animation:aurora-shift 10s ease infinite;
+  pointer-events:none;
+}
 /* ── BOTTOM NAV ─────────────────────────────────── */
 .bottom-nav {
   height: calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
@@ -586,6 +603,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
   background:linear-gradient(180deg,var(--ink-1),var(--ink));
   border:0.5px solid var(--line-2); border-radius:16px 16px 0 0;
   width:100%; max-width:600px; max-height:88vh; overflow-y:auto;
+  box-sizing:border-box; overflow-x:hidden; position:relative;
   -webkit-overflow-scrolling:touch; padding-bottom:env(safe-area-inset-bottom);
   overscroll-behavior:contain; box-shadow:0 -12px 60px rgba(0,0,0,0.7);
 }
@@ -656,8 +674,8 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 
 /* DETAIL MODAL */
 .detail-close-x {
-  position:sticky; top:12px; float:right; z-index:10; margin-right:12px;
-  background:rgba(0,0,0,0.55); backdrop-filter:blur(8px);
+  position:absolute; top:10px; right:10px; z-index:30;
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
   border:0.5px solid var(--line-2); color:var(--paper-dim);
   border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer;
   display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;
@@ -666,7 +684,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 .detail-modal-footer { position:sticky; bottom:0; z-index:5; background:linear-gradient(0deg,var(--ink) 60%,rgba(14,20,16,0)); padding:16px 20px 20px !important; }
 .detail-hero { width:100%; max-height:280px; background:linear-gradient(160deg,var(--ink-2),var(--ink)); display:flex; align-items:center; justify-content:center; font-size:80px; overflow:hidden; flex-shrink:0; cursor:zoom-in; }
 .detail-hero img { width:100%; max-height:270px; object-fit:contain; display:block; }
-.detail-body { padding:16px 20px; display:flex; flex-direction:column; gap:15px; }
+.detail-body { padding:14px 18px 16px; display:flex; flex-direction:column; gap:15px; }
 .detail-name { font-family:var(--serif); font-size:28px; font-weight:500; color:var(--paper); letter-spacing:-0.3px; font-style:italic; }
 .detail-species { font-family:var(--body); font-size:12px; color:var(--sage-dim); font-style:italic; margin-top:2px; letter-spacing:0.3px; }
 .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
@@ -1146,7 +1164,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
     </div>
     <div class="topbar-right" style="position:relative;z-index:1;">
       <div id="sync-status" title="Offline" style="width:7px;height:7px;border-radius:50%;background:var(--brass);flex-shrink:0;transition:background 0.3s;"></div>
-      <div class="topbar-stat"><b id="stat-total">0</b><span>birds</span></div>
+      <div class="topbar-stat"><b id="stat-total">0</b><span style="letter-spacing:0.18em;">BIRDS</span></div>
     </div>
   </div>
 
@@ -1561,7 +1579,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
 
 <!-- DETAIL MODAL -->
 <div class="modal-bg" id="detail-modal">
-  <div class="modal" style="border-radius:16px 16px 0 0;position:relative;">
+  <div class="modal" style="border-radius:16px 16px 0 0;">
     <div class="modal-handle"></div>
     <button class="detail-close-x" onclick="closeModal('detail-modal')">×</button>
     <div id="detail-content"></div>
@@ -1668,7 +1686,9 @@ var currentPhotoBase64 = null;
 var locationResolved = false;
 var locationPromise = null;
 var userLat = null, userLng = null;
-var ebirdCache = {}; // v2 - clears stale dist=100 cache
+var ebirdCache = {};
+try { var _ec = sessionStorage.getItem('gh_ec'); if (_ec) ebirdCache = JSON.parse(_ec); } catch(e) {}
+function _saveEbirdCache() { try { sessionStorage.setItem('gh_ec', JSON.stringify(ebirdCache)); } catch(e) {} }
 // ═══════════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════════
@@ -1679,7 +1699,7 @@ async function initAuth() {
   document.getElementById('app').style.display = 'none';
   try {
     const { data: { user } } = await sb.auth.getUser();
-    setLoadingProgress(10, 'Authenticating…');
+    setLoadingProgress(10, 'Opening the journal…');
     if (user) { currentUser = user; showApp(); loadAllData(); }
     else {
       setLoadingProgress(10, 'Signing in…');
@@ -1805,7 +1825,7 @@ async function getFromCache(key) {
 
 async function loadAllData() {
   updateSyncStatus(isOnline ? 'online' : 'offline');
-  setLoadingProgress(25, 'Loading species list…');
+  setLoadingProgress(25, 'Gathering the codex…');
   const { data: masters } = await sb.from('master_birds').select('*');
   if (masters && masters.length) {
     MASTER = masters.map(m => ({ name: m.name, species: m.species, type: m.type, size: m.size }));
@@ -1813,7 +1833,7 @@ async function loadAllData() {
   } else {
     MASTER = await getFromCache('master') || [];
   }
-  setLoadingProgress(55, 'Loading your sightings…');
+  setLoadingProgress(55, 'Recalling your sightings…');
   if (isOnline && currentUser) {
     const { data: sightings, error } = await sb
       .from('bird_sightings').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
@@ -1822,7 +1842,7 @@ async function loadAllData() {
   } else { birds = await getFromCache('birds') || []; }
   setLoadingProgress(80, 'Building your codex…');
   updateStats(); renderCodexActive();
-  setLoadingProgress(95, 'Almost ready…');
+  setLoadingProgress(95, 'Field journal ready…');
   setTimeout(function() {
     _afterRenderHook(); initParallax();
     hideLoadingScreen();
@@ -1846,10 +1866,31 @@ function normalizeBird(s) {
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
-// ═══════════════════════════════════════════════════════════════════; return m[h]||'🐦'; }; return m[t]||'unknown'; }; return m[s]||'small'; }
+// ═══════════════════════════════════════════════════════════════════
 
 function updateStats() {
   document.getElementById('stat-total').textContent = birds.length;
+  // Time-of-day icon in topbar
+  (function() {
+    var h = new Date().getHours();
+    var isNight = h < 6 || h >= 19;
+    var isDusk  = (h >= 17 && h < 19) || (h >= 6 && h < 8);
+    var icon = isNight
+      ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10.5 7.5A4.5 4.5 0 015 3a5 5 0 100 8.5A4.5 4.5 0 0110.5 7.5z" fill="rgba(201,163,94,0.35)"/></svg>'
+      : isDusk
+      ? '<svg width="14" height="14" viewBox="0 0 14 14"><line x1="7" y1="1" x2="7" y2="3" stroke="rgba(201,163,94,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="7" y1="11" x2="7" y2="13" stroke="rgba(201,163,94,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="1" y1="7" x2="3" y2="7" stroke="rgba(201,163,94,0.4)" stroke-width="1.2" stroke-linecap="round"/><line x1="11" y1="7" x2="13" y2="7" stroke="rgba(201,163,94,0.4)" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="7" r="2.5" fill="rgba(201,163,94,0.3)" stroke="rgba(201,163,94,0.4)" stroke-width="0.8"/></svg>'
+      : '';
+    if (icon) {
+      var el = document.createElement('div');
+      el.innerHTML = icon;
+      el.style.cssText = 'position:absolute;right:18px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.7;';
+      // Don't add if already present
+      if (!document.querySelector('.topbar-time-icon')) {
+        el.className = 'topbar-time-icon';
+        document.querySelector('.topbar')?.appendChild(el);
+      }
+    }
+  })();
   const storageEl = document.getElementById('storage-usage');
   if (storageEl) {
     const approxBytes = new Blob([JSON.stringify(birds)]).size;
@@ -1955,7 +1996,12 @@ const CATEGORY_CONFIG = [
   { label: 'Unknown', types: ['Unknown'] },
 ];
 
+var _lastPdexHash = '';
 function renderPokedex() {
+  var _rhQ = ((document.getElementById('codex-search-input') || {}).value || '').toLowerCase().trim();
+  var _rhHash = _rhQ + '|' + birds.length + '|' + (window._pdexShowUnseen ? '1' : '0');
+  if (_rhHash === _lastPdexHash) return;
+  _lastPdexHash = _rhHash;
   const q = ((document.getElementById('search-input') || {}).value || '').toLowerCase().trim();
   const captured = new Set(birds.map(b => (b.name || '').toLowerCase().trim()));
   const categories = CATEGORY_CONFIG.map(cat => {
@@ -2040,7 +2086,7 @@ function renderPokedex() {
       </div>
       <!-- Section title -->
       <div style="padding:8px 2px 6px;">
-        <div class="section-order-label">${orderLabel}</div>
+        <div class="section-order-label" style="display:flex;align-items:center;gap:8px;"><span style="font-family:var(--mono);font-size:8px;color:rgba(201,163,94,0.45);letter-spacing:0.2em;">${['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'][catIdx]||catIdx}</span><span style="width:20px;height:0.5px;background:rgba(201,163,94,0.15);display:inline-block;"></span><span>${orderLabel}</span></div>
         <div class="section-header">
           <div class="section-title">${titleHtml}</div>
           <div class="section-count">${capturedCount}<span style="color:var(--sage-dim);margin:0 2px;">/</span>${total}</div>
@@ -2048,9 +2094,7 @@ function renderPokedex() {
         <!-- Progress bar -->
         <div class="section-progress-wrap">
           <div class="section-progress-fill" style="width:${Math.max(progress * 100, progress > 0 ? 2 : 0)}%"></div>
-          <div class="section-progress-tick" style="left:25%"></div>
-          <div class="section-progress-tick" style="left:50%"></div>
-          <div class="section-progress-tick" style="left:75%"></div>
+
         </div>
       </div>`;
 
@@ -2086,14 +2130,17 @@ function renderPokedex() {
           }
           <div style="position:absolute;bottom:5px;left:7px;right:7px;display:flex;justify-content:space-between;z-index:2;pointer-events:none;">
             <span style="font-family:var(--mono);font-size:6.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--brass-hi);opacity:0.7;">PLATE · No. ${String(i+1).padStart(3,'0')}</span>
-            <span style="font-family:var(--mono);font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--paper-dim);opacity:0.5;">FROM LIFE</span>
+            <span style="font-family:var(--body);font-style:italic;font-size:8px;color:var(--paper-dim);opacity:0.45;">from life</span>
           </div>
           <div class="pdex-collected-mark"><svg width="8" height="8" viewBox="0 0 9 9"><path d="M1 4.5L3.5 7L8 1.8" stroke="var(--ink)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         </div>
         <div class="pdex-body">
           <div class="pdex-name">${userBird.name.split(' ').slice(0,-1).join(' ')||userBird.name} <em style="font-style:italic;color:var(--brass-hi);font-weight:400;">${userBird.name.split(' ').slice(-1)[0]||''}</em></div>
           <div class="pdex-species">${userBird.species || ''}</div>
-          ${iucnBadge(userBird) ? `<div style="margin-top:3px;">${iucnBadge(userBird)}</div>` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
+            ${iucnBadge(userBird) ? iucnBadge(userBird) : '<span></span>'}
+            ${(function(){ var d=userBird.date||userBird._raw?.date_spotted; if(!d)return''; var days=Math.floor((Date.now()-new Date(d).getTime())/86400000); return days===0?'<span style="font-family:var(--mono);font-size:6.5px;color:var(--sage);letter-spacing:0.1em;">today</span>':days<7?`<span style="font-family:var(--mono);font-size:6.5px;color:var(--sage-dim);letter-spacing:0.1em;">${days}d</span>`:'' })()}
+          </div>
         </div>
       </div>`;
     });
@@ -2124,7 +2171,7 @@ function renderPokedex() {
             <div style="width:52px;height:52px;color:var(--paper-ghost);opacity:0.18;position:relative;z-index:1;">${SILHOUETTES[item.type||cat.types[0]]||SILHOUETTES.Unknown}</div>
           </div>
           <div class="pdex-body">
-            <div class="pdex-name" style="color:var(--paper-ghost);font-size:11px;">${item.name}</div>
+            <div class="pdex-name" style="color:var(--paper-ghost);font-size:12px;">${item.name}</div>
             <div class="pdex-species" style="opacity:0.3;">${item.species||''}</div>
           </div>
         </div>`;
@@ -2133,10 +2180,10 @@ function renderPokedex() {
     }
 
     // Section footer ornament
-    const shortLabel = label.toUpperCase().slice(0, 12);
+    const shortLabel = label.toUpperCase().split(' ')[0].slice(0, 10);
     html += `<div class="section-footer">
       <div class="section-footer-line"></div>
-      <span class="section-footer-label">END · ${shortLabel}</span>
+      <span class="section-footer-label" style="letter-spacing:0.24em;font-size:7.5px;">✦ ${shortLabel} ✦</span>
       <div class="section-footer-line"></div>
     </div>`;
 
@@ -2381,9 +2428,14 @@ function _refreshLeafletMarkers(geoBirds) {
     _leafletMarkers.push(marker);
   });
 
-  if (geoBirds.length > 1) {
-    var group = new L.featureGroup(_leafletMarkers);
-    _leafletMap.fitBounds(group.getBounds().pad(0.2));
+  if (_leafletMarkers.length > 0) {
+    // Only fit to markers within 800km of user to avoid world zoom
+    var nearM = userLat ? _leafletMarkers.filter(function(m){
+      var ll = m.getLatLng(); return distKm(userLat,userLng,ll.lat,ll.lng) < 800;
+    }) : _leafletMarkers;
+    var useM = nearM.length > 0 ? nearM : _leafletMarkers;
+    if (useM.length === 1) { _leafletMap.setView(useM[0].getLatLng(), 13); }
+    else { _leafletMap.fitBounds(new L.featureGroup(useM).getBounds().pad(0.25), {maxZoom:13}); }
   }
 }
 
@@ -2418,14 +2470,14 @@ function openDetail(id) {
 
   document.getElementById('detail-content').innerHTML = `
     <!-- Image plate -->
-    <div style="margin:16px 0 0;position:relative;">
+    <div style="margin:0;position:relative;">
       <!-- Tape corners — inside frame -->
         <div style="position:absolute;top:6px;left:6px;width:28px;height:12px;background:rgba(143,168,136,0.35);border-radius:2px;transform:rotate(-2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
         <div style="position:absolute;top:6px;right:6px;width:28px;height:12px;background:rgba(143,168,136,0.35);border-radius:2px;transform:rotate(2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
         <div style="position:absolute;bottom:32px;left:6px;width:28px;height:12px;background:rgba(143,168,136,0.25);border-radius:2px;transform:rotate(2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
         <div style="position:absolute;bottom:32px;right:6px;width:28px;height:12px;background:rgba(143,168,136,0.25);border-radius:2px;transform:rotate(-2deg);z-index:5;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
       <!-- Photo frame -->
-      <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="position:relative;cursor:zoom-in;height:280px;overflow:hidden;border:0.5px solid var(--line-2);border-radius:2px;background:linear-gradient(165deg,${b.type?({"Raptor":"#3A3128","Waterbird":"#2A3A42","Wader":"#2A3830","Owl":"#2E2C1C","Kingfisher":"#1E2C3A","Songbird":"#2A3428"}[b.type]||"#252D26"):"#252D26"} 0%,var(--ink) 100%);">
+      <div onclick="b_photo_click(this)" data-photo-id="${b.id}" style="position:relative;cursor:zoom-in;height:300px;margin-top:8px;overflow:hidden;border:0.5px solid var(--line-2);border-radius:10px;background:linear-gradient(165deg,${b.type?({"Raptor":"#3A3128","Waterbird":"#2A3A42","Wader":"#2A3830","Owl":"#2E2C1C","Kingfisher":"#1E2C3A","Songbird":"#2A3428"}[b.type]||"#252D26"):"#252D26"} 0%,var(--ink) 100%);">
         <!-- Topo contour lines background -->
         <svg viewBox="0 0 360 280" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.07;">
           ${[20,38,58,80,104,130,158,188].map((r,i) => `<ellipse cx="180" cy="140" rx="${r}" ry="${Math.round(r*0.75)}" fill="none" stroke="var(--paper)" stroke-width="0.6"/>`).join("")}
@@ -4095,16 +4147,15 @@ function renderStats() {
   html += '<div style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);margin-top:4px;">' + uniqueSpecies + ' / ' + totalMaster + '</div></div>';
   html += '</div>';
   // Progress bar
-  html += '<div style="position:relative;height:8px;margin-top:14px;background:rgba(201,163,94,0.06);border-radius:4px;overflow:hidden;">';
-  html += '<div style="width:' + Math.max(pct,1) + '%;height:100%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi));border-radius:4px;box-shadow:0 0 10px rgba(201,163,94,0.5);position:relative;overflow:hidden;">';
-  html += '<div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.3) 50%,transparent 100%);animation:shimmer-bar 2.6s ease-in-out infinite;"></div></div>';
-  [0.25,0.5,0.75].forEach(function(t){ html += '<div style="position:absolute;left:' + (t*100) + '%;top:-2px;bottom:-2px;width:0.5px;background:var(--ink);"></div>'; });
+  html += '<div style="position:relative;height:3px;margin-top:16px;background:rgba(201,163,94,0.08);border-radius:2px;overflow:hidden;">';
+  html += '<div style="width:' + Math.max(pct,1) + '%;height:100%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi));border-radius:2px;box-shadow:0 0 6px rgba(201,163,94,0.4);transition:width 1s ease;"></div>';
   html += '</div>';
   // Mini stats row
   html += '<div style="display:flex;margin-top:14px;gap:0;">';
   [{v:totalSightings,l:'Sightings'},{v:thisWeekCount,l:'This week'},{v:hotspotsVisited,l:'Locations'},{v:currentStreak+' wks',l:'Streak'}].forEach(function(s){
-    html += '<div style="flex:1;"><div style="font-family:var(--serif);font-size:18px;font-weight:500;color:var(--paper);line-height:1;">' + s.v + '</div>';
-    html += '<div style="font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--paper-dim);margin-top:3px;">' + s.l + '</div></div>';
+    html += '<div style="flex:1;border-left:0.5px solid rgba(201,163,94,0.08);padding-left:10px;">&ZeroWidthSpace;';
+    html += '<div style="font-family:var(--serif);font-size:22px;font-weight:500;color:var(--paper);line-height:1;letter-spacing:-0.5px;">' + s.v + '</div>';
+    html += '<div style="font-family:var(--mono);font-size:7.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--brass);opacity:0.6;margin-top:4px;">' + s.l + '</div></div>';
   });
   html += '</div>';
   html += '</div></div>'; // close card
@@ -4649,7 +4700,7 @@ async function fetchNearby(lat, lng, dist, days) {
   try {
     var res = await fetch(EBIRD_BASE + '/data/obs/geo/recent?lat=' + lat + '&lng=' + lng + '&dist=' + (dist||25) + '&back=' + (days||7) + '&maxResults=100&includeProvisional=true', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
     if (!res.ok) throw new Error('eBird error');
-    var data = await res.json(); ebirdCache[cacheKey] = data; return data;
+    var data = await res.json(); ebirdCache[cacheKey] = data; _saveEbirdCache(); return data;
   } catch(e) { return []; }
 }
 
@@ -4659,7 +4710,7 @@ async function fetchNotable(lat, lng, dist) {
   try {
     var res = await fetch(EBIRD_BASE + '/data/obs/geo/recent/notable?lat=' + lat + '&lng=' + lng + '&dist=' + (dist||50) + '&back=14&maxResults=20&detail=full', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
     if (!res.ok) throw new Error('eBird notable error');
-    var data = await res.json(); ebirdCache[cacheKey] = data; return data;
+    var data = await res.json(); ebirdCache[cacheKey] = data; _saveEbirdCache(); return data;
   } catch(e) { return []; }
 }
 
@@ -4669,7 +4720,7 @@ async function fetchHotspots(lat, lng, dist) {
   try {
     var res = await fetch(EBIRD_BASE + '/ref/hotspot/geo?lat=' + lat + '&lng=' + lng + '&dist=' + (dist||25) + '&back=30&fmt=json', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
     if (!res.ok) throw new Error('eBird hotspots error');
-    var data = await res.json(); ebirdCache[cacheKey] = data; return data;
+    var data = await res.json(); ebirdCache[cacheKey] = data; _saveEbirdCache(); return data;
   } catch(e) { return []; }
 }
 
@@ -4735,8 +4786,9 @@ async function renderDiscover(targetId) {
       html += '<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--sage);margin-top:3px;">' + (obs.sciName||'') + '</div>';
       html += '</div>';
       html += '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">';
-      html += '<a href="https://ebird.org/species/' + (obs.speciesCode||'') + '" target="_blank" style="padding:6px 10px;font-family:var(--mono);font-size:9px;color:var(--sage);border:0.5px solid rgba(143,168,136,0.3);border-radius:4px;background:transparent;text-decoration:none;text-align:center;">Know more</a>';
-      if (obs.lat && obs.lng) html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng + '" target="_blank" style="padding:6px 10px;font-family:var(--mono);font-size:9px;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:4px;background:transparent;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;"><svg width="8" height="10" viewBox="0 0 8 10"><path d="M4 0a3 3 0 013 3c0 2-3 6-3 6S1 5 1 3a3 3 0 013-3z" fill="none" stroke="currentColor" stroke-width="0.8"/><circle cx="4" cy="3" r="1" fill="currentColor"/></svg>Locate</a>';
+      var btnBase = 'padding:7px 12px;font-family:var(--mono);font-size:8.5px;letter-spacing:0.1em;border-radius:5px;background:transparent;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;';
+      html += '<a href="https://ebird.org/species/' + (obs.speciesCode||'') + '" target="_blank" style="' + btnBase + 'color:var(--sage);border:0.5px solid rgba(143,168,136,0.28);">eBird ↗</a>';
+      if (obs.lat && obs.lng) html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + obs.lat + ',' + obs.lng + '" target="_blank" style="' + btnBase + 'color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.3);"><svg width="7" height="9" viewBox="0 0 8 10"><path d="M4 0a3 3 0 013 3c0 2-3 6-3 6S1 5 1 3a3 3 0 013-3z" fill="none" stroke="currentColor" stroke-width="0.8"/><circle cx="4" cy="3" r="1" fill="currentColor"/></svg>Go</a>';
       html += '</div></div></div>';
     });
     html += '</div>';
@@ -4798,7 +4850,7 @@ async function fetchHotspotSpecies(locId) {
   try {
     var res = await fetch(EBIRD_BASE + '/data/obs/' + locId + '/recent?maxResults=20&back=14', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
     if (!res.ok) return [];
-    var data = await res.json(); ebirdCache[cacheKey] = data; return data;
+    var data = await res.json(); ebirdCache[cacheKey] = data; _saveEbirdCache(); return data;
   } catch(e) { return []; }
 }
 
@@ -5367,5 +5419,411 @@ window.addEventListener('offline', () => { isOnline = false; updateSyncStatus('o
 
 initAuth();
 </script>
+
+<!-- ═══════════════════════════════════════════════════
+     AMBIENT LAYER: Flying birds + atmosphere
+═══════════════════════════════════════════════════ -->
+<canvas id="bird-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;opacity:0.14;" aria-hidden="true"></canvas>
+
+<style>
+/* ── Aurora shimmer on topbar ── */
+@keyframes aurora-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.topbar::before {
+  background: linear-gradient(270deg,
+    rgba(201,163,94,0.0), rgba(62,81,66,0.06),
+    rgba(201,163,94,0.04), rgba(62,81,66,0.0));
+  background-size: 400% 400%;
+  animation: aurora-shift 12s ease infinite;
+}
+
+/* ── Bottom nav ink pool glow ── */
+@keyframes nav-breathe {
+  0%,100% { box-shadow: 0 -1px 20px rgba(201,163,94,0.04); }
+  50%      { box-shadow: 0 -1px 32px rgba(201,163,94,0.10); }
+}
+.bottom-nav { animation: nav-breathe 8s ease-in-out infinite; will-change:box-shadow; }
+
+/* ── Codex section headers: ornamental side lines ── */
+.pokedex-section.in-view .section-header::before,
+.pokedex-section.in-view .section-header::after {
+  content:''; position:absolute; top:50%; height:0.5px;
+  background:linear-gradient(90deg, var(--brass-lo), transparent);
+  width:20px; transform:translateY(-50%);
+}
+.pokedex-section.in-view .section-header::before { right:100%; margin-right:8px; }
+.pokedex-section.in-view .section-header::after  { left:100%;  margin-left:8px; transform:translateY(-50%) scaleX(-1); }
+
+/* ── Card hover: subtle gold inner glow ── */
+.pdex-card:hover {
+  box-shadow: 0 14px 36px rgba(0,0,0,0.65),
+              0 0 0 0.5px rgba(201,163,94,0.22),
+              inset 0 0 20px rgba(201,163,94,0.03);
+}
+
+/* ── Loading screen: gold dust particles ── */
+@keyframes dust-float {
+  0%   { transform:translateY(0) translateX(0) scale(1); opacity:0; }
+  20%  { opacity:1; }
+  100% { transform:translateY(-120px) translateX(var(--dx)) scale(0.3); opacity:0; }
+}
+.dust-particle {
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background:var(--brass-hi); animation:dust-float 4s ease-out infinite;
+}
+
+/* ── Stat cards in detail modal: subtle left accent bar ── */
+#detail-content [id^="barchart-inner-"] > div {
+  border-left: 1.5px solid rgba(201,163,94,0.15) !important;
+  transition: border-color 0.3s;
+}
+#detail-content [id^="barchart-inner-"] > div:hover {
+  border-left-color: rgba(201,163,94,0.4) !important;
+}
+
+/* ── Tab strip active: wider underline that breathes ── */
+@keyframes tab-line-breathe {
+  0%,100% { width:60%; opacity:1; }
+  50%      { width:80%; opacity:0.7; }
+}
+.pdex-tab.active .tab-ink-pool {
+  animation: tab-line-breathe 3s ease-in-out infinite;
+}
+
+/* ── Section progress bars: staggered entrance ── */
+.pokedex-section.in-view .section-progress-fill {
+  animation: progress-reveal 0.8s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+@keyframes progress-reveal {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ═══════════════════════════════════════════
+   DEEP UI PASS — Grey Heron v2
+═══════════════════════════════════════════ */
+
+/* ── 1. Section divider: animated etching line ── */
+.pokedex-section + .pokedex-section {
+  border-top: 0.5px solid transparent;
+  background-image: linear-gradient(var(--ink-1), var(--ink-1)),
+    linear-gradient(90deg, transparent 0%, rgba(201,163,94,0.12) 20%,
+    rgba(201,163,94,0.20) 50%, rgba(201,163,94,0.12) 80%, transparent 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* ── 2. FAB pulse ring ── */
+@keyframes fab-pulse {
+  0%   { box-shadow: 0 4px 16px rgba(201,163,94,0.2), 0 0 0 0 rgba(201,163,94,0.4); }
+  60%  { box-shadow: 0 4px 16px rgba(201,163,94,0.2), 0 0 0 10px rgba(201,163,94,0); }
+  100% { box-shadow: 0 4px 16px rgba(201,163,94,0.2), 0 0 0 0 rgba(201,163,94,0); }
+}
+.topbar-add { animation: fab-pulse 3s ease-out infinite; }
+.topbar-add:hover { animation: none; }
+
+/* ── 3. Modal drag handle: wider, more tactile ── */
+.modal-handle {
+  width: 44px !important; height: 5px !important;
+  background: linear-gradient(90deg, rgba(201,163,94,0.15), rgba(201,163,94,0.35), rgba(201,163,94,0.15)) !important;
+  border-radius: 3px !important;
+  margin: 10px auto 6px !important;
+}
+
+/* ── 4. Detail body section cards: hover lift ── */
+#detail-content > .detail-body > div {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#detail-content > .detail-body > div:active {
+  transform: scale(0.99);
+}
+
+/* ── 5. Nearest sighting card: glow when loaded ── */
+#detail-content [id^="nearest-sighting-"] {
+  transition: border-color 0.5s ease;
+}
+
+/* ── 6. XC waveform bars: gradient glow ── */
+.xc-bar {
+  background: linear-gradient(180deg, var(--brass-hi) 0%, var(--brass) 50%, rgba(201,163,94,0.4) 100%) !important;
+  border-radius: 2px 2px 1px 1px !important;
+}
+
+/* ── 7. Tab strip: bottom edge shimmer on scroll ── */
+.pdex-tabs-wrap::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,163,94,0.18) 40%, rgba(201,163,94,0.08) 60%, transparent);
+  pointer-events: none;
+}
+
+/* ── 8. Discover section tab strip ── */
+#view-discover .discover-tabs {
+  position: relative;
+}
+#view-discover .discover-tabs::after {
+  content: '';
+  position: absolute; bottom: 0; left: 5%; right: 5%; height: 0.5px;
+  background: linear-gradient(90deg, transparent, rgba(201,163,94,0.2), transparent);
+}
+
+/* ── 9. IUCN badge: sharper text, richer background ── */
+.wax-badge {
+  letter-spacing: 0.14em !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+
+/* ── 10. Codex grid: subtle drop shadow on scroll ── */
+.pdex-card {
+  box-shadow: 0 2px 14px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.03) inset;
+}
+
+/* ── 11. Loading bar: animated gradient sweep ── */
+@keyframes bar-sweep {
+  0%   { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+#loading-bar-fill {
+  background: linear-gradient(90deg,
+    var(--brass-lo) 0%, var(--brass-hi) 40%,
+    rgba(255,255,255,0.7) 50%,
+    var(--brass-hi) 60%, var(--brass-lo) 100%) !important;
+  background-size: 200px 100% !important;
+  animation: bar-sweep 1.5s linear infinite !important;
+  transition: width 0.4s ease !important;
+}
+
+/* ── 12. Topbar logo: subtle letter-spacing on hover ── */
+.topbar-logo:hover .topbar-logo-name {
+  letter-spacing: 0.01em;
+  transition: letter-spacing 0.4s ease;
+}
+
+/* ── 13. Stats page: section headers more editorial ── */
+.stats-section-label {
+  font-size: 8px !important;
+  letter-spacing: 0.32em !important;
+}
+
+/* ── 14. Bottom nav: active icon scale ── */
+.nav-tab.active svg {
+  filter: drop-shadow(0 0 4px rgba(201,163,94,0.5));
+}
+
+/* ── 15. Image plate: subtle inner vignette ── */
+#detail-content .pdex-img::after,
+#detail-content [onclick*="b_photo_click"]::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(14,20,16,0.25) 100%);
+}
+
+/* ── 16. Upload zone: animated corner brackets ── */
+@keyframes bracket-glow {
+  0%,100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
+}
+#upload-drop-zone .corner-bracket { animation: bracket-glow 2.5s ease-in-out infinite; }
+
+/* ── 17. Scroll spy tab active: text bump ── */
+.pdex-tab.active .pdex-tab-label {
+  transform: translateY(-0.5px);
+  transition: transform 0.2s ease;
+}
+
+/* ── 18. Map container: border radius + shadow ── */
+#map-el {
+  border-radius: 0;
+}
+
+/* ── 19. Hotspot map container: styled frame ── */
+#hotspot-map-el {
+  border-radius: 8px;
+}
+
+</style>
+
+<script>
+(function() {
+  var canvas = document.getElementById('bird-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ─── BIRD SILHOUETTE ─────────────────────────────
+  // Clean classic M-curve — two wing strokes only
+  function drawBird(x, y, size, phase, dir) {
+    var flap = Math.sin(phase) * 0.5; // -0.5 (down) to +0.5 (up)
+    var span = size * 9;              // total wingspan in px
+    var mid  = size * 1.2;            // body centre height
+    var wTip = span * 0.5;            // wing tip x offset from centre
+    // Wing tip y: raised when flap>0, lowered when flap<0
+    var tipY = y - mid + flap * size * 3.5;
+    // Control point for the curve arc — above the line
+    var cpY  = y - mid + flap * size * 1.2 - size * 0.8;
+    ctx.beginPath();
+    // Left wing: tip → centre
+    ctx.moveTo(x - wTip, tipY);
+    ctx.quadraticCurveTo(x - wTip * 0.38, cpY, x, y);
+    // Right wing: centre → tip
+    ctx.quadraticCurveTo(x + wTip * 0.38, cpY, x + wTip, tipY);
+  }
+
+  // ─── FLOCK DATA MODEL ────────────────────────────────
+  // A "flock event" is a group of 1-9 birds all heading the same direction
+  // at the same altitude band, with slight individual offsets.
+  // Birds in a flock maintain loose V-formation or scattered cluster.
+
+  var flocks = []; // array of active flocks
+
+  function createFlock() {
+    var count   = Math.random() < 0.35 ? 1           // solo bird (35%)
+                : Math.random() < 0.55 ? 2 + Math.floor(Math.random() * 3)  // small group 2-4 (35%)
+                : 4 + Math.floor(Math.random() * 5); // larger group 4-8 (30%)
+
+    var fromLeft = Math.random() > 0.5;
+    var dir      = fromLeft ? 1 : -1;
+
+    // All birds in flock share same altitude band + heading
+    var bandY    = H * (0.04 + Math.random() * 0.48);
+    var speed    = 0.7 + Math.random() * 0.6;    // pixels per frame
+    var size     = 1.4 + Math.random() * 2.2;    // shared base size
+
+    var flock = { birds: [], dir: dir, speed: speed, dead: false };
+
+    for (var i = 0; i < count; i++) {
+      // Formation offset — loose V or scatter
+      var formX, formY;
+      if (count === 1) {
+        formX = formY = 0;
+      } else if (count <= 4) {
+        // Loose V: each bird offset back and slightly up/down
+        formX = -i * (18 + Math.random() * 10);
+        formY = (i % 2 === 0 ? -1 : 1) * (i * 8 + Math.random() * 6);
+      } else {
+        // Scattered cluster
+        formX = -(Math.random() * count * 14);
+        formY = (Math.random() - 0.5) * 60;
+      }
+
+      var startX = fromLeft
+        ? -80 + formX * dir
+        : W + 80 - formX * dir;
+
+      flock.birds.push({
+        x:    startX,
+        y:    bandY + formY,
+        // Individual micro-drift
+        vy:   (Math.random() - 0.5) * 0.04,
+        // Stagger phase so each bird is mid-different flap
+        phase: Math.random() * Math.PI * 2,
+        phaseSpeed: 0.055 + Math.random() * 0.03,
+        size: size * (0.85 + Math.random() * 0.3),
+        // Lead bird slightly larger
+        opacity: i === 0 ? 0.9 : 0.6 + Math.random() * 0.35,
+      });
+    }
+
+    return flock;
+  }
+
+  // Seed 2-3 flocks already mid-screen on load
+  for (var s = 0; s < 3; s++) {
+    var f = createFlock();
+    f.birds.forEach(function(b) {
+      b.x = W * (0.1 + Math.random() * 0.8);
+      b.y = H * (0.04 + Math.random() * 0.45);
+    });
+    flocks.push(f);
+  }
+
+  var lastSpawn = 0;
+  var nextInterval = 6000 + Math.random() * 8000;
+
+  function tick(ts) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Spawn new flock
+    if (ts - lastSpawn > nextInterval) {
+      flocks.push(createFlock());
+      lastSpawn = ts;
+      nextInterval = 5000 + Math.random() * 10000;
+    }
+
+    ctx.strokeStyle = '#C9A35E';
+    ctx.lineCap = 'round';
+
+    for (var fi = flocks.length - 1; fi >= 0; fi--) {
+      var flock = flocks[fi];
+      var allDead = true;
+
+      for (var bi = 0; bi < flock.birds.length; bi++) {
+        var b = flock.birds[bi];
+        b.x     += flock.speed * flock.dir;
+        b.y     += b.vy;
+        b.phase += b.phaseSpeed;
+        // Very gentle sinusoidal altitude drift
+        b.vy    += Math.sin(b.phase * 0.18) * 0.003;
+        b.vy    *= 0.97;
+
+        var offScreen = flock.dir > 0
+          ? b.x > W + 100
+          : b.x < -100;
+
+        if (!offScreen) allDead = false;
+
+        // Edge fade
+        var fade = 1;
+        var mg = 60;
+        if (b.x < mg) fade = Math.max(0, b.x / mg);
+        if (b.x > W - mg) fade = Math.max(0, (W - b.x) / mg);
+
+        ctx.globalAlpha = b.opacity * fade;
+        ctx.lineWidth   = Math.max(0.6, b.size * 0.5);
+        drawBird(b.x, b.y, b.size, b.phase, flock.dir);
+        ctx.stroke();
+      }
+
+      if (allDead) flocks.splice(fi, 1);
+    }
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+
+  var animFrameId = requestAnimationFrame(tick);
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { cancelAnimationFrame(animFrameId); }
+    else { animFrameId = requestAnimationFrame(tick); }
+  });
+
+  // ── Dust particles on loading screen ──
+  var loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) {
+    for (var d = 0; d < 14; d++) {
+      var dust = document.createElement('div');
+      dust.className = 'dust-particle';
+      var dx = (Math.random() - 0.5) * 80;
+      dust.style.cssText = 'bottom:' + (15 + Math.random() * 35) + '%;' +
+        'left:' + (25 + Math.random() * 50) + '%;' +
+        '--dx:' + dx + 'px;' +
+        'animation-delay:' + (Math.random() * 5) + 's;' +
+        'animation-duration:' + (3.5 + Math.random() * 2.5) + 's;';
+      loadingScreen.appendChild(dust);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
