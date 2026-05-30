@@ -1845,27 +1845,47 @@ async function getFromCache(key) {
 async function loadAllData() {
   updateSyncStatus(isOnline ? 'online' : 'offline');
   setLoadingProgress(25, 'Gathering the codex…');
-  const { data: masters } = await sb.from('master_birds').select('*');
-  if (masters && masters.length) {
-    MASTER = masters.map(m => ({ name: m.name, species: m.species, type: m.type, size: m.size }));
-    saveToCache('master', MASTER);
-  } else {
-    MASTER = await getFromCache('master') || [];
+
+  // 1) Show cached data immediately so the app is usable without waiting on network
+  var cachedMaster = await getFromCache('master');
+  var cachedBirds = await getFromCache('birds');
+  if (cachedMaster && cachedMaster.length) MASTER = cachedMaster;
+  if (cachedBirds && cachedBirds.length) birds = cachedBirds;
+  if (MASTER.length || birds.length) {
+    setLoadingProgress(70, 'Building your codex…');
+    updateStats(); renderCodexActive();
+    setTimeout(function() { _afterRenderHook(); initParallax(); hideLoadingScreen(); }, 200);
   }
-  setLoadingProgress(55, 'Recalling your sightings…');
-  if (isOnline && currentUser) {
-    const { data: sightings, error } = await sb
-      .from('bird_sightings').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-    if (!error && sightings) { birds = sightings.map(normalizeBird); saveToCache('birds', birds); }
-    else { birds = await getFromCache('birds') || []; }
-  } else { birds = await getFromCache('birds') || []; }
-  setLoadingProgress(80, 'Building your codex…');
-  updateStats(); renderCodexActive();
+
+  // 2) Refresh from the network in parallel (master + sightings together, not sequentially)
+  if (isOnline) {
+    setLoadingProgress(85, 'Recalling your sightings…');
+    try {
+      var masterQ = sb.from('master_birds').select('*');
+      var sightQ = currentUser
+        ? sb.from('bird_sightings').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+        : Promise.resolve({ data: null });
+      var results = await Promise.all([masterQ, sightQ]);
+      var masters = results[0] && results[0].data;
+      var sightings = results[1] && results[1].data;
+      if (masters && masters.length) {
+        MASTER = masters.map(function(m){ return { name: m.name, species: m.species, type: m.type, size: m.size }; });
+        saveToCache('master', MASTER);
+      }
+      if (sightings) {
+        birds = sightings.map(normalizeBird);
+        saveToCache('birds', birds);
+      }
+      updateStats(); renderCodexActive();
+    } catch (e) { /* keep cached data on failure */ }
+  }
+
+  // If we had no cache to show earlier, hide the loader now
   setLoadingProgress(95, 'Field journal ready…');
   setTimeout(function() {
-    _afterRenderHook(); initParallax();
-    hideLoadingScreen();
-  }, 300);
+    _afterRenderHook(); initParallax(); hideLoadingScreen();
+  }, 200);
+
   setTimeout(updateDiscoverBadge, 5000);
   populateSidebar();
   if (typeof ACHIEVEMENTS !== 'undefined') checkNewAchievements(birds);
@@ -3340,23 +3360,20 @@ function addRevealToCards() {
 // Parallax on content scroll
 function initParallax() {
   var content = document.querySelector('.content');
-  if (!content) return;
-  content.addEventListener('scroll', function() {
+  if (!content || content._parallaxBound) return;
+  content._parallaxBound = true;
+  var topbar = document.querySelector('.topbar');
+  var ticking = false;
+  function update() {
     var sy = content.scrollTop;
-    // Codex section titles subtle upward parallax
-    document.querySelectorAll('.section-title').forEach(function(el) {
-      var parent = el.closest('.pokedex-section');
-      if (!parent) return;
-      var top = parent.offsetTop - sy;
-      var shift = Math.max(-8, Math.min(0, (top - 100) * 0.04));
-      el.style.transform = 'translateY(' + shift + 'px)';
-    });
-    // Topbar — subtle opacity fade on scroll
-    var topbar = document.querySelector('.topbar');
     if (topbar) {
       var opacity = Math.max(0.85, 1 - sy * 0.0008);
       topbar.style.background = 'rgba(14,20,16,' + opacity + ')';
     }
+    ticking = false;
+  }
+  content.addEventListener('scroll', function() {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
   }, { passive:true });
 }
 
