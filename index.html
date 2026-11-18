@@ -1201,7 +1201,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
         <div id="codex-search-bar" style="display:none;padding:0 14px 8px;overflow:hidden;">
           <div class="search-wrap">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" class="search-input" id="search-input" placeholder="Search birds…" oninput="renderCodexActive();updateSearchClearBtn();" style="padding-right:32px;"/>
+            <input type="text" class="search-input" id="search-input" placeholder="Search birds…" oninput="queueCodexSearch();updateSearchClearBtn();" style="padding-right:32px;"/>
             <button id="search-clear-btn" onclick="clearPdexSearch()" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--sage-dim);font-size:16px;line-height:1;padding:2px 4px;">×</button>
           </div>
         </div>
@@ -1222,6 +1222,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
     <div class="view" id="view-map" style="display:none;flex-direction:column;">
       <div style="flex:1;position:relative;min-height:0;">
         <div id="map-el" style="width:100%;height:100%;min-height:400px;"></div>
+        <div id="map-chips" class="map-chips"></div>
 
       </div>
     </div>
@@ -1232,7 +1233,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
       <div style="flex-shrink:0;position:sticky;top:0;z-index:9;background:var(--ink);border-bottom:0.5px solid var(--line);display:flex;justify-content:space-around;padding:0 18px 0;">
         <button id="dtab-nearby" onclick="switchDiscoverTab('nearby')" style="background:none;border:none;cursor:pointer;padding:12px 0 12px;position:relative;color:var(--brass-hi);opacity:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span style="font-family:var(--serif);font-size:15px;font-weight:500;">Rarities</span>
+          <span style="font-family:var(--serif);font-size:15px;font-weight:500;">Dispatches</span>
           <span id="dtab-rarity-count" style="display:none;position:absolute;top:8px;right:-2px;min-width:14px;height:14px;padding:0 3px;border-radius:7px;background:var(--wax);font-family:var(--mono);font-size:8px;font-weight:600;color:var(--paper);align-items:center;justify-content:center;"></span>
           <div id="dtab-nearby-line" style="position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--brass-hi);"></div>
         </button>
@@ -1332,7 +1333,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
   <nav class="bottom-nav">
     <button class="nav-tab active" id="tab-codex" onclick="switchTab('codex')">
       <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 7h16M9 3v18"/></svg>
-      Pokédex<div class="nav-ink"></div>
+      Codex<div class="nav-ink"></div>
     </button>
     <button class="nav-tab" id="tab-map" onclick="switchTab('map')">
       <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
@@ -1340,7 +1341,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
     </button>
     <button class="nav-tab" id="tab-discover" onclick="switchTab('discover')" style="position:relative;">
       <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      Discover
+      Rarities
       <span id="discover-badge" style="display:none;position:absolute;top:6px;right:9px;min-width:14px;height:13px;padding:0 3px;border-radius:6px;background:var(--wax);font-family:var(--mono);font-size:9px;font-weight:600;color:var(--paper);display:none;align-items:center;justify-content:center;border:0.5px solid var(--wax-deep);"></span>
       <div class="nav-ink"></div>
     </button>
@@ -1442,11 +1443,6 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
             <ellipse cx="150" cy="130" rx="122" ry="108" fill="none" stroke="var(--paper-dim)" stroke-width="0.25"/>
           </g>
         </svg>
-        <!-- Corner brackets -->
-        <svg width="18" height="18" viewBox="0 0 18 18" style="position:absolute;top:12px;left:12px;"><path d="M0 0L0 9M0 0L9 0" stroke="var(--brass)" stroke-width="1.2" opacity="0.6"/></svg>
-        <svg width="18" height="18" viewBox="0 0 18 18" style="position:absolute;top:12px;right:12px;transform:scaleX(-1)"><path d="M0 0L0 9M0 0L9 0" stroke="var(--brass)" stroke-width="1.2" opacity="0.6"/></svg>
-        <svg width="18" height="18" viewBox="0 0 18 18" style="position:absolute;bottom:12px;left:12px;transform:scaleY(-1)"><path d="M0 0L0 9M0 0L9 0" stroke="var(--brass)" stroke-width="1.2" opacity="0.6"/></svg>
-        <svg width="18" height="18" viewBox="0 0 18 18" style="position:absolute;bottom:12px;right:12px;transform:scale(-1)"><path d="M0 0L0 9M0 0L9 0" stroke="var(--brass)" stroke-width="1.2" opacity="0.6"/></svg>
         <!-- Content -->
         <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;">
           <div style="width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--brass-hi),var(--brass) 60%,var(--brass-lo));border:1px solid var(--brass-lo);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),0 4px 14px rgba(201,163,94,0.25);margin-bottom:14px;">
@@ -1456,6 +1452,15 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
           <div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;text-align:center;max-width:240px;">Choose a photo — we'll identify the bird and press it into your codex.</div>
         </div>
       </div>
+      <input type="file" id="photo-camera" accept="image/*" capture="environment" onchange="handlePhoto(event);" style="display:none;"/>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="ai-btn ai-btn-loc" onclick="document.getElementById('photo-camera').click()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Take photo
+        </button>
+        <button class="ai-btn ai-btn-id" onclick="document.getElementById('photo-file').click()">Choose photo</button>
+      </div>
+      <button onclick="advanceAddStep(2)" style="display:block;margin:12px auto 0;background:none;border:none;cursor:pointer;font-family:var(--body);font-style:italic;font-size:13px;color:var(--paper-dim);text-decoration:underline;text-decoration-color:var(--line-3);text-underline-offset:3px;padding:10px 14px;">Log without a photo</button>
 
     </div>
 
@@ -1575,6 +1580,7 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
         <div class="form-group" style="margin-bottom:0;"><label>Scientific Name</label><input type="text" id="f-species" placeholder="Auto-filled" style="font-size:12px;font-style:italic;"/></div>
         <div class="form-group" style="margin-bottom:0;"><label>Location</label><input type="text" id="f-location" placeholder="Ulsoor Lake" style="font-size:12px;"/></div>
       </div>
+      <div id="loc-chips" class="loc-chips"></div>
 
       <!-- GPS row (hidden until GPS used) -->
       <div class="form-2col" id="geo-row" style="display:none;margin-bottom:10px;">
@@ -1602,15 +1608,18 @@ body.modal-open .fab { opacity:0; pointer-events:none; transform:scale(0.8); tra
     <div class="modal-handle"></div>
     <button class="detail-close-x" onclick="closeModal('detail-modal')">×</button>
     <div id="detail-content"></div>
-    <div class="modal-footer detail-modal-footer" style="flex-direction:column;gap:8px;">
-      <button class="btn-save" id="detail-record-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <div class="modal-footer detail-modal-footer" style="flex-direction:row;gap:8px;align-items:stretch;">
+      <button class="btn-save" id="detail-record-btn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;">
         <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         Record a Sighting
       </button>
-      <div style="display:flex;gap:7px;width:100%;">
-        <button class="btn-cancel" id="detail-edit-btn" style="flex:1;color:var(--sage);border-color:rgba(143,168,136,0.2);">Edit</button>
-        <button class="btn-cancel" id="detail-share-btn" style="flex:1;color:var(--brass);border-color:rgba(201,163,94,0.2);">Share</button>
-        <button class="btn-danger" id="detail-delete-btn" style="flex:1;">Remove</button>
+      <button class="btn-cancel" id="detail-share-btn" style="color:var(--brass);border-color:rgba(201,163,94,0.2);">Share</button>
+      <button class="btn-cancel" id="detail-more-btn" onclick="toggleDetailMore(event)" aria-label="More" aria-haspopup="true" style="padding:10px 13px;display:flex;align-items:center;color:var(--paper-dim);">
+        <svg width="16" height="4" viewBox="0 0 16 4" fill="currentColor"><circle cx="2" cy="2" r="1.6"/><circle cx="8" cy="2" r="1.6"/><circle cx="14" cy="2" r="1.6"/></svg>
+      </button>
+      <div id="detail-more-menu" class="more-menu">
+        <button id="detail-edit-btn">Edit this entry</button>
+        <button id="detail-delete-btn" class="danger">Remove this entry</button>
       </div>
     </div>
   </div>
@@ -1706,8 +1715,67 @@ var locationResolved = false;
 var locationPromise = null;
 var userLat = null, userLng = null;
 var ebirdCache = {};
-try { var _ec = sessionStorage.getItem('gh_ec'); if (_ec) ebirdCache = JSON.parse(_ec); } catch(e) {}
-function _saveEbirdCache() { try { sessionStorage.setItem('gh_ec', JSON.stringify(ebirdCache)); } catch(e) {} }
+// Live eBird results are kept for 15 minutes, then fetched again
+var EBIRD_CACHE_MS = 15 * 60 * 1000;
+var _ebirdCacheAt = 0;
+try {
+  var _ec = sessionStorage.getItem('gh_ec');
+  _ebirdCacheAt = parseInt(sessionStorage.getItem('gh_ec_t') || '0', 10) || 0;
+  if (_ec && Date.now() - _ebirdCacheAt < EBIRD_CACHE_MS) ebirdCache = JSON.parse(_ec); else _ebirdCacheAt = 0;
+} catch(e) {}
+function _saveEbirdCache() {
+  try {
+    if (!_ebirdCacheAt) _ebirdCacheAt = Date.now();
+    sessionStorage.setItem('gh_ec', JSON.stringify(ebirdCache));
+    sessionStorage.setItem('gh_ec_t', String(_ebirdCacheAt));
+  } catch(e) {}
+}
+
+function _esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function _uniqueSpeciesCount() {
+  return new Set(birds.map(function(b){ return (b.name || '').toLowerCase().trim(); }).filter(Boolean)).size;
+}
+
+// ── Map tiles ─────────────────────────────────────────────────────
+// CARTO's dark map tiles need a free key since September 2026 (carto.com/basemaps/apikey).
+// A key can be locked to one website, so the hosted site and local testing each take their own.
+// Leave both empty and the maps use OpenStreetMap tiles instead, darkened to suit the journal.
+var CARTO_KEY_LIVE  = '';   // used on dharwar-anuj11.github.io
+var CARTO_KEY_LOCAL = '';   // used on localhost / 127.0.0.1
+function _cartoKey() {
+  var h = location.hostname;
+  var local = (h === 'localhost' || h === '127.0.0.1' || h === '');
+  return local ? (CARTO_KEY_LOCAL || CARTO_KEY_LIVE) : (CARTO_KEY_LIVE || CARTO_KEY_LOCAL);
+}
+function _addBaseTiles(map) {
+  var osmAttr = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+  function useOsm() {
+    map.getContainer().classList.add('gh-osm-tiles');
+    return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: osmAttr, maxZoom: 19 }).addTo(map);
+  }
+  var key = _cartoKey();
+  if (!key) return useOsm();
+  var base = 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}';
+  var tail = '.png?key=' + encodeURIComponent(key);
+  var layer = L.tileLayer(base + '{r}' + tail, {
+    attribution: osmAttr + ' © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19,
+  });
+  // If the first tiles are refused, step down: sharp tiles, then standard tiles, then OpenStreetMap
+  var fails = 0, loads = 0, stage = 0;
+  layer.on('tileload', function(){ loads++; });
+  layer.on('tileerror', function(){
+    if (loads > 0 || ++fails < 4) return;
+    fails = 0;
+    if (stage === 0) { stage = 1; layer.setUrl(base + tail); }
+    else if (stage === 1) { stage = 2; map.removeLayer(layer); useOsm(); }
+  });
+  return layer.addTo(map);
+}
 // ═══════════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════════
@@ -1717,7 +1785,12 @@ async function initAuth() {
   document.getElementById('login-container').style.display = 'none';
   document.getElementById('app').style.display = 'none';
   try {
-    const { data: { user } } = await sb.auth.getUser();
+    let user = null;
+    try { const got = await sb.auth.getUser(); user = got && got.data ? got.data.user : null; } catch (e) {}
+    // No answer from the server (no signal): fall back to the sign-in remembered on this phone
+    if (!user) {
+      try { const kept = await sb.auth.getSession(); user = kept && kept.data && kept.data.session ? kept.data.session.user : null; } catch (e) {}
+    }
     setLoadingProgress(10, 'Opening the journal…');
     if (user) { currentUser = user; showApp(); loadAllData(); }
     else {
@@ -1851,6 +1924,8 @@ async function loadAllData() {
   var cachedBirds = await getFromCache('birds');
   if (cachedMaster && cachedMaster.length) MASTER = cachedMaster;
   if (cachedBirds && cachedBirds.length) birds = cachedBirds;
+  var cachedPending = await getFromCache('pending');
+  if (cachedPending && cachedPending.length) _pendingSaves = cachedPending;
   if (MASTER.length || birds.length) {
     setLoadingProgress(70, 'Building your codex…');
     updateStats(); renderCodexActive();
@@ -1873,7 +1948,8 @@ async function loadAllData() {
         saveToCache('master', MASTER);
       }
       if (sightings) {
-        birds = sightings.map(normalizeBird);
+        // sightings still waiting to sync stay at the top of the list
+        birds = _pendingSaves.map(_pendingBird).reverse().concat(sightings.map(normalizeBird));
         saveToCache('birds', birds);
       }
       updateStats(); renderCodexActive();
@@ -1890,6 +1966,8 @@ async function loadAllData() {
   populateSidebar();
   if (typeof ACHIEVEMENTS !== 'undefined') checkNewAchievements(birds);
   updateSyncStatus('synced');
+  _showPendingStatus();
+  syncPending();
 }
 
 function normalizeBird(s) {
@@ -1904,11 +1982,83 @@ function normalizeBird(s) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// SIGHTINGS WAITING TO SYNC (saved on this phone while there is no signal)
+// ═══════════════════════════════════════════════════════════════════
+var _pendingSaves = [];        // [{ localId, row }] in the order they were recorded
+var _syncingPending = false;
+
+function _pendingBird(p) {
+  var b = normalizeBird(Object.assign({}, p.row, { id: p.localId }));
+  b._pending = true;
+  return b;
+}
+function _pendingIndex(id) {
+  return _pendingSaves.findIndex(function(p){ return p.localId == id; });
+}
+function _showPendingStatus() {
+  var el = document.getElementById('sync-status');
+  if (!el) return;
+  if (_pendingSaves.length) { el.style.background = 'var(--brass)'; el.title = _pendingSaves.length + ' waiting to sync'; }
+  else if (isOnline) { el.style.background = 'var(--sage)'; el.title = 'Synced'; }
+}
+function _savePending() { saveToCache('pending', _pendingSaves); _showPendingStatus(); }
+
+// Did the save fail because the server could not be reached, rather than because it said no?
+function _looksOffline(err) {
+  if (!navigator.onLine) return true;
+  var m = (err && (err.message || String(err))) || '';
+  return /failed to fetch|networkerror|network request failed|load failed|fetch/i.test(m);
+}
+function queueSightingLocally(row) {
+  var p = { localId: 'local-' + Date.now() + '-' + Math.floor(Math.random() * 1000), row: row };
+  _pendingSaves.push(p);
+  _savePending();
+  return _pendingBird(p);
+}
+
+// Send waiting sightings to the server, oldest first. Stops quietly if the signal drops again.
+async function syncPending() {
+  if (_syncingPending || !_pendingSaves.length || !navigator.onLine || !currentUser) return;
+  _syncingPending = true;
+  var syncedIds = [];
+  try {
+    var i = 0;
+    while (i < _pendingSaves.length) {
+      var p = _pendingSaves[i];
+      // one that was just removed and may still be undone is left alone
+      if (_undoDelete && _undoDelete.bird.id == p.localId) { i++; continue; }
+      var res = null;
+      try { res = await sb.from('bird_sightings').insert([p.row]).select(); } catch (e) { res = { error: e }; }
+      if (res && res.error) {
+        if (_looksOffline(res.error)) break;
+        i++; continue;                       // the server refused this one: keep it and try the next
+      }
+      var saved = (res && res.data && res.data[0]) ? normalizeBird(res.data[0]) : null;
+      if (!saved) { i++; continue; }
+      var at = birds.findIndex(function(b){ return b.id == p.localId; });
+      if (at !== -1) birds[at] = saved; else birds.unshift(saved);
+      if (window._currentDetailId == p.localId) window._currentDetailId = saved.id;
+      _pendingSaves.splice(i, 1);
+      syncedIds.push(saved.id);
+    }
+  } finally {
+    _syncingPending = false;
+    _savePending();
+  }
+  if (syncedIds.length) {
+    saveToCache('birds', birds);
+    updateStats(); renderCodexActive();
+    showToast(syncedIds.length + (syncedIds.length === 1 ? ' sighting synced ✦' : ' sightings synced ✦'));
+    syncedIds.forEach(function(id, n){ setTimeout(function(){ autoFetchFacts(id); }, 600 + n * 400); });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
 
 function updateStats() {
-  document.getElementById('stat-total').textContent = birds.length;
+  document.getElementById('stat-total').textContent = _uniqueSpeciesCount();
   // Time-of-day icon in topbar
   (function() {
     var h = new Date().getHours();
@@ -2001,7 +2151,7 @@ function switchTab(tab) {
     document.getElementById('discover-badge').style.display = 'none';
     switchDiscoverTab(currentDiscoverTab || 'nearby');
   }
-  setTimeout(function() { addRevealToCards(); }, 80);
+  if (tab === 'codex') setTimeout(function() { addRevealToCards(); }, 80);
   if (navigator.vibrate) navigator.vibrate(6);
 }
 
@@ -2037,13 +2187,56 @@ const CATEGORY_CONFIG = [
   { label: 'Unknown', types: ['Unknown'] },
 ];
 
+// "This week" page at the top of the Codex
+function _thisWeekCardHtml() {
+  if (!birds.length) return '';
+  var now = Date.now(), weekAgo = now - 7 * 86400000;
+  function when(b) { var t = new Date(b.date || (b._raw && b._raw.created_at) || 0).getTime(); return isNaN(t) ? 0 : t; }
+  var sightings = birds.filter(function(b){ return when(b) > weekAgo; }).length;
+  var first = {};
+  birds.forEach(function(b) {
+    var k = (b.name || '').toLowerCase().trim(); if (!k) return;
+    var t = when(b);
+    if (!(k in first) || t < first[k]) first[k] = t;
+  });
+  var fresh = Object.keys(first).filter(function(k){ return first[k] > weekAgo; }).length;
+  var fmt = function(t){ return new Date(t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); };
+  return '<div class="this-week">'
+    + '<div class="tw-head"><span class="tw-label">This Week</span><span class="tw-range">' + fmt(weekAgo + 86400000) + ' to ' + fmt(now) + '</span></div>'
+    + '<div class="tw-grid">'
+    +   '<div><div class="tw-num serif-num">' + sightings + '</div><div class="tw-cap">' + (sightings === 1 ? 'Sighting' : 'Sightings') + '</div></div>'
+    +   '<div><div class="tw-num serif-num">' + fresh + '</div><div class="tw-cap">New species</div></div>'
+    +   '<button class="tw-rarity" id="tw-rarity" onclick="switchTab(\'discover\')"><div class="tw-rname">Rarities nearby</div><div class="tw-cap">Tap to look</div></button>'
+    + '</div></div>';
+}
+// Filled in once the live rarity feed for your position is in hand
+function _fillThisWeekRarity() {
+  var el = document.getElementById('tw-rarity');
+  if (!el || !userLat || !userLng) return;
+  var list = ebirdCache['notable_' + Number(userLat).toFixed(2) + '_' + Number(userLng).toFixed(2)];
+  if (!list || !list.length) return;
+  var mine = new Set(birds.map(function(b){ return (b.name || '').toLowerCase().trim(); }));
+  var best = null;
+  list.forEach(function(o) {
+    if (!o.lat || !o.lng) return;
+    var d = distKm(userLat, userLng, o.lat, o.lng);
+    var isNew = !mine.has((o.comName || '').toLowerCase().trim());
+    // a rarity you have not logged beats a nearer one you already have
+    if (!best || (isNew && !best.isNew) || (isNew === best.isNew && d < best.d)) best = { o: o, d: d, isNew: isNew };
+  });
+  if (!best) return;
+  el.innerHTML = '<div class="tw-rname">' + _esc(best.o.comName || 'Rarity') + '</div><div class="tw-cap">Rarity · ' + best.d.toFixed(1) + ' km away</div>';
+}
+
 var _lastPdexHash = '';
 function renderPokedex() {
-  var _rhQ = ((document.getElementById('codex-search-input') || {}).value || '').toLowerCase().trim();
-  var _rhHash = _rhQ + '|' + birds.length + '|' + (window._pdexShowUnseen ? '1' : '0');
+  const q = ((document.getElementById('search-input') || {}).value || '').toLowerCase().trim();
+  // Rebuild only when something the grid shows has changed: the search text, the species list, or a sighting
+  var _rhHash = q + '|' + MASTER.length + '|' + birds.map(function(b){
+    return b.id + '~' + (b.name||'') + '~' + (b.species||'') + '~' + (b.type||'') + '~' + (b.date||'') + '~' + (b.photo ? b.photo.length : 0) + '~' + ((b.profile && b.profile.conservation) || '') + (b._pending ? '~p' : '');
+  }).join('|');
   if (_rhHash === _lastPdexHash) return;
   _lastPdexHash = _rhHash;
-  const q = ((document.getElementById('search-input') || {}).value || '').toLowerCase().trim();
   const captured = new Set(birds.map(b => (b.name || '').toLowerCase().trim()));
   const categories = CATEGORY_CONFIG.map(cat => {
     const group = MASTER.filter(m => cat.types.includes(m.type));
@@ -2106,7 +2299,7 @@ function renderPokedex() {
   // Diamond ornament SVG
   const diamond = `<svg width="18" height="10" viewBox="0 0 18 10"><path d="M0 5 H6 M12 5 H18" stroke="var(--brass)" stroke-width="0.5"/><circle cx="9" cy="5" r="2" fill="none" stroke="var(--brass)" stroke-width="0.5"/><circle cx="9" cy="5" r="0.7" fill="var(--brass)"/></svg>`;
 
-  let html = '';
+  let html = q ? '' : _thisWeekCardHtml();
   categories.forEach((cat, catIdx) => {
     const { label, allInType, capturedCount } = cat;
     const total = allInType.length;
@@ -2161,18 +2354,19 @@ function renderPokedex() {
       const plateNum = `#${String(i + 1).padStart(3, '0')}`;
       const tintMap = { Raptor:'#3A3128', Waterbird:'#2A3A42', Songbird:'#2A3428', Wader:'#2A3830', Owl:'#2E2C1C', Kingfisher:'#1E2C3A', 'Bee-eater':'#1E3228' };
       const tint = tintMap[userBird.type] || '#252D26';
-      html += `<div class="pdex-card fadeIn" style="animation-delay:${i * 0.03}s" onclick="openDetail('${userBird.id}')">
+      html += `<div class="pdex-card${q ? '' : ' fadeIn'}" style="animation-delay:${i * 0.03}s" onclick="openDetail('${userBird.id}')">
         <div class="pdex-img" style="${userBird.photo ? '' : `background:linear-gradient(165deg,${tint} 0%,var(--ink) 100%);`}">
           ${!userBird.photo ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,${tint}55 0%,transparent 70%);pointer-events:none;z-index:0;"></div>` : ''}
           <div class="pdex-num" style="z-index:4;">${plateNum}</div>
           ${userBird.photo
-            ? `<img src="${userBird.photo}" alt="${userBird.name}" loading="lazy" style="pointer-events:none;"/>`
+            ? `<img src="${userBird.photo}" alt="${userBird.name}" loading="lazy" decoding="async" style="pointer-events:none;"/>`
             : `<div style="width:54px;height:54px;color:#0a0d0a;opacity:0.4;position:relative;z-index:1;">${SILHOUETTES[userBird.type || item.type] || SILHOUETTES.Unknown}</div>`
           }
+          ${userBird._pending ? '<div class="pdex-pending">Waiting to sync</div>' : ''}
           <div class="pdex-collected-mark"><svg width="8" height="8" viewBox="0 0 9 9"><path d="M1 4.5L3.5 7L8 1.8" stroke="var(--ink)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         </div>
         <div class="pdex-body">
-          <div class="pdex-name">${userBird.name.split(' ').slice(0,-1).join(' ')||userBird.name} <em style="font-style:italic;color:var(--brass-hi);font-weight:400;">${userBird.name.split(' ').slice(-1)[0]||''}</em></div>
+          <div class="pdex-name">${userBird.name.split(' ').slice(0,-1).join(' ')||userBird.name} <em style="font-style:italic;color:var(--brass-hi);font-weight:400;">${userBird.name.trim().indexOf(' ') === -1 ? '' : userBird.name.split(' ').slice(-1)[0]}</em></div>
           <div class="pdex-species">${userBird.species || ''}</div>
           <div class="pdex-meta-row">
             ${iucnBadge(userBird, true) ? iucnBadge(userBird, true) : '<span></span>'}
@@ -2194,13 +2388,13 @@ function renderPokedex() {
         <div class="pdex-unseen-avatars">${avatarPreview}</div>
         <div style="flex:1;min-width:0;overflow:hidden;">
           <div class="pdex-unseen-title" style="font-family:var(--serif);font-size:13px;font-weight:500;color:var(--paper);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            Show <em style="color:var(--brass-hi);font-style:italic;">${unseenItems.length} unrecorded</em>
+            ${q ? 'Hide' : 'Show'} <em style="color:var(--brass-hi);font-style:italic;">${unseenItems.length} unrecorded</em>
           </div>
           <div style="font-family:var(--body);font-size:11px;font-style:italic;color:var(--sage-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Silhouettes of species not yet logged</div>
         </div>
-        <svg width="10" height="6" viewBox="0 0 10 6" style="flex-shrink:0;transition:transform 0.25s;"><path d="M1 1 L5 5 L9 1" stroke="var(--sage-dim)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="10" height="6" viewBox="0 0 10 6" style="flex-shrink:0;transition:transform 0.25s;${q ? 'transform:rotate(180deg);' : ''}"><path d="M1 1 L5 5 L9 1" stroke="var(--sage-dim)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div id="pdex-unseen-${catIdx}" class="pdex-unseen-grid" style="display:none;">`;
+      <div id="pdex-unseen-${catIdx}" class="pdex-unseen-grid" style="display:${q ? 'grid' : 'none'};">`;
       unseenItems.forEach((item, i) => {
         html += `<div class="pdex-card undiscovered" onclick="showUndiscovered('${item.name.replace(/'/g,"\\'")}','${(item.species||'').replace(/'/g,"\\'")}','${item.type||cat.types[0]}')">
           <div class="pdex-img" style="background:repeating-linear-gradient(135deg,var(--ink-1) 0 6px,rgba(201,163,94,0.018) 6px 7px);">
@@ -2227,6 +2421,13 @@ function renderPokedex() {
     html += `</div>`; // close pokedex-section
   });
 
+  if (q && !categories.length) {
+    html += `<div style="padding:56px 28px 8px;text-align:center;">
+      <div style="font-family:var(--serif);font-size:20px;font-style:italic;color:var(--paper);">No birds match</div>
+      <div style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);margin-top:6px;line-height:1.5;">Nothing found for “${_esc(q)}”. Try a shorter name or the scientific name.</div>
+    </div>`;
+  }
+
   // Final flourish
   html += `<div style="padding:28px 18px 8px;text-align:center;">
     <svg width="60" height="14" viewBox="0 0 60 14">
@@ -2240,6 +2441,7 @@ function renderPokedex() {
   </div>`;
 
   document.getElementById('pdex-grid-area').innerHTML = html;
+  _fillThisWeekRarity();
 
   // Add image load fade-in
   document.querySelectorAll('.pdex-img img').forEach(function(img) {
@@ -2254,8 +2456,15 @@ function renderPokedex() {
       if (e.isIntersecting) e.target.classList.add('in-view');
     });
   }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+  // Second observer: marks which sections are on screen so their shimmer and glow
+  // only run while visible (see the "smoothness" styles)
+  if (window._onScreenObserver) window._onScreenObserver.disconnect();
+  window._onScreenObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { e.target.classList.toggle('on-screen', e.isIntersecting); });
+  }, { rootMargin: '120px 0px 120px 0px', threshold: 0 });
   document.querySelectorAll('.pokedex-section').forEach(function(s) {
     window._sectionObserver.observe(s);
+    window._onScreenObserver.observe(s);
   });
 
   setupPdexScrollSpy();
@@ -2296,11 +2505,26 @@ function scrollToPdexSection(id, tabEl) {
   const tabsH = tabsWrap ? tabsWrap.offsetHeight : 56;
   section.style.scrollMarginTop = (tabsH + 4) + 'px';
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // Keep tab strip in sync after scroll settles
-  setTimeout(function() {
-    tabEl.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  // Keep tab strip in sync, then hand back to the scroll spy once the glide has finished
+  _centerPdexTab(tabEl);
+  var resumed = false;
+  var hasScrollEnd = scroller && ('onscrollend' in scroller);
+  function resume() {
+    if (resumed) return; resumed = true;
+    if (scroller && hasScrollEnd) scroller.removeEventListener('scrollend', resume);
     setupPdexScrollSpy();
-  }, 500);
+  }
+  if (scroller && hasScrollEnd) scroller.addEventListener('scrollend', resume);
+  setTimeout(resume, hasScrollEnd ? 1500 : 700);
+}
+
+function _centerPdexTab(tabEl) {
+  // Slide the category strip sideways only. scrollIntoView would also take hold of the
+  // main list and cut a flick short.
+  var strip = document.getElementById('pdex-tabs');
+  if (!strip || !tabEl) return;
+  var left = tabEl.offsetLeft - strip.offsetLeft - (strip.clientWidth - tabEl.offsetWidth) / 2;
+  strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
 }
 
 function setupPdexScrollSpy() {
@@ -2310,35 +2534,37 @@ function setupPdexScrollSpy() {
   if (window._pdexScrollHandler) scroller.removeEventListener('scroll', window._pdexScrollHandler);
   if (window._pdexObserver) { window._pdexObserver.disconnect(); window._pdexObserver = null; }
 
-  window._pdexScrollHandler = function() {
+  var queued = false;
+  window._pdexActiveIdx = -1;
+  function update() {
+    queued = false;
+    var view = document.getElementById('view-codex');
+    if (!view || !view.classList.contains('active')) return;
     const sections = document.querySelectorAll('.pokedex-section[id^="pdex-sec-"]');
     if (!sections.length) return;
     const tabsWrap = document.querySelector('.pdex-tabs-wrap');
     const tabsH = tabsWrap ? tabsWrap.offsetHeight : 56;
     const scrollerTop = scroller.getBoundingClientRect().top;
-    // Find the section whose top is closest to just below the sticky header
+    // The active section is the last one whose top has passed just below the sticky header
     const threshold = scrollerTop + tabsH + 8;
     let activeIdx = 0;
     sections.forEach(function(sec, i) {
-      const top = sec.getBoundingClientRect().top;
-      // Section is considered active if its top has passed the threshold
-      if (top <= threshold + 20) activeIdx = i;
+      if (sec.getBoundingClientRect().top <= threshold + 20) activeIdx = i;
     });
-    // Update tabs without triggering scroll (use _pdexTabSetActive)
+    if (activeIdx === window._pdexActiveIdx) return;
+    window._pdexActiveIdx = activeIdx;
     const tabs = document.querySelectorAll('.pdex-tab');
-    tabs.forEach(function(t, i) {
-      const wasActive = t.classList.contains('active');
-      t.classList.toggle('active', i === activeIdx);
-      // Scroll tab into view only if it just became active
-      if (!wasActive && i === activeIdx) {
-        t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-      }
-    });
+    tabs.forEach(function(t, i) { t.classList.toggle('active', i === activeIdx); });
+    if (tabs[activeIdx]) _centerPdexTab(tabs[activeIdx]);
+  }
+  // At most one measurement per painted frame, and nothing is touched unless the section changed
+  window._pdexScrollHandler = function() {
+    if (!queued) { queued = true; requestAnimationFrame(update); }
   };
 
   scroller.addEventListener('scroll', window._pdexScrollHandler, { passive: true });
   // Run once immediately to set initial state
-  window._pdexScrollHandler();
+  update();
 }
 
 let currentUndiscoveredName = '', currentUndiscoveredSpecies = '', currentUndiscoveredType = '';
@@ -2370,12 +2596,109 @@ function openAddForBird(name, species, type) {
 // ── Leaflet map instance ──────────────────────────────────────────
 var _leafletMap = null;
 var _leafletMarkers = [];
+var _userMarker = null;
+
+function _updateUserMarker() {
+  if (!_leafletMap || !userLat || !userLng) return;
+  var label = '<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#8FA888;letter-spacing:0.1em;">' + _hereLabel() + '</div>';
+  if (_userMarker) { _userMarker.setLatLng([userLat, userLng]); _userMarker.setPopupContent(label); return; }
+  var userIcon = L.divIcon({
+    className: '',
+    html: '<div style="width:16px;height:16px;border-radius:50%;background:#8FA888;border:2px solid rgba(14,20,16,0.8);box-shadow:0 0 0 4px rgba(143,168,136,0.25);"></div>',
+    iconSize: [16,16], iconAnchor: [8,8],
+  });
+  _userMarker = L.marker([userLat, userLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(_leafletMap).bindPopup(label);
+}
+
+// Sightings logged at the very same spot are fanned out a few metres so each pin can be tapped
+function _spreadLatLng(b, seenAt) {
+  var la = parseFloat(b.lat), ln = parseFloat(b.lng);
+  var k = la.toFixed(5) + ',' + ln.toFixed(5);
+  var n = seenAt[k] = (seenAt[k] || 0) + 1;
+  if (n === 1) return [la, ln];
+  var r = 0.00012 * Math.sqrt(n - 1), a = (n - 1) * 2.39996;
+  return [la + r * Math.sin(a), ln + r * Math.cos(a)];
+}
+
+function locateOnMap(btn) {
+  if (btn) btn.classList.add('busy');
+  getLocation({ force: true, wait: true }).then(function() {
+    if (btn) btn.classList.remove('busy');
+    if (!_leafletMap) return;
+    if (!userLat || !userLng) { showToast('Could not find your location', 'error'); return; }
+    _updateUserMarker();
+    _leafletMap.flyTo([userLat, userLng], Math.max(_leafletMap.getZoom(), 14), { duration: 0.6 });
+    if (_locFromMemory) showToast('Showing your last known spot');
+  });
+}
+
+
+// ── Map layers: filter sightings by type, and show eBird hotspots on the same map ──
+var _mapTypeFilter = '';
+var _mapHotspotsOn = false;
+var _mapHotspotLayer = null;
+
+function _mapFilter(geoBirds) {
+  if (!_mapTypeFilter) return geoBirds;
+  return geoBirds.filter(function(b){ return (b.type || 'Unknown') === _mapTypeFilter; });
+}
+function _renderMapChips() {
+  var box = document.getElementById('map-chips');
+  if (!box) return;
+  var counts = {}, total = 0;
+  birds.forEach(function(b) { if (!(b.lat && b.lng)) return; var t = b.type || 'Unknown'; counts[t] = (counts[t] || 0) + 1; total++; });
+  var types = Object.keys(counts).sort(function(a, b){ return counts[b] - counts[a]; });
+  if (_mapTypeFilter && !counts[_mapTypeFilter]) _mapTypeFilter = '';
+  var html = '<button class="map-chip' + (_mapHotspotsOn ? ' on' : '') + '" onclick="toggleMapHotspots()">Hotspots</button>';
+  if (types.length > 1) {
+    html += '<button class="map-chip' + (!_mapTypeFilter ? ' on' : '') + '" data-t="" onclick="setMapType(this.dataset.t)">All <span>' + total + '</span></button>';
+    types.forEach(function(t) {
+      html += '<button class="map-chip' + (_mapTypeFilter === t ? ' on' : '') + '" data-t="' + _esc(t) + '" onclick="setMapType(this.dataset.t)">' + _esc(t) + ' <span>' + counts[t] + '</span></button>';
+    });
+  }
+  box.innerHTML = html;
+}
+function setMapType(t) { _mapTypeFilter = t || ''; initMap(); }
+
+// One hotspot pin with its popup, shared by the main map and the Hotspots list map
+function _hotspotMarker(h) {
+  var hsIcon = L.divIcon({ className:'', html:'<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E3BF7A,#C9A35E 60%,#8B7240);border:2px solid rgba(14,20,16,0.8);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;"><svg width="8" height="10" viewBox="0 0 9 11" fill="#1A1410"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z"/></svg></div>', iconSize:[22,22], iconAnchor:[11,22], popupAnchor:[0,-24] });
+  var dist = distKm(userLat, userLng, h.lat, h.lng);
+  var popup = L.popup({ className:'leaflet-popup-dark', maxWidth:200, closeButton:true }).setContent(
+    '<div style="font-family:Cormorant Garamond,serif;min-width:140px;">' +
+    '<div style="font-size:14px;font-weight:500;color:#ECDFC5;margin-bottom:3px;">' + _esc(h.locName) + '</div>' +
+    '<div style="font-size:11px;color:#8FA888;margin-bottom:6px;">' + dist.toFixed(1) + 'km · ' + (h.numSpeciesAllTime||'?') + ' species</div>' +
+    '<a href="https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng + '" target="_blank" style="display:block;text-align:center;padding:5px;background:linear-gradient(135deg,#C9A35E,#8B7240);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;color:#1A1410;text-decoration:none;">NAVIGATE ↗</a>' +
+    '</div>');
+  return L.marker([parseFloat(h.lat), parseFloat(h.lng)], {icon:hsIcon}).bindPopup(popup);
+}
+
+async function toggleMapHotspots() {
+  if (!_leafletMap) return;
+  if (_mapHotspotsOn) {
+    _mapHotspotsOn = false;
+    if (_mapHotspotLayer) { _leafletMap.removeLayer(_mapHotspotLayer); _mapHotspotLayer = null; }
+    _renderMapChips();
+    return;
+  }
+  if (!userLat || !userLng) { showToast('Location needed to show hotspots', 'error'); return; }
+  _mapHotspotsOn = true; _renderMapChips();
+  var spots = await fetchHotspots(userLat, userLng, 25);
+  if (!_mapHotspotsOn || !_leafletMap) return;
+  if (!spots.length) { _mapHotspotsOn = false; _renderMapChips(); showToast('Could not load hotspots', 'error'); return; }
+  spots = spots.slice().sort(function(a, b){ return distKm(userLat, userLng, a.lat, a.lng) - distKm(userLat, userLng, b.lat, b.lng); }).slice(0, 30);
+  var pins = spots.map(_hotspotMarker);
+  if (_mapHotspotLayer) _leafletMap.removeLayer(_mapHotspotLayer);
+  _mapHotspotLayer = L.layerGroup(pins).addTo(_leafletMap);
+  _leafletMap.fitBounds(new L.featureGroup(pins.concat(_userMarker ? [_userMarker] : [])).getBounds().pad(0.15), { maxZoom: 13 });
+}
 
 async function initMap() {
   var el = document.getElementById('map-el');
   if (!el) return;
 
-  var geoBirds = birds.filter(function(b){ return b.lat && b.lng; });
+  var geoBirds = _mapFilter(birds.filter(function(b){ return b.lat && b.lng; }));
+  _renderMapChips();
 
   // If already initialised, just refresh markers
   if (_leafletMap) {
@@ -2388,8 +2711,10 @@ async function initMap() {
   el.style.height = '100%';
   el.style.minHeight = (window.innerHeight - 140) + 'px';
 
-  // Try to get location, but never block the map on it
-  await getLocation({ force: true });
+  // Never hold the map back for a GPS fix: draw it with the last known position straight away.
+  // The marker moves on its own once the live fix lands.
+  await Promise.race([getLocation(), new Promise(function(r){ setTimeout(r, 1200); })]);
+  if (_leafletMap) return;
   // Centre on user, else first geotagged sighting, else Bengaluru
   var lat = userLat, lng = userLng;
   if (!lat || !lng) {
@@ -2403,12 +2728,8 @@ async function initMap() {
     attributionControl: true,
   });
 
-  // Dark tile layer — CartoDB Dark Matter (free, no API key)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-  }).addTo(_leafletMap);
+  // Dark map tiles (CARTO Dark Matter with a key, OpenStreetMap without one)
+  _addBaseTiles(_leafletMap);
 
   // Custom marker icon
   var birdIcon = L.divIcon({
@@ -2420,16 +2741,23 @@ async function initMap() {
   // Zoom controls styled
   L.control.zoom({ position: 'topright' }).addTo(_leafletMap);
 
-  // User location marker
-  if (userLat && userLng) {
-    var userIcon = L.divIcon({
-      className: '',
-      html: '<div style="width:16px;height:16px;border-radius:50%;background:#8FA888;border:2px solid rgba(14,20,16,0.8);box-shadow:0 0 0 4px rgba(143,168,136,0.25);"></div>',
-      iconSize: [16,16], iconAnchor: [8,8],
-    });
-    L.marker([userLat, userLng], { icon: userIcon }).addTo(_leafletMap)
-      .bindPopup('<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#8FA888;letter-spacing:0.1em;">YOU ARE HERE</div>');
-  }
+  // "Go to my location" button under the zoom controls
+  var LocateControl = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: function() {
+      var b = L.DomUtil.create('button', 'gh-locate-btn');
+      b.type = 'button'; b.title = 'Go to my location'; b.setAttribute('aria-label', 'Go to my location');
+      b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>';
+      L.DomEvent.disableClickPropagation(b);
+      L.DomEvent.on(b, 'click', function() { locateOnMap(b); });
+      return b;
+    },
+  });
+  new LocateControl().addTo(_leafletMap);
+
+  // User location marker (kept up to date by _updateUserMarker as new fixes arrive)
+  _updateUserMarker();
+  getLocation({ force: true }).then(_updateUserMarker);
 
   _refreshLeafletMarkers(geoBirds);
 
@@ -2449,6 +2777,7 @@ function _refreshLeafletMarkers(geoBirds) {
     iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-16],
   });
 
+  var seenAt = {};
   geoBirds.forEach(function(b) {
     var popupHtml = '<div style="font-family:Cormorant Garamond,serif;min-width:140px;">' +
       '<div style="font-size:15px;font-weight:500;color:#ECDFC5;margin-bottom:2px;">' + (b.name||'Unknown') + '</div>' +
@@ -2464,7 +2793,7 @@ function _refreshLeafletMarkers(geoBirds) {
       closeButton: true,
     }).setContent(popupHtml);
 
-    var marker = L.marker([parseFloat(b.lat), parseFloat(b.lng)], { icon: birdIcon })
+    var marker = L.marker(_spreadLatLng(b, seenAt), { icon: birdIcon })
       .bindPopup(popup)
       .addTo(_leafletMap);
     _leafletMarkers.push(marker);
@@ -2555,6 +2884,7 @@ function openDetail(id) {
         <div style="font-family:var(--body);font-style:italic;font-size:15px;color:var(--sage);margin-top:3px;">${b.species || ''}</div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
           ${iucnBadge(b) ? iucnBadge(b) : ''}
+          ${b._pending ? '<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass-hi);padding:3px 7px;border:0.5px solid rgba(201,163,94,0.4);border-radius:3px;">Waiting to sync</span>' : ''}
           ${b.type ? `<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage-dim);padding:3px 7px;border:0.5px solid var(--line-2);border-radius:3px;">${b.type}</span>` : ''}
           ${orderMap[b.type] ? `<span style="font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--sage-dim);padding:3px 7px;border:0.5px solid var(--line-2);border-radius:3px;">${orderMap[b.type]}</span>` : ''}
         </div>
@@ -2676,10 +3006,11 @@ function openDetail(id) {
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:10px;opacity:0.7;">Your Sightings · ${birdSightings.length} recorded</div>
         ${birdSightings.length > 0
           ? birdSightings.map(s => `
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:6px;margin-bottom:5px;">
+            <div class="sighting-tap" onclick="openSightingEntry('${s.id}')" style="display:flex;align-items:center;gap:12px;padding:11px 10px;background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:6px;margin-bottom:5px;">
               <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brass);letter-spacing:0.1em;flex-shrink:0;">${s.date ? new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'}).toUpperCase() : '—'}</span>
               <span style="font-family:var(--body);font-size:13px;color:var(--paper-dim);font-style:italic;flex:1;">${s.location||'Location unrecorded'}</span>
-              ${s.lat && s.lng ? `<a href="https://www.openstreetmap.org/?mlat=${s.lat}&mlon=${s.lng}&zoom=15" target="_blank" style="font-family:var(--mono);font-size:9px;color:var(--sage);text-decoration:none;">GPS ↗</a>` : ''}
+              ${s.lat && s.lng ? `<a href="https://www.openstreetmap.org/?mlat=${s.lat}&mlon=${s.lng}&zoom=15" target="_blank" onclick="event.stopPropagation()" style="font-family:var(--mono);font-size:9px;color:var(--sage);text-decoration:none;padding:6px 2px;">GPS ↗</a>` : ''}
+              <svg width="6" height="10" viewBox="0 0 6 10" style="flex-shrink:0;"><path d="M1 1l4 4-4 4" stroke="var(--sage-dim)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>`).join('')
           : `<div style="font-family:var(--body);font-style:italic;font-size:13px;color:var(--sage-dim);padding:4px 0;">No sightings recorded yet.</div>`
         }
@@ -2744,14 +3075,14 @@ async function loadXcAudio(birdId, scientificName) {
   if (!audioEl) return;
 
   try {
-    var res = await fetch(url);
+    var res = await fetchWithTimeout(url, {}, 9000);
     var data = await res.json();
     var recs = data.recordings || [];
 
     // Fall back to any country if India has none
     if (!recs.length) {
       var url2 = 'https://xeno-canto.org/api/3/recordings?query=' + encodeURIComponent('gen:' + genus + (species ? ' sp:' + species : '') + ' q:A') + '&key=f23568e54688083e34e5081c57143f7f0ee3d579';
-      var res2 = await fetch(url2);
+      var res2 = await fetchWithTimeout(url2, {}, 9000);
       var data2 = await res2.json();
       recs = data2.recordings || [];
     }
@@ -2980,9 +3311,9 @@ function formatTime(secs) {
 // ═══════════════════════════════════════════════════════════════════
 function liveNearbyMessage() {
   if (locationBlocked) {
-    return 'Live data needs location access (unavailable here). Enable it in Discover, or open the hosted site.';
+    return 'Live data needs location access (unavailable here). Enable it in Rarities, or open the hosted site.';
   }
-  return 'Enable location in Discover to see live data here.';
+  return 'Enable location in Rarities to see live data here.';
 }
 function fillLiveNearbyUnavailable(birdId) {
   var msg = liveNearbyMessage();
@@ -3228,6 +3559,18 @@ function renderCodexActive() {
   renderPokedex();
 }
 
+// Typing in search: wait for a short pause, then redraw once and show the results from the top
+var _codexSearchTimer = null;
+function queueCodexSearch() {
+  clearTimeout(_codexSearchTimer);
+  _codexSearchTimer = setTimeout(function() {
+    renderCodexActive();
+    var c = document.getElementById('content');
+    if (c) { c.style.scrollBehavior = 'auto'; c.scrollTop = 0; c.style.scrollBehavior = ''; }
+    _afterRenderHook();
+  }, 140);
+}
+
 function renderSightingsList() {
   var el = document.getElementById('sightings-list-area');
   if (!el) return;
@@ -3331,51 +3674,42 @@ function renderSightingsList() {
 }
 
 function initRevealObserver() {
-  var io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-    });
-  }, { rootMargin:'0px 0px -40px 0px', threshold:0.08 });
-  document.querySelectorAll('.reveal,.reveal-left').forEach(function(el) { io.observe(el); });
+  // One shared observer for the whole app (this used to build a new one on every call)
+  if (!window._revealIO) {
+    window._revealIO = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); window._revealIO.unobserve(e.target); }
+      });
+    }, { rootMargin:'0px 0px -40px 0px', threshold:0.08 });
+  }
+  document.querySelectorAll('.reveal:not(.visible),.reveal-left:not(.visible)').forEach(function(el) { window._revealIO.observe(el); });
 }
 
 function addRevealToCards() {
-  // Apply reveal class + shimmer delays to codex cards after render
-  document.querySelectorAll('.pdex-card:not(.reveal)').forEach(function(card, i) {
+  // Apply reveal class + shimmer delays to codex cards after render.
+  // Measure every card first, then change them, so the browser lays the page out once instead of once per card.
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.pdex-card:not(.reveal)'));
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.cat-row:not(.reveal)'));
+  var vh = window.innerHeight;
+  var cardTops = cards.map(function(c){ return c.getBoundingClientRect().top; });
+  var rowTops = rows.map(function(r){ return r.getBoundingClientRect().top; });
+  cards.forEach(function(card, i) {
     card.classList.add('reveal');
     card.style.setProperty('--roll-delay', (i % 8) * 0.5);
     // Trigger immediately if already visible
-    var rect = card.getBoundingClientRect();
-    if (rect.top < window.innerHeight) card.classList.add('visible');
+    if (cardTops[i] < vh) card.classList.add('visible');
   });
-  document.querySelectorAll('.cat-row:not(.reveal)').forEach(function(row, i) {
+  rows.forEach(function(row, i) {
     row.classList.add('reveal');
     row.style.transitionDelay = (i * 0.03) + 's';
-    var rect = row.getBoundingClientRect();
-    if (rect.top < window.innerHeight) row.classList.add('visible');
+    if (rowTops[i] < vh) row.classList.add('visible');
   });
   initRevealObserver();
 }
 
-// Parallax on content scroll
-function initParallax() {
-  var content = document.querySelector('.content');
-  if (!content || content._parallaxBound) return;
-  content._parallaxBound = true;
-  var topbar = document.querySelector('.topbar');
-  var ticking = false;
-  function update() {
-    var sy = content.scrollTop;
-    if (topbar) {
-      var opacity = Math.max(0.85, 1 - sy * 0.0008);
-      topbar.style.background = 'rgba(14,20,16,' + opacity + ')';
-    }
-    ticking = false;
-  }
-  content.addEventListener('scroll', function() {
-    if (!ticking) { ticking = true; requestAnimationFrame(update); }
-  }, { passive:true });
-}
+// The top bar sits on a solid background with nothing scrolling beneath it, so the old
+// per-scroll opacity change was invisible work. Kept as a named function because boot calls it.
+function initParallax() {}
 
 // Add stat-num-pulse to life list percentage
 function pulseStats() {
@@ -3643,6 +3977,7 @@ function parseExifGps(view) {
 // ═══════════════════════════════════════════════════════════════════
 function handlePhoto(e) {
   const file = e.target.files[0]; if (!file) return;
+  e.target.value = '';   // so choosing the same photo again still registers
   const reader = new FileReader();
   reader.onload = ev => {
     const original = ev.target.result;
@@ -3668,14 +4003,24 @@ function handlePhoto(e) {
 }
 
 function useCurrentLocation() {
-  navigator.geolocation.getCurrentPosition(p => {
+  if (!navigator.geolocation) { showToast('Location is not available here', 'error'); return; }
+  showToast('Finding your location…');
+  function fill(p) {
+    _applyFix(p);
     document.getElementById('f-lat').value = p.coords.latitude.toFixed(7);
     document.getElementById('f-lng').value = p.coords.longitude.toFixed(7);
     document.getElementById('geo-row').style.display = 'grid';
     document.getElementById('exif-bar').style.display = 'block';
     document.getElementById('exif-bar').className = 'exif-bar found';
     document.getElementById('exif-bar').textContent = `GPS: ${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
-  }, () => showToast('Location access denied', 'error'));
+    renderLocationChips();
+  }
+  function gpsFailed(err) { showToast(err && err.code === 1 ? 'Location access denied' : 'Could not find your location', 'error'); }
+  // Always a brand-new reading for a sighting: precise first, coarse if that is slow
+  navigator.geolocation.getCurrentPosition(fill, function(err) {
+    if (err && err.code === 1) { gpsFailed(err); return; }
+    navigator.geolocation.getCurrentPosition(fill, gpsFailed, { enableHighAccuracy: false, timeout: 8000, maximumAge: 0 });
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
 }
 
 
@@ -3704,37 +4049,85 @@ async function saveBird() {
     location_lng: (lat && lng) ? lng : null,
     facts: null, profile: null,
   };
-  const { data, error } = await sb.from('bird_sightings').insert([birdRow]).select();
+  // No signal, or the server cannot be reached: keep the sighting on this phone and send it later
+  let data = null, error = null, queued = false;
+  if (!navigator.onLine) { queued = true; }
+  else {
+    try { const res = await sb.from('bird_sightings').insert([birdRow]).select(); data = res.data; error = res.error; }
+    catch (e) { error = e; }
+    if (error && _looksOffline(error)) { queued = true; error = null; }
+  }
   if (error) { showToast('Save failed: ' + error.message, 'error'); if (saveBtn) { saveBtn.textContent = 'Press into Codex'; saveBtn.disabled = false; } return; }
   // Is this a species never recorded before? (check against existing names BEFORE we add it)
   var existingNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
   var isNewSpecies = !existingNames.has(name.toLowerCase().trim());
-  const saved = data && data[0] ? normalizeBird(data[0]) : normalizeBird(birdRow);
+  const saved = queued ? queueSightingLocally(birdRow) : (data && data[0] ? normalizeBird(data[0]) : normalizeBird(birdRow));
+  const prevCount = _uniqueSpeciesCount();
   birds.unshift(saved);
   saveToCache('birds', birds);
-  const prevCount = birds.length - 1;
   updateStats(); renderCodexActive();
-  animateCountTick(prevCount, birds.length);
+  animateCountTick(prevCount, _uniqueSpeciesCount());
   checkNewAchievements(birds);
   if (isNewSpecies) { celebrateNewSpecies(name, saved.type); } else { launchConfetti(saveBtn); }
   saveBtn.textContent = '✓ Saved!'; saveBtn.style.background = 'var(--moss)'; saveBtn.style.color = 'var(--paper)';
   setTimeout(() => {
     closeModal('add-modal');
-    showToast('Sighting saved ✦');
+    showToast(queued ? 'Saved here. Will sync when online' : 'Sighting saved ✦');
     if (saveBtn) { saveBtn.textContent = 'Press into Codex'; saveBtn.style.background = ''; saveBtn.style.color = ''; saveBtn.disabled = false; }
     var stepBar = document.getElementById('add-step-bar'); if (stepBar) stepBar.style.display = '';
-    if (saved && !saved.facts) setTimeout(() => autoFetchFacts(saved.id), 400);
+    if (saved && !saved.facts && !queued) setTimeout(() => autoFetchFacts(saved.id), 400);
   }, 600);
 }
 
-async function deleteBird(id) {
-  if (!confirm('Remove this entry?')) return;
-  try { await sb.from('bird_sightings').delete().eq('id', id); } catch (e) {}
-  birds = birds.filter(b => b.id != id);
+// Removing an entry takes effect on screen at once and can be undone for a few seconds.
+// The server copy is only deleted once that window has passed.
+var _undoDelete = null;   // { bird, index, timer }
+function _commitDelete() {
+  var u = _undoDelete;
+  if (!u) return;
+  _undoDelete = null; clearTimeout(u.timer);
+  var pi = _pendingIndex(u.bird.id);
+  if (pi !== -1) { _pendingSaves.splice(pi, 1); _savePending(); return; }   // never reached the server
+  try { sb.from('bird_sightings').delete().eq('id', u.bird.id).then(function(){}, function(){}); } catch (e) {}
+}
+function undoDelete() {
+  var u = _undoDelete;
+  if (!u) return;
+  _undoDelete = null; clearTimeout(u.timer);
+  birds.splice(Math.min(u.index, birds.length), 0, u.bird);
   saveToCache('birds', birds);
   updateStats(); renderCodexActive();
-  closeModal('detail-modal'); showToast('Entry removed', 'error');
+  showToast('Entry restored ✦');
 }
+function deleteBird(id) {
+  var index = birds.findIndex(function(b){ return b.id == id; });
+  if (index === -1) return;
+  _commitDelete();          // an earlier removal still waiting goes through now
+  var bird = birds[index];
+  birds.splice(index, 1);
+  saveToCache('birds', birds);
+  updateStats(); renderCodexActive();
+  closeModal('detail-modal');
+  _undoDelete = { bird: bird, index: index, timer: setTimeout(_commitDelete, 6000) };
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.innerHTML = '<span>Entry removed</span><button class="toast-undo" onclick="undoDelete()">Undo</button>';
+  t.className = 'toast has-action show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 6000);
+}
+window.addEventListener('pagehide', _commitDelete);
+
+function toggleDetailMore(e) {
+  if (e) e.stopPropagation();
+  var m = document.getElementById('detail-more-menu');
+  if (m) m.classList.toggle('open');
+}
+// Any tap elsewhere (including on one of its own items, after that item has acted) closes the menu
+document.addEventListener('click', function() {
+  var m = document.getElementById('detail-more-menu');
+  if (m && m.classList.contains('open')) m.classList.remove('open');
+});
 
 function openEdit(id) {
   const b = birds.find(x => x.id == id); if (!b) return;
@@ -3791,7 +4184,10 @@ async function updateBird(id) {
     photo_base64: currentPhotoBase64 || birds.find(b => b.id == id)?.photo || null,
     location_lat: (lat && lng) ? lat : null, location_lng: (lat && lng) ? lng : null,
   };
-  try { await sb.from('bird_sightings').update(updates).eq('id', id); } catch (e) {}
+  // An entry still waiting to sync is edited on this phone; the edit goes up with it
+  var _pi = _pendingIndex(id);
+  if (_pi !== -1) { Object.assign(_pendingSaves[_pi].row, updates); _savePending(); }
+  else { try { await sb.from('bird_sightings').update(updates).eq('id', id); } catch (e) {} }
   birds = birds.map(b => b.id == id ? { ...b, name: nameVal, species: updates.species, type: updates.bird_type, size: updates.size, location: updates.location, date: updates.date_spotted, notes: updates.notes, photo: updates.photo_base64, lat: updates.location_lat, lng: updates.location_lng } : b);
   saveToCache('birds', birds);
   updateStats(); renderCodexActive();
@@ -3851,7 +4247,38 @@ function advanceAddStep(step) {
     var specDisp = document.getElementById('confirm-id-species');
     if (nameDisp) nameDisp.textContent = nameVal || 'Unknown bird';
     if (specDisp) specDisp.textContent = speciesVal || '';
+    renderLocationChips();
   }
+}
+
+// Places you have logged before, nearest first when the sighting has GPS, offered as one-tap chips
+function renderLocationChips() {
+  var box = document.getElementById('loc-chips');
+  var field = document.getElementById('f-location');
+  if (!box || !field) return;
+  var lat = parseFloat((document.getElementById('f-lat') || {}).value);
+  var lng = parseFloat((document.getElementById('f-lng') || {}).value);
+  var hasSightingGps = isFinite(lat) && isFinite(lng);
+  if (!hasSightingGps && userLat && userLng) { lat = Number(userLat); lng = Number(userLng); }
+  var hasAny = isFinite(lat) && isFinite(lng);
+  var seen = {}, places = [];
+  birds.forEach(function(b, i) {
+    var name = (b.location || '').trim();
+    if (!name) return;
+    var k = name.toLowerCase();
+    if (!seen[k]) { seen[k] = { name: name, recent: i, dist: Infinity }; places.push(seen[k]); }
+    if (hasAny && b.lat && b.lng) {
+      var d = distKm(lat, lng, parseFloat(b.lat), parseFloat(b.lng));
+      if (d < seen[k].dist) seen[k].dist = d;
+    }
+  });
+  places.sort(function(a, b) { return (a.dist - b.dist) || (a.recent - b.recent); });
+  // Standing where you have logged before (within 1 km of this sighting's own GPS): fill the name in
+  if (hasSightingGps && !field.value.trim() && places.length && places[0].dist < 1) field.value = places[0].name;
+  box.innerHTML = places.slice(0, 4).map(function(p) {
+    return '<button type="button" class="loc-chip" data-loc="' + _esc(p.name) + '" onclick="document.getElementById(\'f-location\').value=this.dataset.loc">'
+      + _esc(p.name) + (p.dist < 50 ? ' <span>' + p.dist.toFixed(1) + ' km</span>' : '') + '</button>';
+  }).join('');
 }
 
 function _buildSonogram() {
@@ -4151,13 +4578,14 @@ function importData(e) {
   reader.readAsText(file);
 }
 
-document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); }));
+document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) closeModal(bg.id); }));
 document.querySelectorAll('.modal-handle').forEach(handle => {
   let startY = 0;
   handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
   handle.addEventListener('touchend', e => {
     const dy = e.changedTouches[0].clientY - startY;
-    if (dy > 60) { const modal = handle.closest('.modal-bg'); if (modal) modal.classList.remove('open'); }
+    // the folio has its own drag-to-dismiss below, so its handle is left to that
+    if (dy > 60) { const modal = handle.closest('.modal-bg'); if (modal && modal.id !== 'detail-modal') closeModal(modal.id); }
   }, { passive: true });
 });
 // ═══════════════════════════════════════════════════════════════════
@@ -4192,6 +4620,27 @@ var ACHIEVEMENTS = [
   { id:'endangered_3',    tier:'elite',    icon:'🛡️', name:'Guardian Species',     desc:'Spot 3 or more Endangered or Critically Endangered species.',           check: function(b){ return b.filter(function(s){ var c=s.profile&&s.profile.conservation; return c==='EN'||c==='CR'; }).length >= 3; } },
   { id:'season_complete', tier:'elite',    icon:'🗓️', name:'All Seasons',          desc:'Log sightings in all four seasons.',                                    check: function(b){ var ss=new Set(b.map(function(s){ var m=new Date(s.date||s.created_at).getMonth(); return m<3?'win':m<6?'spr':m<9?'mon':'aut'; })); return ss.size>=4; } }
 ];
+
+// How far along each countable achievement is: [so far, needed]
+function _uniqNames(b, type) {
+  return new Set(b.filter(function(s){ return !type || s.type === type; }).map(function(s){ return s.name; })).size;
+}
+var ACH_PROGRESS = {
+  ten_species:       function(b){ return [_uniqNames(b), 10]; },
+  twentyfive_sp:     function(b){ return [_uniqNames(b), 25]; },
+  fifty_species:     function(b){ return [_uniqNames(b), 50]; },
+  hundred_species:   function(b){ return [_uniqNames(b), 100]; },
+  fifty_sightings:   function(b){ return [b.length, 50]; },
+  hundred_sightings: function(b){ return [b.length, 100]; },
+  five_types:        function(b){ return [new Set(b.map(function(s){ return s.type; }).filter(Boolean)).size, 5]; },
+  ten_types:         function(b){ return [new Set(b.map(function(s){ return s.type; }).filter(Boolean)).size, 10]; },
+  waterbird_10:      function(b){ return [b.filter(function(s){ return s.type==='Waterbird'||s.type==='Wader'; }).length, 10]; },
+  gps_10:            function(b){ return [b.filter(function(s){ return s.lat&&s.lng; }).length, 10]; },
+  photo_10:          function(b){ return [b.filter(function(s){ return s.photo; }).length, 10]; },
+  five_raptors:      function(b){ return [_uniqNames(b, 'Raptor'), 5]; },
+  week_streak:       function(b){ return [calcWeekStreak(b), 4]; },
+  endangered_3:      function(b){ return [b.filter(function(s){ var c=s.profile&&s.profile.conservation; return c==='EN'||c==='CR'; }).length, 3]; },
+};
 
 var TIER_LABELS = { starter:'Starter', explorer:'Explorer', dedicated:'Dedicated', elite:'Elite' };
 var TIER_COLORS = { starter:'var(--sage-dim)', explorer:'var(--sage)', dedicated:'var(--brass-hi)', elite:'var(--brass)' };
@@ -4297,7 +4746,7 @@ function renderStats() {
     hundred_species:'star', ten_types:'compass', endangered_3:'wax', season_complete:'sunrise',
   };
 
-  var achieved = ACHIEVEMENTS.map(function(a){ return {id:a.id,tier:a.tier,icon:a.icon,name:a.name,desc:a.desc,seal:SEAL_MAP[a.id]||'feather',unlocked:a.check(b)}; });
+  var achieved = ACHIEVEMENTS.map(function(a){ return {id:a.id,tier:a.tier,icon:a.icon,name:a.name,desc:a.desc,seal:SEAL_MAP[a.id]||'feather',unlocked:a.check(b),progress:ACH_PROGRESS[a.id]?ACH_PROGRESS[a.id](b):null}; });
   var unlockedCount = achieved.filter(function(a){ return a.unlocked; }).length;
 
   var html = '';
@@ -4333,6 +4782,25 @@ function renderStats() {
   });
   html += '</div>';
   html += '</div></div>'; // close card
+
+  // ── THROUGH THE YEAR: sightings in each of the last 12 months ──
+  var monthCounts = [], monthLabels = [], nowD = new Date();
+  for (var mi = 11; mi >= 0; mi--) {
+    var m0 = new Date(nowD.getFullYear(), nowD.getMonth() - mi, 1);
+    monthLabels.push('JFMAMJJASOND'.charAt(m0.getMonth()));
+    monthCounts.push(b.filter(function(s){ var d = new Date(s.date || 0); return d.getFullYear() === m0.getFullYear() && d.getMonth() === m0.getMonth(); }).length);
+  }
+  var monthMax = Math.max.apply(null, monthCounts) || 1;
+  html += '<div style="margin:0 12px 18px;padding:14px 16px 12px;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:12px;">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass-hi);">Through the Year</span><span style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);">sightings, last 12 months</span></div>';
+  html += '<div class="month-chart" style="height:76px;margin-top:12px;">';
+  monthCounts.forEach(function(c, i) {
+    html += '<div class="month-bar-wrap" style="height:100%;justify-content:flex-end;">';
+    html += '<div style="font-family:var(--mono);font-size:8px;color:' + (i === 11 ? 'var(--brass-hi)' : 'var(--paper-dim)') + ';">' + (c || '') + '</div>';
+    html += '<div class="month-bar' + (i === 11 ? ' current' : '') + '" style="height:' + Math.round(c / monthMax * 44) + 'px;"></div>';
+    html += '<div class="month-bar-label"' + (i === 11 ? ' style="color:var(--brass-hi);"' : '') + '>' + monthLabels[i] + '</div></div>';
+  });
+  html += '</div></div>';
 
   // ── ACHIEVEMENTS HEADER ──
   html += '<div style="padding:0 12px;margin-bottom:14px;">';
@@ -4380,7 +4848,8 @@ function renderStats() {
         html += '<span style="font-family:var(--mono);font-size:10px;color:var(--brass-hi);letter-spacing:0.18em;">UNLOCKED</span>';
       } else {
         html += '<svg width="9" height="9" viewBox="0 0 10 10"><rect x="2" y="4.5" width="6" height="5" rx="0.6" stroke="var(--paper-dim)" stroke-width="0.8" fill="none"/><path d="M3.5 4.5V3 a1.5 1.5 0 013 0V4.5" stroke="var(--paper-dim)" stroke-width="0.8" fill="none"/></svg>';
-        html += '<span style="font-family:var(--mono);font-size:10px;color:var(--paper-dim);letter-spacing:0.18em;">LOCKED</span>';
+        html += '<span style="font-family:var(--mono);font-size:10px;color:var(--paper-dim);letter-spacing:0.18em;">' + (a.progress ? Math.min(a.progress[0], a.progress[1]) + ' OF ' + a.progress[1] : 'LOCKED') + '</span>';
+        if (a.progress) html += '<div style="flex:1;max-width:120px;height:2px;background:rgba(201,163,94,0.14);border-radius:1px;overflow:hidden;"><div style="width:' + Math.round(Math.min(1, a.progress[0] / a.progress[1]) * 100) + '%;height:100%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi));"></div></div>';
       }
       html += '</div></div></div>';
     });
@@ -4655,13 +5124,16 @@ async function renderMigration(targetId) {
 
   // Fetch live eBird data
   var liveNotable = [], liveRecent = [];
+  if (!el.innerHTML.trim()) el.innerHTML = loadingBird;
   try {
-    await getLocation();
+    await getLocation({ force: true });
     var lat = userLat, lng = userLng;
-    if (!lat || !lng) { return; } // no location yet
+    // No position: skip the live feeds and still draw the almanac below
+    if (!lat || !lng) throw new Error('no-location');
+    el.dataset.loc = _locKey();
     var _res = await Promise.all([
-      fetch(EBIRD_BASE+'/data/obs/geo/recent/notable?lat='+lat+'&lng='+lng+'&dist=50&back=14&maxResults=50&detail=full',{headers:{'X-eBirdApiToken':EBIRD_KEY}}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];}),
-      fetch(EBIRD_BASE+'/data/obs/geo/recent?lat='+lat+'&lng='+lng+'&dist=50&back=30&maxResults=200&includeProvisional=true',{headers:{'X-eBirdApiToken':EBIRD_KEY}}).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];})
+      fetchWithTimeout(EBIRD_BASE+'/data/obs/geo/recent/notable?lat='+lat+'&lng='+lng+'&dist=50&back=14&maxResults=50&detail=full',{headers:{'X-eBirdApiToken':EBIRD_KEY}},9000).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];}),
+      fetchWithTimeout(EBIRD_BASE+'/data/obs/geo/recent?lat='+lat+'&lng='+lng+'&dist=50&back=30&maxResults=200&includeProvisional=true',{headers:{'X-eBirdApiToken':EBIRD_KEY}},9000).then(function(r){return r.ok?r.json():[];}).catch(function(){return [];})
     ]);
     liveNotable = _res[0]||[];
     var _seen=new Set();
@@ -4693,6 +5165,7 @@ async function renderMigration(targetId) {
   html += '<div style="flex:1;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:8px;padding:8px 10px;"><div style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:3px;">Month</div><div style="font-family:var(--serif);font-size:22px;color:var(--brass-hi);font-weight:500;">' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m] + '</div><div style="font-family:var(--mono);font-size:9px;color:var(--sage-dim);">almanac view</div></div>';
   html += '</div>';
   html += '</div>';
+  if (liveRecent.length || liveNotable.length) html += '<div style="margin-bottom:8px;">' + _updatedLine() + '</div>';
 
   // ── Year-wheel SVG ──
   html += '<div style="margin:0 18px 16px;padding:14px;background:var(--ink-1);border:0.5px solid var(--line-2);border-radius:12px;position:relative;">';
@@ -4940,9 +5413,12 @@ async function renderDiscover(targetId) {
   el.innerHTML = loadingBird;
   await getLocation({ force: true });
   if (!userLat || !userLng) { el.innerHTML = locationNeededState('rarities near you'); return; }
+  el.dataset.loc = _locKey();
   var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
-  var nearby = await fetchNearby(userLat, userLng, 25, 7);
-  var notable = await fetchNotable(userLat, userLng, 50);
+  // Both feeds at once rather than one after the other
+  var _feeds = await Promise.all([fetchNearby(userLat, userLng, 25, 7), fetchNotable(userLat, userLng, 50)]);
+  var nearby = _feeds[0], notable = _feeds[1];
+  _fillThisWeekRarity();
   if (!nearby.length && !notable.length) { el.innerHTML = ebirdUnavailableState(el, 'renderDiscover', targetId); return; }
 
   var newSpecies = nearby.filter(function(obs){ return !myBirdNames.has((obs.comName||'').toLowerCase().trim()); });
@@ -4967,8 +5443,9 @@ async function renderDiscover(targetId) {
   html += '<div style="flex:1;">';
   html += '<div style="font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:6px;">What\'s stirring this week</div>';
   html += '<div style="font-family:var(--serif);font-size:22px;line-height:1.1;color:var(--paper);"><em style="color:var(--brass-hi);font-style:italic;font-size:26px;">' + notable.length + '</em> rarities, <em style="color:var(--sage);font-style:italic;font-size:26px;">' + nearby.length + '</em> sightings</div>';
-  html += '<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;line-height:1.3;">within 25km · last 7 days · via eBird</div>';
+  html += '<div style="font-family:var(--body);font-style:italic;font-size:12px;color:var(--paper-dim);margin-top:4px;line-height:1.3;">within 25km' + (_locFromMemory ? ' of your last known spot' : '') + ' · last 7 days · via eBird</div>';
   html += '</div></div>';
+  html += _updatedLine();
 
   // ── Rarity Dispatches ──
   if (notable.length) {
@@ -5023,6 +5500,7 @@ async function renderDiscover(targetId) {
       html += '<div style="font-family:var(--mono);font-size:10px;color:var(--paper-dim);margin-top:4px;letter-spacing:0.1em;">' + loc.toUpperCase() + ' · ' + daysAgo(obs.obsDt).toUpperCase() + '</div>';
       html += '</div>';
       if (dist) html += '<div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:13px;color:var(--brass-hi);font-weight:500;">' + dist.toFixed(1) + '</div><div style="font-family:var(--mono);font-size:9px;color:var(--paper-dim);">KM</div></div>';
+      html += '<button onclick="openAddForBird(this.dataset.name,this.dataset.sci)" data-name="' + _esc(obs.comName) + '" data-sci="' + _esc(obs.sciName||'') + '" style="flex-shrink:0;padding:9px 10px;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:5px;background:transparent;cursor:pointer;white-space:nowrap;">+ LOG</button>';
       html += '</div>';
     });
     html += '</div>';
@@ -5058,29 +5536,96 @@ async function fetchHotspotSpecies(locId) {
   var cacheKey = 'hsp_' + locId;
   if (ebirdCache[cacheKey]) return ebirdCache[cacheKey];
   try {
-    var res = await fetch(EBIRD_BASE + '/data/obs/' + locId + '/recent?maxResults=20&back=14', { headers: { 'X-eBirdApiToken': EBIRD_KEY } });
-    if (!res.ok) return [];
+    var res = await fetchWithTimeout(EBIRD_BASE + '/data/obs/' + locId + '/recent?maxResults=60&back=7', { headers: { 'X-eBirdApiToken': EBIRD_KEY } }, 8000);
+    if (!res.ok) return null;
     var data = await res.json(); ebirdCache[cacheKey] = data; _saveEbirdCache(); return data;
-  } catch(e) { return []; }
+  } catch(e) { return null; }   // null = could not ask; [] = asked, nothing recorded
+}
+
+// Whole calendar days between an eBird date ("2026-11-17 07:30") and today
+function _calDaysAgo(obsDt) {
+  var d = new Date(String(obsDt || '').replace(' ', 'T'));
+  if (isNaN(d.getTime())) return 99;
+  var a = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  var n = new Date(); var b = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
+  return Math.max(0, Math.round((b - a) / 86400000));
+}
+function _dayWord(days) { return days === 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago'; }
+
+// Fill a hotspot card with what has been recorded there this week: a one-line summary,
+// the latest day's species, and the full list by day behind the button.
+function loadHotspotRecent(locId) {
+  var sum = document.getElementById('hsp-sum-' + locId);
+  if (!sum || sum.dataset.state === 'loading' || sum.dataset.state === 'done') return Promise.resolve();
+  sum.dataset.state = 'loading';
+  var top = document.getElementById('hsp-top-' + locId);
+  var list = document.getElementById('hsp-list-' + locId);
+  var btn = document.getElementById('hsp-btn-' + locId);
+  return fetchHotspotSpecies(locId).then(function(obs) {
+    if (obs === null) {
+      sum.dataset.state = '';
+      sum.innerHTML = '<span>Could not check recent sightings</span>';
+      if (btn) { btn.textContent = 'Try again'; btn.dataset.label = 'Try again'; }
+      return;
+    }
+    sum.dataset.state = 'done';
+    if (!obs.length) {
+      sum.innerHTML = '<span>Nothing recorded here this week</span>';
+      if (btn) btn.style.display = 'none';
+      return;
+    }
+    var mine = new Set(birds.map(function(b){ return (b.name || '').toLowerCase().trim(); }));
+    var days = {}, order = [];
+    obs.forEach(function(o) {
+      var d = _calDaysAgo(o.obsDt);
+      if (!days[d]) { days[d] = []; order.push(d); }
+      days[d].push(o);
+    });
+    order.sort(function(a, b){ return a - b; });
+    var latest = order[0];
+    var fresh = obs.filter(function(o){ return !mine.has((o.comName || '').toLowerCase().trim()); }).length;
+    function chip(o) {
+      var isNew = !mine.has((o.comName || '').toLowerCase().trim());
+      return '<span class="hotspot-species-chip" style="' + (isNew ? 'border-color:rgba(201,163,94,0.2);color:var(--brass-hi);' : '') + '">' + (isNew ? '★ ' : '') + _esc(o.comName) + '</span>';
+    }
+    sum.innerHTML = (latest === 0 ? '<span class="live-dot"></span>' : '')
+      + '<b>' + (latest === 0 ? days[0].length + ' species today' : 'Last recorded ' + _dayWord(latest)) + '</b>'
+      + '<span>' + obs.length + ' this week' + (fresh ? ' · ' + fresh + ' new for you' : '') + '</span>';
+    if (top) {
+      var shown = days[latest].slice(0, 6);
+      top.innerHTML = shown.map(chip).join('') + (days[latest].length > shown.length ? '<span class="hotspot-species-chip" style="border-style:dashed;">+' + (days[latest].length - shown.length) + ' more</span>' : '');
+    }
+    if (list) {
+      list.innerHTML = order.map(function(d) {
+        return '<div class="hsp-day">' + _dayWord(d) + ' · ' + days[d].length + '</div>' + days[d].map(chip).join('');
+      }).join('');
+    }
+    if (btn) { btn.dataset.label = 'All ' + obs.length + ' species'; btn.textContent = (list && list.classList.contains('open')) ? 'Hide' : btn.dataset.label; }
+  });
 }
 
 function toggleHotspotSpecies(locId) {
   var list = document.getElementById('hsp-list-' + locId);
   var btn = document.getElementById('hsp-btn-' + locId);
+  var sum = document.getElementById('hsp-sum-' + locId);
   if (!list) return;
-  if (list.classList.contains('open')) { list.classList.remove('open'); btn.textContent = '▸ Show recent sightings'; return; }
-  if (list.dataset.loaded) { list.classList.add('open'); btn.textContent = '▾ Hide'; return; }
-  btn.textContent = 'Loading...';
-  fetchHotspotSpecies(locId).then(function(obs) {
-    if (!obs.length) { btn.textContent = 'No recent sightings'; return; }
-    var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
-    var html = '';
-    obs.forEach(function(o) {
-      var isNew = !myBirdNames.has((o.comName||'').toLowerCase().trim());
-      html += '<span class="hotspot-species-chip" style="' + (isNew ? 'border-color:rgba(201,163,94,0.2);color:var(--brass-hi);' : '') + '">' + (isNew ? '★ ' : '') + o.comName + '</span>';
+  if (sum && sum.dataset.state !== 'done') { loadHotspotRecent(locId).then(function(){ if (sum.dataset.state === 'done') { list.classList.add('open'); if (btn) btn.textContent = 'Hide'; } }); return; }
+  var open = list.classList.toggle('open');
+  if (btn) btn.textContent = open ? 'Hide' : (btn.dataset.label || 'Recent species');
+}
+
+// Cards ask eBird only as they come into view, so a long list does not fire a dozen requests at once
+function _watchHotspotCards(root) {
+  if (window._hotspotCardIO) window._hotspotCardIO.disconnect();
+  if (!window.IntersectionObserver) { root.querySelectorAll('.hsp-card').forEach(function(c){ loadHotspotRecent(c.dataset.loc); }); return; }
+  window._hotspotCardIO = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (!e.isIntersecting) return;
+      window._hotspotCardIO.unobserve(e.target);
+      loadHotspotRecent(e.target.dataset.loc);
     });
-    list.innerHTML = html; list.dataset.loaded = '1'; list.classList.add('open'); btn.textContent = '▾ Hide';
-  });
+  }, { rootMargin: '200px 0px 200px 0px' });
+  root.querySelectorAll('.hsp-card').forEach(function(c){ window._hotspotCardIO.observe(c); });
 }
 
 async function renderHotspots(targetId) {
@@ -5089,6 +5634,7 @@ async function renderHotspots(targetId) {
   el.innerHTML = loadingBird;
   await getLocation({ force: true });
   if (!userLat || !userLng) { el.innerHTML = locationNeededState('hotspots near you'); return; }
+  el.dataset.loc = _locKey();
   var hotspots = await fetchHotspots(userLat, userLng, 25);
   if (!hotspots.length) {
     el.innerHTML = ebirdUnavailableState(el, 'renderHotspots', targetId);
@@ -5102,6 +5648,8 @@ async function renderHotspots(targetId) {
   html += '<div style="margin:16px 18px 0;border-radius:12px;overflow:hidden;border:0.5px solid var(--line-2);">';
   html += '<div id="hotspot-map-el" style="width:100%;height:300px;"></div>';
   html += '</div>';
+
+  html += '<div style="margin-top:12px;">' + _updatedLine() + '</div>';
 
   // ── Hotspot nearest card ──
   var top = hotspots[0];
@@ -5127,18 +5675,20 @@ async function renderHotspots(targetId) {
 
   hotspots.slice(0, 12).forEach(function(h) {
     var dist = distKm(userLat, userLng, h.lat, h.lng);
-    html += '<div style="background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:10px;padding:11px 14px;">';
+    html += '<div class="hsp-card" data-loc="' + _esc(h.locId) + '" style="background:var(--ink-2);border:0.5px solid var(--line-2);border-radius:10px;padding:11px 14px;">';
     html += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">';
-    html += '<div style="font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.1;color:var(--paper);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + h.locName + '</div>';
+    html += '<div style="font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.1;color:var(--paper);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(h.locName) + '</div>';
     html += '<div style="text-align:right;flex-shrink:0;"><div style="font-family:var(--mono);font-size:12px;color:var(--brass-hi);font-weight:500;">' + dist.toFixed(1) + '<span style="color:var(--paper-dim);font-size:11px;">km</span></div></div>';
     html += '</div>';
     html += '<div style="margin-top:5px;display:flex;align-items:center;gap:8px;">';
     if (h.numSpeciesAllTime) html += '<span style="font-family:var(--mono);font-size:10px;color:var(--paper);">' + h.numSpeciesAllTime + '<span style="color:var(--paper-dim);"> species</span></span><span style="width:2px;height:2px;border-radius:50%;background:var(--paper-dim);display:inline-block;"></span>';
     html += '<span style="font-family:var(--mono);font-size:10px;color:var(--sage);">eBird hotspot</span>';
     html += '</div>';
+    html += '<div class="hsp-sum" id="hsp-sum-' + h.locId + '"><span class="skeleton-line" style="width:150px;height:10px;"></span></div>';
+    html += '<div class="hsp-top" id="hsp-top-' + h.locId + '"></div>';
     html += '<div style="margin-top:8px;display:flex;gap:6px;">';
     html += '<a href="https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng + '" target="_blank" style="flex:1;text-align:center;padding:7px 0;font-family:var(--mono);font-size:10px;color:var(--brass-hi);border:0.5px solid rgba(201,163,94,0.35);border-radius:5px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z" fill="none" stroke="currentColor" stroke-width="0.8"/><circle cx="4.5" cy="3.5" r="1.2" fill="currentColor"/></svg>Navigate</a>';
-    html += '<button onclick="toggleHotspotSpecies(\'' + h.locId + '\')" style="flex:1;padding:7px 0;font-family:var(--mono);font-size:10px;color:var(--sage);border:0.5px solid rgba(143,168,136,0.3);border-radius:5px;background:transparent;cursor:pointer;" id="hsp-btn-' + h.locId + '">Species</button>';
+    html += '<button onclick="toggleHotspotSpecies(\'' + h.locId + '\')" style="flex:1;padding:7px 0;font-family:var(--mono);font-size:10px;color:var(--sage);border:0.5px solid rgba(143,168,136,0.3);border-radius:5px;background:transparent;cursor:pointer;" id="hsp-btn-' + h.locId + '">Recent species</button>';
     html += '</div>';
     html += '<div class="hotspot-species-list" id="hsp-list-' + h.locId + '"></div>';
     html += '</div>';
@@ -5147,10 +5697,16 @@ async function renderHotspots(targetId) {
 
   el.innerHTML = html;
   el._hotspots = hotspots;
+  _watchHotspotCards(el);
 
   // ── Init Leaflet map for hotspots ──
   setTimeout(function() {
     var mapEl = document.getElementById('hotspot-map-el');
+    // A map left over from an earlier draw of this pane belongs to a box that no longer exists: start clean
+    if (mapEl && window._hotspotLeaflet && window._hotspotLeaflet.getContainer() !== mapEl) {
+      try { window._hotspotLeaflet.remove(); } catch(e) {}
+      window._hotspotLeaflet = null;
+    }
     if (!mapEl || window._hotspotLeaflet) {
       if (window._hotspotLeaflet) {
         window._hotspotLeaflet.invalidateSize();
@@ -5160,12 +5716,12 @@ async function renderHotspots(targetId) {
     }
     var lat = userLat, lng = userLng;
     if (!lat || !lng) { return; } // no location yet
-    window._hotspotLeaflet = L.map('hotspot-map-el', { center:[lat,lng], zoom:12, zoomControl:true, attributionControl:false });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(window._hotspotLeaflet);
+    window._hotspotLeaflet = L.map('hotspot-map-el', { center:[lat,lng], zoom:12, zoomControl:true, attributionControl:true });
+    _addBaseTiles(window._hotspotLeaflet);
 
     // User location
     var userIcon = L.divIcon({ className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#8FA888;border:2px solid rgba(14,20,16,0.9);box-shadow:0 0 0 4px rgba(143,168,136,0.22);"></div>', iconSize:[14,14], iconAnchor:[7,7] });
-    L.marker([lat, lng], {icon:userIcon}).addTo(window._hotspotLeaflet).bindPopup('<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#8FA888;">YOU ARE HERE</div>');
+    L.marker([lat, lng], {icon:userIcon}).addTo(window._hotspotLeaflet).bindPopup('<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#8FA888;">' + _hereLabel() + '</div>');
 
     _refreshHotspotMarkers(hotspots);
 
@@ -5179,24 +5735,43 @@ function _refreshHotspotMarkers(hotspots) {
   if (window._hotspotLeafletMarkers) window._hotspotLeafletMarkers.forEach(function(m){ window._hotspotLeaflet.removeLayer(m); });
   window._hotspotLeafletMarkers = [];
 
-  var hsIcon = L.divIcon({ className:'', html:'<div style="width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E3BF7A,#C9A35E 60%,#8B7240);border:2px solid rgba(14,20,16,0.8);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;"><svg width="8" height="10" viewBox="0 0 9 11" fill="#1A1410"><path d="M4.5 0a3.5 3.5 0 013.5 3.5c0 2.5-3.5 7-3.5 7S1 6 1 3.5a3.5 3.5 0 013.5-3.5z"/></svg></div>', iconSize:[22,22], iconAnchor:[11,22], popupAnchor:[0,-24] });
-
   hotspots.slice(0, 20).forEach(function(h) {
-    var dist = distKm(userLat, userLng, h.lat, h.lng);
-    var popup = L.popup({ className:'leaflet-popup-dark', maxWidth:200, closeButton:true }).setContent(
-      '<div style="font-family:Cormorant Garamond,serif;min-width:140px;">' +
-      '<div style="font-size:14px;font-weight:500;color:#ECDFC5;margin-bottom:3px;">' + h.locName + '</div>' +
-      '<div style="font-size:11px;color:#8FA888;margin-bottom:6px;">' + dist.toFixed(1) + 'km · ' + (h.numSpeciesAllTime||'?') + ' species</div>' +
-      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + h.lat + ',' + h.lng + '" target="_blank" style="display:block;text-align:center;padding:5px;background:linear-gradient(135deg,#C9A35E,#8B7240);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:0.12em;color:#1A1410;text-decoration:none;">NAVIGATE ↗</a>' +
-      '</div>');
-    var m = L.marker([parseFloat(h.lat), parseFloat(h.lng)], {icon:hsIcon}).bindPopup(popup).addTo(window._hotspotLeaflet);
+    var m = _hotspotMarker(h).addTo(window._hotspotLeaflet);
     window._hotspotLeafletMarkers.push(m);
   });
 
-  if (window._hotspotLeafletMarkers.length > 1) {
-    var group = new L.featureGroup(window._hotspotLeafletMarkers);
-    window._hotspotLeaflet.fitBounds(group.getBounds().pad(0.3));
+  _fitHotspotMap();
+  _watchHotspotMapSize();
+}
+
+// Frame every hotspot pin (and you) in the map
+function _fitHotspotMap() {
+  var m = window._hotspotLeaflet, pins = window._hotspotLeafletMarkers || [];
+  if (!m || !pins.length) return;
+  var bounds = new L.featureGroup(pins).getBounds();
+  if (userLat && userLng) bounds.extend([userLat, userLng]);
+  m.fitBounds(bounds.pad(0.2), { maxZoom: 14, animate: false });
+}
+// Leaflet measures its box once. If the window changed size while this pane was hidden, or the map was
+// built while hidden, it believes the box is 0 wide and draws a corner of tiles with no pins.
+// Watch the box and put the map right whenever the two disagree.
+function _watchHotspotMapSize() {
+  var el = document.getElementById('hotspot-map-el');
+  if (!el || !window.ResizeObserver) return;
+  if (window._hotspotRO) {
+    if (window._hotspotROEl === el) return;
+    window._hotspotRO.disconnect();
   }
+  window._hotspotROEl = el;
+  window._hotspotRO = new ResizeObserver(function() {
+    var m = window._hotspotLeaflet;
+    if (!m || m.getContainer() !== el || !el.offsetWidth || !el.offsetHeight) return;
+    var size = m.getSize();
+    if (size.x === el.offsetWidth && size.y === el.offsetHeight) return;
+    m.invalidateSize({ animate: false });
+    _fitHotspotMap();
+  });
+  window._hotspotRO.observe(el);
 }
 
 async function checkRarityOnLoad() {
@@ -5220,70 +5795,120 @@ async function checkRarityOnLoad() {
 // ═══════════════════════════════════════════════════════════════════
 // LOCATION CACHE
 // ═══════════════════════════════════════════════════════════════════
-var locationBlocked = false; // true when the origin can't use geolocation (e.g. file://)
-function getLocation(opts) {
-  opts = opts || {};
-  // Already have coords this session — resolve immediately, no new prompt
-  if (userLat && userLng) return Promise.resolve();
+var locationBlocked = false;   // true when no position could be found at all
+var _locFixAt = 0;             // when the last live fix arrived (0 = none yet this session)
+var _locFromMemory = false;    // true while the position is a remembered one, not a live fix
+var _locDonePromise = null;
+var LOC_REUSE_MS = 2 * 60 * 1000;   // a live fix is reused for 2 minutes
+var LOC_STALE_MS = 5 * 60 * 1000;   // after 5 minutes, background callers ask for a quiet refresh
 
-  // Seed from a previously cached fix so the UI can render distances instantly
+function _locKey() { return (userLat && userLng) ? Number(userLat).toFixed(4) + ',' + Number(userLng).toFixed(4) : ''; }
+function _hereLabel() { return _locFromMemory ? 'LAST KNOWN SPOT' : 'YOU ARE HERE'; }
+
+// Instant answer with no prompt: this session's position, else the one saved in
+// localStorage, else the most recent GPS-tagged sighting.
+function _rememberedLocation() {
+  if (userLat && userLng) return true;
   try {
     var cached = JSON.parse(localStorage.getItem('gh_lastloc') || 'null');
     if (cached && cached.lat && cached.lng) {
-      userLat = cached.lat; userLng = cached.lng;
-      if (!opts.force) { locationResolved = true; return Promise.resolve(); }
+      userLat = Number(cached.lat); userLng = Number(cached.lng); _locFromMemory = true;
+      return true;
     }
   } catch(e) {}
+  var geo = birds.filter(function(b){ return b.lat && b.lng; });
+  if (geo.length) {
+    geo.sort(function(a, b){ return new Date(b.date || 0) - new Date(a.date || 0); });
+    var la = parseFloat(geo[0].lat), ln = parseFloat(geo[0].lng);
+    if (isFinite(la) && isFinite(ln) && la && ln) { userLat = la; userLng = ln; _locFromMemory = true; return true; }
+  }
+  return false;
+}
 
-  // Non-forced calls never trigger a prompt; they just use whatever we have
+// A live fix has arrived: adopt it, save it, and let the map and Rarities catch up
+function _applyFix(pos) {
+  var lat = pos.coords.latitude, lng = pos.coords.longitude;
+  userLat = lat; userLng = lng;
+  _locFixAt = Date.now(); _locFromMemory = false;
+  locationResolved = true; locationBlocked = false;
+  try { localStorage.setItem('gh_lastloc', JSON.stringify({ lat: lat, lng: lng, t: _locFixAt })); } catch(e) {}
+  _updateUserMarker();
+  _refreshDiscoverForLocation();
+}
+
+// Precise fix first; if that is slow or unavailable, settle for a quicker coarse one
+function _requestFix(done) {
+  var finished = false;
+  function ok(pos) { if (finished) return; finished = true; _applyFix(pos); done(true); }
+  function fail() { if (finished) return; finished = true; done(false); }
+  navigator.geolocation.getCurrentPosition(ok, function(err) {
+    if (err && err.code === 1) { fail(); return; }   // permission refused: a second try will not help
+    navigator.geolocation.getCurrentPosition(ok, fail, { enableHighAccuracy: false, timeout: 6000, maximumAge: 120000 });
+  }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });   // always a new reading, never the browser's own remembered one
+}
+
+// One request at a time. "early" resolves as soon as screens have something to draw with;
+// "done" resolves only when the live attempt has finished.
+function _startLocationRequest(mayPrompt) {
+  var resolveEarly, resolveDone;
+  var early = new Promise(function(r){ resolveEarly = r; });
+  var done = new Promise(function(r){ resolveDone = r; });
+  locationPromise = early; _locDonePromise = done;
+  var hadPosition = !!(userLat && userLng);
+  function end(gotFix, quiet) {
+    locationResolved = true;
+    if (!gotFix && !_rememberedLocation() && !quiet) locationBlocked = true;
+    if (locationPromise === early) { locationPromise = null; _locDonePromise = null; }
+    resolveEarly(); resolveDone();
+  }
+  function start() {
+    _requestFix(end);
+    // With a remembered position in hand, don't keep the screen waiting on GPS.
+    // Whatever is showing refreshes by itself if the live fix turns out to be somewhere else.
+    if (hadPosition) setTimeout(resolveEarly, 2500);
+  }
+  if (!navigator.geolocation) { end(false); return { early: early, done: done }; }
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+      if (result.state === 'denied') { end(false); return; }
+      if (result.state === 'prompt' && !mayPrompt) { end(false, true); return; }
+      start();
+    }).catch(function() { if (mayPrompt) start(); else end(false, true); });
+  } else if (mayPrompt) { start(); }
+  else { end(false, true); }
+  return { early: early, done: done };
+}
+
+function getLocation(opts) {
+  opts = opts || {};
+  var have = _rememberedLocation();
+  var age = _locFixAt ? Date.now() - _locFixAt : Infinity;
+
   if (!opts.force) {
+    // Background callers never prompt. Hand back what we have and freshen it quietly.
+    if (have) {
+      locationResolved = true;
+      if (age > LOC_STALE_MS && !locationPromise) _startLocationRequest(false);
+      return Promise.resolve();
+    }
     if (locationResolved) return Promise.resolve();
-    // fall through only if we want a passive (granted-only) attempt
+    if (locationPromise) return locationPromise;
+    return _startLocationRequest(false).early;
   }
 
-  // A forced request must always be able to fire a fresh prompt, so do NOT
-  // reuse a previously-resolved promise. Reset the in-flight handle.
-  if (opts.force) locationPromise = null;
-  if (locationPromise) return locationPromise;
-
-  locationPromise = new Promise(function(resolve) {
-    if (!navigator.geolocation) { locationResolved = true; locationBlocked = true; resolve(); return; }
-
-    function onSuccess(pos) {
-      userLat = pos.coords.latitude;
-      userLng = pos.coords.longitude;
-      locationResolved = true; locationBlocked = false;
-      try { localStorage.setItem('gh_lastloc', JSON.stringify({ lat: userLat, lng: userLng, t: Date.now() })); } catch(e) {}
-      resolve();
-    }
-    function onError(err) {
-      locationResolved = true;
-      // Mark blocked only if the request actually failed and we have no coords.
-      // (Some browsers do allow geolocation on file://, so we never refuse preemptively.)
-      if (!userLat && !userLng) locationBlocked = true;
-      resolve();
-    }
-
-    var go = function(maxAge){ navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 9000, maximumAge: maxAge, enableHighAccuracy: false }); };
-
-    if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-        if (result.state === 'denied') { locationResolved = true; resolve(); return; }
-        // passive (non-forced) calls only proceed if already granted
-        if (result.state === 'prompt' && !opts.force) { locationResolved = true; resolve(); return; }
-        go(result.state === 'granted' ? 600000 : 0);
-      }).catch(function() { go(0); });
-    } else {
-      go(0);
-    }
-  });
-  return locationPromise;
+  // Asked for on purpose (opening Map or Discover, the locate button): go for a live fix
+  // rather than trusting the saved one. A fix under 2 minutes old is reused.
+  if (age < LOC_REUSE_MS && !opts.wait) return Promise.resolve();
+  if (locationPromise) return opts.wait ? _locDonePromise : locationPromise;
+  var req = _startLocationRequest(true);
+  return opts.wait ? req.done : req.early;
 }
 
 async function updateDiscoverBadge() {
   try {
     await getLocation();
     var nearby = await fetchNearby(userLat, userLng, 25, 7);
+    if (userLat && userLng) fetchNotable(userLat, userLng, 50).then(_fillThisWeekRarity).catch(function(){});
     var myBirdNames = new Set(birds.map(function(b){ return (b.name||'').toLowerCase().trim(); }));
     var newCount = nearby.filter(function(obs){ return !myBirdNames.has((obs.comName||'').toLowerCase().trim()); }).length;
     var badge = document.getElementById('discover-badge');
@@ -5387,8 +6012,31 @@ function _redrawHotspotDots(allHotspots, maxRange) {
     svg.appendChild(g);
   });
 }
+// "Updated 10:42 am · Refresh" line shown on the live panes
+function _updatedLine() {
+  var t = new Date(_ebirdCacheAt || Date.now()).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+  return '<div class="updated-line"><span class="live-dot"></span><span>Updated ' + t + '</span><button onclick="refreshDiscover()">Refresh</button></div>';
+}
+function refreshDiscover() {
+  ebirdCache = {}; _ebirdCacheAt = 0;
+  try { sessionStorage.removeItem('gh_ec'); sessionStorage.removeItem('gh_ec_t'); } catch(e) {}
+  ['nearby','hotspots','migrate'].forEach(function(t) {
+    var pane = document.getElementById('discover-' + t + '-inner');
+    if (pane && !_discoverBusy[t]) delete pane.dataset.loaded;
+  });
+  switchDiscoverTab(currentDiscoverTab || 'nearby');
+}
+
 function switchDiscoverTab(tab) {
   currentDiscoverTab = tab;
+  // Live results older than 15 minutes are dropped so every pane loads afresh
+  if (_ebirdCacheAt && Date.now() - _ebirdCacheAt > EBIRD_CACHE_MS) {
+    ebirdCache = {}; _ebirdCacheAt = 0;
+    ['nearby','hotspots','migrate'].forEach(function(t) {
+      var pane = document.getElementById('discover-' + t + '-inner');
+      if (pane && !_discoverBusy[t]) delete pane.dataset.loaded;
+    });
+  }
   ['nearby','hotspots','migrate'].forEach(function(t) {
     var el = document.getElementById('discover-' + t + '-inner');
     var btn = document.getElementById('dtab-' + t);
@@ -5405,23 +6053,58 @@ function switchDiscoverTab(tab) {
   if (tab === 'migrate') renderDiscoverMigration();
 }
 
+var _discoverBusy = { nearby: false, hotspots: false, migrate: false };
+
+// Has the position moved more than 1 km since this pane was drawn?
+function _paneMoved(el) {
+  if (!el || !el.dataset.loc || !userLat || !userLng) return false;
+  var p = el.dataset.loc.split(',');
+  return distKm(parseFloat(p[0]), parseFloat(p[1]), userLat, userLng) > 1;
+}
+function _discoverShowing(tab) {
+  var v = document.getElementById('view-discover');
+  return !!(v && v.classList.contains('active') && currentDiscoverTab === tab);
+}
+function _runDiscoverPane(tab, el, renderFn) {
+  el.dataset.loaded = '1';
+  _discoverBusy[tab] = true;
+  var p;
+  try { p = Promise.resolve(renderFn()); } catch(e) { p = Promise.resolve(); }
+  p.catch(function(){}).then(function() {
+    _discoverBusy[tab] = false;
+    // The live fix landed somewhere else while this pane was loading: draw it again for the right place
+    if (_paneMoved(el)) { delete el.dataset.loaded; if (_discoverShowing(tab)) switchDiscoverTab(tab); }
+  });
+}
+// Called whenever a live fix arrives. Panes drawn for another place (or drawn with no place at all)
+// are marked to reload, and the one on screen reloads now.
+function _refreshDiscoverForLocation() {
+  ['nearby','hotspots','migrate'].forEach(function(t) {
+    var el = document.getElementById('discover-' + t + '-inner');
+    if (!el || !el.dataset.loaded || _discoverBusy[t]) return;
+    if (el.dataset.loc && !_paneMoved(el)) return;
+    delete el.dataset.loaded;
+    if (_discoverShowing(t)) switchDiscoverTab(t);
+  });
+}
+
 function renderDiscoverNearby() {
   var el = document.getElementById('discover-nearby-inner');
   if (!el || el.dataset.loaded) return;
-  renderDiscover('discover-nearby-inner'); el.dataset.loaded = '1';
+  _runDiscoverPane('nearby', el, function(){ return renderDiscover('discover-nearby-inner'); });
 }
 function renderDiscoverHotspots() {
   var el = document.getElementById('discover-hotspots-inner');
   if (!el || el.dataset.loaded) return;
   // Reset leaflet instance so map reinits in new container
   if (window._hotspotLeaflet) { window._hotspotLeaflet.remove(); window._hotspotLeaflet = null; }
-  renderHotspots('discover-hotspots-inner'); el.dataset.loaded = '1';
+  _runDiscoverPane('hotspots', el, function(){ return renderHotspots('discover-hotspots-inner'); });
 }
 function renderDiscoverMigration() {
   var el = document.getElementById('discover-migrate-inner');
   if (!el || el.dataset.loaded) return;
   currentMigrateMonth = new Date().getMonth();
-  renderMigration('discover-migrate-inner'); el.dataset.loaded = '1';
+  _runDiscoverPane('migrate', el, function(){ return renderMigration('discover-migrate-inner'); });
 }
 
 function toggleCodexSearch() { togglePdexSearch(); }
@@ -5631,12 +6314,28 @@ function flashAchievement(achievement) {
   }, 2400);
 }
 
-// Tab slide animation
+// Tab change: one short slide in the direction of travel, and each tab keeps its own scroll position
 var originalSwitchTab = switchTab;
+var _tabOrder = ['codex','map','discover','stats'];
+var _tabScroll = {};
 switchTab = function(tab) {
+  var content = document.getElementById('content');
+  var prevBtn = document.querySelector('.nav-tab.active');
+  var prev = prevBtn ? prevBtn.id.replace('tab-','') : '';
+  // Tapping the tab you are already on takes you back to the top
+  if (prev === tab) {
+    if (content && tab !== 'map') content.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  if (content && prev) _tabScroll[prev] = content.scrollTop;
   originalSwitchTab(tab);
   var activeView = document.getElementById('view-' + tab);
   if (!activeView) return;
+  if (content) {
+    content.style.scrollBehavior = 'auto';
+    content.scrollTop = (tab === 'map') ? 0 : (_tabScroll[tab] || 0);
+    content.style.scrollBehavior = '';
+  }
   // Skip fade animation for map — Leaflet needs stable dimensions at init
   if (tab === 'map') {
     activeView.style.opacity = '1';
@@ -5647,26 +6346,22 @@ switchTab = function(tab) {
     }, 100);
     return;
   }
-  activeView.style.opacity = '0'; activeView.style.transform = 'translateY(8px)'; activeView.style.transition = 'none';
+  var fromX = (_tabOrder.indexOf(tab) >= _tabOrder.indexOf(prev)) ? 14 : -14;
+  clearTimeout(activeView._tabAnim);
+  activeView.style.transition = 'none';
+  activeView.style.opacity = '0';
+  activeView.style.transform = 'translateX(' + fromX + 'px)';
   requestAnimationFrame(function() {
     requestAnimationFrame(function() {
-      activeView.style.transition = 'opacity 0.22s ease, transform 0.22s cubic-bezier(0.25,0.46,0.45,0.94)';
-      activeView.style.opacity = '1'; activeView.style.transform = 'translateY(0)';
+      activeView.style.transition = 'opacity 0.2s ease, transform 0.24s cubic-bezier(0.25,0.46,0.45,0.94)';
+      activeView.style.opacity = '1'; activeView.style.transform = 'translateX(0)';
     });
   });
+  // Clear the inline styles afterwards so the view is not left as its own layer
+  activeView._tabAnim = setTimeout(function() {
+    activeView.style.transition = ''; activeView.style.transform = ''; activeView.style.opacity = '';
+  }, 340);
 };
-
-// Ripple on codex cards
-document.addEventListener('click', function(e) {
-  var card = e.target.closest('.pdex-card');
-  if (!card || card.classList.contains('undiscovered')) return;
-  var rect = card.getBoundingClientRect();
-  var ripple = document.createElement('div');
-  var x = e.clientX - rect.left, y = e.clientY - rect.top;
-  ripple.style.cssText = 'position:absolute;border-radius:50%;background:rgba(201,163,94,0.12);pointer-events:none;transform:scale(0);animation:rippleOut 0.5s ease forwards;left:'+(x-30)+'px;top:'+(y-30)+'px;width:60px;height:60px;z-index:2;';
-  card.style.position = 'relative'; card.appendChild(ripple);
-  setTimeout(function(){ ripple.remove(); }, 500);
-}, true);
 
 function shimmerIUCNBadges() {
   var badges = document.querySelectorAll('.wax-badge');
@@ -5754,8 +6449,8 @@ window.addEventListener('offline', () => { isOnline = false; updateSyncStatus('o
     } catch(e){ return birds.map(function(b){return b.id;}); }
   }
   function pageBird(dir){
-    var ids = orderedBirdIds();
-    var cur = window._currentDetailId;
+    var ids = orderedBirdIds().map(String);
+    var cur = String(window._currentDetailId);
     var i = ids.indexOf(cur);
     if (i === -1 || ids.length < 2) return;
     var ni = (i + dir + ids.length) % ids.length;
@@ -5839,46 +6534,86 @@ window.addEventListener('offline', () => { isOnline = false; updateSyncStatus('o
       }
       axis=null;
     });
+    // The browser took the touch away (incoming call, system gesture): put the sheet back
+    modal.addEventListener('touchcancel', function(){
+      dragging=false; axis=null;
+      var c=card(); if (!c) return;
+      c.style.transition='transform 0.2s ease, opacity 0.2s';
+      c.style.transform=''; c.style.opacity='';
+    });
   })();
 
   // ---- 2) Main content: horizontal swipe to switch bottom-nav tabs ----
   (function tabGestures(){
     var content = document.getElementById('content');
     if (!content) return;
-    var sx=0, sy=0, dx=0, dy=0, tracking=false, axis=null, t0=0;
+    var sx=0, sy=0, dx=0, dy=0, tracking=false, axis=null, t0=0, onSidebar=false;
+
+    function sidebarOpen(){
+      var s = document.getElementById('sidebar');
+      return !!(s && s.classList.contains('open'));
+    }
+    // A sideways drag that starts on something which itself moves sideways (the category strip,
+    // a map, a text field) belongs to that thing, not to tab switching.
+    function ownsHorizontal(node){
+      while (node && node !== content && node.nodeType === 1) {
+        var cl = node.classList;
+        if (cl && (cl.contains('leaflet-container') || cl.contains('pdex-tabs'))) return true;
+        var tag = node.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+        if (node.scrollWidth > node.clientWidth + 8) {
+          var ox = getComputedStyle(node).overflowX;
+          if (ox === 'auto' || ox === 'scroll') return true;
+        }
+        node = node.parentNode;
+      }
+      return false;
+    }
+
     content.addEventListener('touchstart', function(e){
+      tracking = false;
       if (anyModalOpen()) return;
-      // ignore horizontal swipes that begin on the Leaflet map (it pans)
-      if (activeTab()==='map') return;
       if (e.touches.length>1) return;
+      onSidebar = sidebarOpen();
+      if (!onSidebar) {
+        // ignore horizontal swipes that begin on the Leaflet map (it pans)
+        if (activeTab()==='map') return;
+        if (ownsHorizontal(e.target)) return;
+      }
       var t=e.touches[0]; sx=t.clientX; sy=t.clientY; dx=0; dy=0; axis=null; tracking=true; t0=Date.now();
     }, {passive:true});
     content.addEventListener('touchmove', function(e){
       if (!tracking) return;
+      if (e.touches.length>1) { tracking=false; return; }
       var t=e.touches[0]; dx=t.clientX-sx; dy=t.clientY-sy;
       if (!axis && (Math.abs(dx)>12 || Math.abs(dy)>12)) axis = Math.abs(dx)>Math.abs(dy)?'x':'y';
     }, {passive:true});
+    content.addEventListener('touchcancel', function(){ tracking=false; }, {passive:true});
     content.addEventListener('touchend', function(){
       if (!tracking) return; tracking=false;
       var dt = Date.now()-t0;
-      // require a deliberate horizontal flick
-      if (axis==='x' && Math.abs(dx)>80 && Math.abs(dx) > Math.abs(dy)*1.6 && dt < 700){
-        var cur = activeTab();
-        var i = TAB_ORDER.indexOf(cur);
-        if (i===-1) return;
-        var ni = i + (dx<0 ? 1 : -1);
-        if (ni<0 || ni>=TAB_ORDER.length) {
-          // gentle edge bounce
-          var v=document.getElementById('view-'+cur);
-          if (v){ v.style.transition='transform 0.18s ease'; v.style.transform='translateX('+(dx<0?-12:12)+'px)';
-            setTimeout(function(){ v.style.transform=''; setTimeout(function(){ v.style.transition=''; },180); },180); }
-          return;
-        }
-        switchTab(TAB_ORDER[ni]);
+      if (axis!=='x' || Math.abs(dx) < Math.abs(dy)*1.5) return;
+      // With the menu open, a swipe to the left closes it and does nothing else
+      if (onSidebar) { if (dx < -50) closeSidebar(); return; }
+      // A quick flick or a longer deliberate drag both count
+      var deliberate = (Math.abs(dx) > 60 && dt < 500) || Math.abs(dx) > 110;
+      if (!deliberate) return;
+      var cur = activeTab();
+      var i = TAB_ORDER.indexOf(cur);
+      if (i===-1) return;
+      var ni = i + (dx<0 ? 1 : -1);
+      if (ni<0 || ni>=TAB_ORDER.length) {
+        // gentle edge bounce
+        var v=document.getElementById('view-'+cur);
+        if (v){ v.style.transition='transform 0.18s ease'; v.style.transform='translateX('+(dx<0?-12:12)+'px)';
+          setTimeout(function(){ v.style.transform=''; setTimeout(function(){ v.style.transition=''; },180); },180); }
+        return;
       }
+      switchTab(TAB_ORDER[ni]);
     });
   })();
 })();
+
 
 initAuth();
 </script>
@@ -6232,6 +6967,154 @@ initAuth();
     animation:none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SMOOTHNESS PASS: same look, less work for the phone
+═══════════════════════════════════════════════════════════════ */
+
+/* Taps respond at once, with no grey flash */
+button, a, label, .pdex-card, .nav-tab, .pdex-tab { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+
+/* A pull at the top of the list, or a sideways drag on the category strip, stays inside the app */
+.content { overscroll-behavior-y:contain; }
+.pdex-tabs { overscroll-behavior-x:contain; }
+
+/* Blur laid over an already solid background showed nothing, yet was redrawn on every scrolled frame */
+.topbar { -webkit-backdrop-filter:none; backdrop-filter:none; }
+.pdex-tabs-wrap { -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+.pdex-num { -webkit-backdrop-filter:none; backdrop-filter:none; background:rgba(14,20,16,0.88); }
+/* Paper grain stays; the blend mode forced the whole screen to be re-mixed every frame */
+.app::before { mix-blend-mode:normal; }
+
+/* Sheets: dim the app behind instead of blurring it live, and rise into place */
+.modal-bg { -webkit-backdrop-filter:none; backdrop-filter:none; background:rgba(4,7,5,0.78); }
+@keyframes scrim-in { from { opacity:0; } }
+@keyframes sheet-rise { from { transform:translateY(32px); opacity:0; } }
+.modal-bg.open { animation:scrim-in 0.18s ease-out; }
+.modal-bg.open > .modal { animation:sheet-rise 0.26s cubic-bezier(0.25,0.46,0.45,0.94); }
+@supports (height:1dvh) { .modal { max-height:88dvh; } }
+
+/* One fade per tab change (handled in switchTab), not two stacked on each other */
+.view.active:not(#view-map) > * { animation:none; }
+
+/* Card shimmer, seal glow and foil titles only run for sections that are on screen */
+.pokedex-section:not(.on-screen) .pdex-card .pdex-img::before,
+.pokedex-section:not(.on-screen) .pdex-card .pdex-collected-mark,
+.pokedex-section:not(.on-screen) .section-title-foil,
+.pokedex-section:not(.on-screen) .wax-badge::after { animation-play-state:paused; }
+
+/* Hover lift is for a mouse. On a touch screen it used to stick to the last card tapped */
+@media (hover:none) {
+  .pdex-card:hover { transform:none; border-color:var(--line-2); box-shadow:0 2px 14px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.03) inset; }
+  .pdex-card:hover::after { background-position:200% 0; }
+  .pdex-card:hover .pdex-img img { transform:none; filter:saturate(1.02) contrast(1.02); }
+  .pdex-card.undiscovered:hover { opacity:0.38; }
+  .pdex-card:active { transform:scale(0.97); }
+}
+
+/* Maps */
+.leaflet-container { background:var(--ink-1); }
+.leaflet-control-attribution { background:rgba(14,20,16,0.75) !important; color:rgba(232,220,196,0.45) !important; font-size:9px !important; }
+.leaflet-control-attribution a { color:rgba(201,163,94,0.7) !important; }
+/* OpenStreetMap stand-in tiles (used only while no CARTO key is set), darkened to match */
+.gh-osm-tiles .leaflet-tile-pane { filter:invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.92) saturate(0.35); }
+.gh-locate-btn {
+  width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(14,20,16,0.9); color:#C9A35E; border:1px solid rgba(201,163,94,0.2); border-radius:4px;
+  box-shadow:0 1px 5px rgba(0,0,0,0.4); cursor:pointer;
+}
+.gh-locate-btn:active { transform:scale(0.94); }
+.gh-locate-btn.busy svg { animation:spin 0.9s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-bg.open, .modal-bg.open > .modal { animation:none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIELD PASS: easier logging, two-column plates, This Week
+═══════════════════════════════════════════════════════════════ */
+
+/* Two-column plates: bigger photos, full names. Wider screens get more columns */
+.pokedex-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+.pokedex-grid .pdex-img, .pokedex-grid .pdex-img img { height:150px; }
+.pokedex-grid .pdex-body { height:82px; padding:10px 11px 11px; }
+.pokedex-grid .pdex-name { font-size:16px; }
+.pokedex-grid .pdex-species { font-size:11.5px; }
+@media (min-width:640px) { .pokedex-grid { grid-template-columns:repeat(3,1fr); } .pdex-unseen-grid { grid-template-columns:repeat(4,1fr); } }
+@media (min-width:960px) { .pokedex-grid { grid-template-columns:repeat(4,1fr); } .pdex-unseen-grid { grid-template-columns:repeat(6,1fr); } }
+
+/* Waiting-to-sync mark on a plate saved without signal */
+.pdex-pending {
+  position:absolute; left:6px; bottom:6px; z-index:4; padding:2px 6px; border-radius:3px;
+  background:rgba(14,20,16,0.88); border:0.5px solid rgba(201,163,94,0.4);
+  font-family:var(--mono); font-size:7.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--brass-hi);
+}
+
+/* This Week page */
+.this-week { margin:14px 12px 2px; padding:14px 16px 15px; position:relative; background:linear-gradient(180deg,var(--ink-2),var(--ink-1)); border:0.5px solid var(--brass-lo); border-radius:12px; }
+.this-week::before { content:''; position:absolute; inset:5px; border:0.5px solid var(--line-2); border-radius:8px; pointer-events:none; }
+.tw-head { display:flex; justify-content:space-between; align-items:baseline; position:relative; }
+.tw-label { font-family:var(--mono); font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--brass-hi); }
+.tw-range { font-family:var(--body); font-style:italic; font-size:12px; color:var(--paper-dim); }
+.tw-grid { display:grid; grid-template-columns:auto auto minmax(0,1fr); margin-top:12px; position:relative; align-items:start; }
+.tw-grid > * { padding:0 14px; border-left:0.5px solid rgba(201,163,94,0.14); text-align:left; min-width:0; }
+.tw-grid > *:first-child { padding-left:0; border-left:none; }
+.tw-num { font-family:var(--serif); font-size:26px; font-weight:500; color:var(--paper); line-height:1; }
+.tw-cap { font-family:var(--mono); font-size:8.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--brass); opacity:0.75; margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tw-rarity { background:none; border-top:none; border-right:none; border-bottom:none; border-radius:0; cursor:pointer; color:inherit; display:block; width:100%; padding-right:0; }
+.tw-rname { font-family:var(--serif); font-style:italic; font-size:17px; color:var(--paper); line-height:1.2; padding-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* Add flow: remembered places */
+.loc-chips { display:flex; flex-wrap:wrap; gap:6px; margin:-2px 0 10px; }
+.loc-chips:empty { display:none; }
+.loc-chip { padding:7px 9px; border-radius:4px; background:rgba(143,168,136,0.06); border:0.5px solid rgba(143,168,136,0.22); font-family:var(--mono); font-size:9.5px; letter-spacing:0.06em; color:var(--paper-dim); cursor:pointer; }
+.loc-chip span { color:var(--sage-dim); margin-left:3px; }
+.loc-chip:active { background:rgba(143,168,136,0.14); }
+
+/* Folio: each sighting opens its own entry, which sits above the folio */
+#entry-modal { z-index:410; }
+.sighting-tap { cursor:pointer; transition:border-color 0.15s; }
+.sighting-tap:active { border-color:var(--brass) !important; }
+/* Folio: Edit and Remove live behind the "more" button */
+.more-menu { position:absolute; right:20px; bottom:calc(100% - 10px); display:none; flex-direction:column; min-width:200px; background:var(--ink-2); border:0.5px solid var(--line-3); border-radius:8px; overflow:hidden; box-shadow:0 12px 36px rgba(0,0,0,0.6); }
+.more-menu.open { display:flex; }
+.more-menu button { background:none; border:none; border-bottom:0.5px solid var(--line); padding:14px 16px; text-align:left; cursor:pointer; font-family:var(--mono); font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--paper-dim); }
+.more-menu button:last-child { border-bottom:none; }
+.more-menu button.danger { color:var(--wax-hi); }
+.more-menu button:active { background:rgba(232,220,196,0.05); }
+
+/* Toast with an action (Undo) */
+.toast.has-action { pointer-events:auto; }
+.toast-undo { background:none; border:none; border-left:0.5px solid var(--line-3); margin-left:2px; padding:4px 2px 4px 12px; cursor:pointer; font:inherit; letter-spacing:inherit; text-transform:uppercase; color:var(--paper); }
+
+/* Bigger touch areas, same visible size */
+#pdex-search-icon { min-width:44px; min-height:44px; margin-right:-10px; }
+#search-clear-btn { min-width:40px; min-height:40px; right:2px !important; }
+button[aria-label="Menu"] { min-width:44px; min-height:44px; justify-content:center; margin-left:-10px; }
+button[onclick="closeSidebar()"] { min-width:44px; min-height:44px; margin:-10px -12px -10px 0; }
+button[onclick^="closeModal("]:not(.btn-cancel):not(.btn-save):not(.detail-close-x) { min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; margin:-10px -12px -10px 0; }
+.detail-close-x { width:40px; height:40px; }
+.rarity-flash-close { min-width:40px; min-height:40px; margin:-10px -10px -10px 0; display:inline-flex; align-items:center; justify-content:center; }
+
+/* Live panes: when the data was fetched, and a way to fetch it again */
+.updated-line { padding:0 18px 6px; display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--sage-dim); }
+.updated-line button { margin-left:auto; padding:8px 12px; background:transparent; border:0.5px solid rgba(201,163,94,0.3); border-radius:5px; font:inherit; letter-spacing:inherit; text-transform:uppercase; color:var(--brass-hi); cursor:pointer; }
+
+/* Map: layer chips along the top */
+.map-chips { position:absolute; top:10px; left:10px; right:58px; z-index:1000; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+.map-chips::-webkit-scrollbar { display:none; }
+.map-chip { flex-shrink:0; padding:9px 11px; border-radius:4px; background:rgba(14,20,16,0.9); border:0.5px solid var(--line-2); box-shadow:0 1px 5px rgba(0,0,0,0.4); font-family:var(--mono); font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--paper-dim); cursor:pointer; }
+.map-chip span { color:var(--sage-dim); margin-left:2px; }
+.map-chip.on { border-color:var(--brass); color:var(--brass-hi); }
+.map-chip.on span { color:var(--brass); }
+
+/* Hotspot cards: what was recorded there lately */
+.hsp-sum { margin-top:9px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-family:var(--mono); font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage-dim); min-height:14px; }
+.hsp-sum b { font-weight:500; color:var(--sage); }
+.hsp-top { margin-top:4px; }
+.hsp-top:empty { display:none; }
+.hsp-day { margin:10px 0 1px; font-family:var(--mono); font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--brass); }
+.hsp-day:first-child { margin-top:2px; }
 
 </style>
 
